@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "noresm ppe toolchain"
+name = "Noresm Perturbed parameter Ensemble toolchain (NPEN)"
 version = "0.1.0"
 description = "Toolchain for setup and post processing to facilitate Perturbed Parameter Ensembles (PPE) in NorESM"
 authors = ["Ove <ovehaugv@outlook.com>"]
@@ -13,6 +13,7 @@ netcdf4 = "^1.6.3"
 [tool.poetry.group.dev.dependencies]
 black = "^24.8.0"
 isort = "^5.13.2"
+jupyterlab = "^4.2.5"
 
 [build-system]
 requires = ["poetry-core"]

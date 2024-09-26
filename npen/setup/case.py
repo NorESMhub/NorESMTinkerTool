@@ -1,13 +1,25 @@
 import datetime, glob, shutil
 import os, sys
-import CIME.build as build
 from netCDF4 import Dataset
 from itertools import islice
-from standard_script_setup import *
-from CIME.case             import Case
-from CIME.utils            import safe_copy
 from argparse              import RawTextHelpFormatter
-from CIME.locked_files          import lock_file, unlock_file
+import argparse as ap
+# Check if the environment variable is set
+if os.environ.get('CIMEROOT') is not None:
+    import CIME.utils
+    CIME.utils.check_minimum_python_version(3, 8)
+    CIME.utils.stop_buffering_output()
+
+    import CIME.build as build
+    from CIME.case             import Case
+    from CIME.utils            import safe_copy
+    from CIME.locked_files          import lock_file, unlock_file
+else:
+    raise ValueError("ERROR: CIMEROOT must be defined in environment")
+
+
+
+
 
 def per_run_case_updates(case, ensemble_str, nint, paramdict, ens_idx):
     print(">>>>> BUILDING CLONE CASE...")
