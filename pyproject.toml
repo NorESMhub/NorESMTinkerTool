@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "noresm ppe toolchain"
+version = "0.1.0"
+description = "Toolchain for setup and post processing to facilitate Perturbed Parameter Ensembles (PPE) in NorESM"
+authors = ["Ove <ovehaugv@outlook.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+netcdf4 = "^1.6.3"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.8.0"
+isort = "^5.13.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
