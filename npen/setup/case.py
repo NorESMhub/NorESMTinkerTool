@@ -5,6 +5,13 @@ from itertools import islice
 from argparse              import RawTextHelpFormatter
 import argparse as ap
 # Check if the environment variable is set
+
+try: 
+    import standard_script_setup
+except ImportError:
+    print("ERROR: default_simulation_setup.py not found")
+    raise SystemExit
+
 if os.environ.get('CIMEROOT') is not None:
     import CIME.utils
     CIME.utils.check_minimum_python_version(3, 8)
@@ -19,7 +26,17 @@ else:
 
 
 
+from npen.setup.namelist import setup_usr_nlstring
 
+def write_user_nl_file(caseroot, usernlfile, user_nl_str):
+    """
+    write user_nl string to file
+    """
+    user_nl_file = os.path.join(caseroot,usernlfile)
+    print("...Writing to user_nl file: "+usernlfile)
+    with open(user_nl_file, "a") as funl:
+        funl.write(user_nl_str)
+    
 
 def per_run_case_updates(case, ensemble_str, nint, paramdict, ens_idx):
     print(">>>>> BUILDING CLONE CASE...")
@@ -49,10 +66,6 @@ def per_run_case_updates(case, ensemble_str, nint, paramdict, ens_idx):
         paramLines.append("{} = {}\n".format(var,paramdict[var][ens_idx]))
 
     usernlfile = os.path.join(caseroot,"user_nl_cam")
-    print("...Writing to user_nl file: "+usernlfile)
-    file1 = open(usernlfile, "a")
-    file1.writelines(paramLines)
-    file1.close()
 
     print(">> Clone {} case_setup".format(ensemble_str))
     case.case_setup()
@@ -65,7 +78,11 @@ def build_base_case(baseroot: str,
                     basecasename: str, 
                     overwrite: bool,
                     case_settings: dict,
-                    env_run_settings: dict):
+                    env_run_settings: dict,
+                    basecase_startval: str,
+                    namelist_collection_dict: dict,
+                    cesmroot: str = os.environ.get('CESMROOT')
+                    ):
     print(">>>>> BUILDING BASE CASE...")
     caseroot = os.path.join(baseroot,basecasename+'.'+basecase_startval)
     if overwrite and os.path.isdir(caseroot):
@@ -80,42 +97,33 @@ def build_base_case(baseroot: str,
                         project=case_settings["project"])
             # make sure that changing the casename will not affect these variables                                           
             case.set_value("EXEROOT",case.get_value("EXEROOT", resolved=True))
-            case.set_value("RUNDIR",case.get_value("RUNDIR",resolved=True)+".00")
-
-            case.set_value("RUN_TYPE",env_run_settings["run_type"])
-            if env_run_settings.get("ref_case_get"):
-                case.set_value("GET_REFCASE",env_run_settings["ref_case_get"])
+            case.set_value("RUNDIR",case.get_value("RUNDIR",resolved=True)+basecase_startval)
+            case.set_value("RUN_TYPE",env_run_settings["runtype"])
+            if env_run_settings.get("ref_case_get") == 'True':
+                case.set_value("GET_REFCASE",True)
             if env_run_settings.get("ref_case_name"):
                 case.set_value("RUN_REFCASE",env_run_settings["ref_case_name"])
             if env_run_settings.get("ref_case_path"):
                 case.set_value("RUN_REFDIR",env_run_settings["ref_case_path"])
-                case.set_value("RUN_REFDATE",env_run_settings["ref_case_date"])
+                case.set_value("RUN_REFDATE",env_run_settings["run_refdate"])
             case.set_value("STOP_OPTION",env_run_settings["stop_option"])
             case.set_value("STOP_N",env_run_settings["stop_n"])
-            case.set_value("RUN_STARTDATE",env_run_settings["start_date"])
+            case.set_value("RUN_STARTDATE",env_run_settings["run_startdate"])
             if env_run_settings.get("restart_n"):
                 case.set_value("REST_OPTION",env_run_settings["stop_option"])
                 case.set_value("REST_N",env_run_settings["restart_n"])
 
-            case.set_value("CAM_CONFIG_OPTS", 
-                           case.get_value("CAM_CONFIG_OPTS",resolved=True)+' '+env_run_settings["cam_conopts"])
-
-        rundir = case.get_value("RUNDIR")
-        caseroot = case.get_value("CASEROOT")
-        
+            case.set_value("CAM_CONFIG_OPTS", f"{case.get_value('CAM_CONFIG_OPTS',resolved=True)} {env_run_settings['cam_onopts']}")
         print(">> base case_setup...")
         case.case_setup()
         
-        print(">> base case write user_nl_cam...")
-        usernlfile = os.path.join(caseroot,"user_nl_cam")
-        funl = open(usernlfile, "a")
-        funl.write(user_nl_string)
-        funl.close()
-        user_nl_clm_file = os.path.join(caseroot,"user_nl_clm")
-        funl = open(user_nl_clm_file, "a")
-        funl.write(user_nl_clm_string)
-        funl.close()
-        
+        print(">> base case write user_nl files...")
+
+        # write user_nl files
+        for nl in namelist_collection_dict:
+            user_nl_str = setup_usr_nlstring(namelist_collection_dict[nl])
+            write_user_nl_file(caseroot, f"user_{nl}", user_nl_str)
+
         print(">> base case_build...")
         build.case_build(caseroot, case=case)
 
