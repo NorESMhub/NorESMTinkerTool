@@ -22,19 +22,20 @@ def format_value(value: str) -> bool:
       return f"'{value}'"
 
 
-def setup_usr_nlstring(user_nl_config: configparser.ConfigParser):
+def setup_usr_nlstring(user_nl_config: configparser.ConfigParser) -> None:
   """
   Takes inn configparser objects of default namelist settings for setting dianoistics and control namelist settings.
   
   Parameters:
   -----------
-
+  user_nl_config : configparser.ConfigParser
+      A configparser object containing default namelist settings.
   """
   user_nlstring = ""
-
-  for key in user_nl_config['misc']:
-    user_nlstring += key + " = " + format_value(user_nl_config['misc'][key]) + "\n"
-  user_nl_config.remove_section('misc')
+  if 'misc' in user_nl_config.sections():
+    for key in user_nl_config['misc']:
+      user_nlstring += key + " = " + format_value(user_nl_config['misc'][key]) + "\n"
+    user_nl_config.remove_section('misc')
   for section in user_nl_config.sections():
     user_nlstring += f"&{section}\n"
     for key in user_nl_config[section]:

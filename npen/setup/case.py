@@ -4,6 +4,7 @@ from netCDF4 import Dataset
 from itertools import islice
 from argparse              import RawTextHelpFormatter
 import argparse as ap
+import subprocess
 # Check if the environment variable is set
 
 try: 
@@ -38,16 +39,16 @@ def write_user_nl_file(caseroot, usernlfile, user_nl_str):
         funl.write(user_nl_str)
     
 
-def per_run_case_updates(case, ensemble_str, nint, paramdict, ens_idx):
+def per_run_case_updates(case, paramdict, ens_idx):
     print(">>>>> BUILDING CLONE CASE...")
     caseroot = case.get_value("CASEROOT")
-    basecasename = os.path.basename(caseroot)[:-nint]
-
+    basecasename = os.path.basename(caseroot)
     unlock_file("env_case.xml",caseroot=caseroot)
-    casename = f"{basecasename}{ensemble_str}"
+    casename = f"{basecasename}{ens_idx}"
     case.set_value("CASE",casename)
     rundir = case.get_value("RUNDIR")
-    rundir = f"{rundir[:-nint]}{ensemble_str}"
+    rundir = os.path.dirname(rundir)
+    rundir = f"{rundir}/run.{ens_idx.split('.')[-1]}"
     case.set_value("RUNDIR",rundir)
     case.flush()
     lock_file("env_case.xml",caseroot=caseroot)
@@ -58,21 +59,21 @@ def per_run_case_updates(case, ensemble_str, nint, paramdict, ens_idx):
     # Add user_nl updates for each run                                                        
 
     paramLines = []
-#    ens_idx = int(ensemble_str)-int(ensemble_startval)
-    # ens_idx = int(ensemble_idx)-int(ensemble_startval)
     print('ensemble_index')
-    print(ens_idx)
+    print(ens_idx.split('.')[-1])
+
     for var in paramdict.keys():
-        paramLines.append("{} = {}\n".format(var,paramdict[var][ens_idx]))
-
+        paramLines.append("{} = {}\n".format(var,paramdict[var]))    
     usernlfile = os.path.join(caseroot,"user_nl_cam")
-
-    print(">> Clone {} case_setup".format(ensemble_str))
+    file1 = open(usernlfile, "a")
+    file1.writelines(paramLines)
+    file1.close()
+    print(">> Clone {} case_setup".format(ens_idx))
     case.case_setup()
-    print(">> Clone {} create_namelists".format(ensemble_str))
+    print(">> Clone {} create_namelists".format(ens_idx))
     case.create_namelists()
-    print(">> Clone {} submit".format(ensemble_str))
-    # case.submit()
+    print(">> Clone {} submit".format(ens_idx))
+    subprocess.run(["./case.submit"], cwd=caseroot)
 
 def build_base_case(baseroot: str, 
                     basecasename: str, 
@@ -130,27 +131,18 @@ def build_base_case(baseroot: str,
         return caseroot
     
 
-def clone_base_case(caseroot, ensemble, overwrite, paramdict, ensemble_num):
+def clone_base_case(baseroot, basecaseroot, overwrite, paramdict, ensemble_idx):
     print(">>>>> CLONING BASE CASE...")
-    print(ensemble)
-    startval = ensemble_startval
-    nint = len(ensemble_startval)
-    cloneroot = caseroot
+    cloneroot = os.path.join(baseroot,ensemble_idx)
     
-    for i in range(int(startval), int(startval)+ensemble):
-        ensemble_idx = '{{0:0{0:d}d}}'.format(nint).format(i)
-        member_string = ensemble_num[i]
-        print(f"member_string= {member_string}")
-        if ensemble > 1:
-            caseroot = f"{cloneroot[:-nint]}{member_string:03d}"
-        print(caseroot, member_string, ensemble_idx)
-        if overwrite and os.path.isdir(caseroot):
-            shutil.rmtree(caseroot)
-        if not os.path.isdir(caseroot):
-            with Case(cloneroot, read_only=False) as clone:
-                clone.create_clone(caseroot, keepexe=True)
-        with Case(caseroot, read_only=False) as case:
-            per_run_case_updates(case, member_string, nint, paramdict, ensemble_idx)
+    print(f"member_string= {ensemble_idx}")
+    if overwrite and os.path.isdir(cloneroot):
+        shutil.rmtree(cloneroot)
+    if not os.path.isdir(cloneroot):
+        with Case(basecaseroot, read_only=False) as clone:
+            clone.create_clone(cloneroot, keepexe=True)
+    with Case(cloneroot, read_only=False) as case:
+        per_run_case_updates(case, paramdict, ensemble_idx)
 
 def take(n, iterable):
     "Return first n items of the iterable as a list"
