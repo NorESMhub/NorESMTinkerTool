@@ -19,6 +19,7 @@ if os.environ.get('CIMEROOT') is not None:
     CIME.utils.stop_buffering_output()
 
     import CIME.build as build
+    import CIME
     from CIME.case             import Case
     from CIME.utils            import safe_copy
     from CIME.locked_files          import lock_file, unlock_file
@@ -39,7 +40,19 @@ def write_user_nl_file(caseroot, usernlfile, user_nl_str):
         funl.write(user_nl_str)
     
 
-def per_run_case_updates(case, paramdict, ens_idx):
+def _per_run_case_updates(case: CIME.case, paramdict: dict, ens_idx: str):
+    """
+    Update and submit the new cloned case, setting namelist parameters according to paramdict
+
+    Parameters
+    ----------
+    case : CIME.case
+        The case object to be updated
+    paramdict : dict
+        Dictionary of namelist parameters to be updated
+    ens_idx : str
+        The ensemble index for the new case
+    """
     print(">>>>> BUILDING CLONE CASE...")
     caseroot = case.get_value("CASEROOT")
     basecasename = os.path.basename(caseroot)
@@ -84,6 +97,28 @@ def build_base_case(baseroot: str,
                     namelist_collection_dict: dict,
                     cesmroot: str = os.environ.get('CESMROOT')
                     ):
+    """
+    Create and build the base case that all PPE cases are cloned from
+
+    Parameters
+    ----------
+    baseroot : str
+        The base directory for the cases
+    basecasename : str
+        The base case name
+    overwrite : bool
+        Overwrite existing cases
+    case_settings : dict
+        Dictionary of case settings
+    env_run_settings : dict
+        Dictionary of environment run settings
+    basecase_startval : str
+        The base case start value
+    namelist_collection_dict : dict
+        Dictionary of namelist collections for the different components
+    cesmroot : str
+        The CESM root directory
+    """
     print(">>>>> BUILDING BASE CASE...")
     caseroot = os.path.join(baseroot,basecasename+'.'+basecase_startval)
     if overwrite and os.path.isdir(caseroot):
@@ -132,6 +167,23 @@ def build_base_case(baseroot: str,
     
 
 def clone_base_case(baseroot, basecaseroot, overwrite, paramdict, ensemble_idx):
+    """
+    Clone the base case and update the namelist parameters
+    
+    Parameters
+    ----------
+    baseroot : str
+        The base directory for the cases
+    basecaseroot : str
+        The base case root directory
+    overwrite : bool
+        Overwrite existing cases
+    paramdict : dict
+        Dictionary of namelist parameters to be updated
+    ensemble_idx : str
+    
+    """
+
     print(">>>>> CLONING BASE CASE...")
     cloneroot = os.path.join(baseroot,ensemble_idx)
     
@@ -142,7 +194,7 @@ def clone_base_case(baseroot, basecaseroot, overwrite, paramdict, ensemble_idx):
         with Case(basecaseroot, read_only=False) as clone:
             clone.create_clone(cloneroot, keepexe=True)
     with Case(cloneroot, read_only=False) as case:
-        per_run_case_updates(case, paramdict, ensemble_idx)
+        _per_run_case_updates(case, paramdict, ensemble_idx)
 
 def take(n, iterable):
     "Return first n items of the iterable as a list"
