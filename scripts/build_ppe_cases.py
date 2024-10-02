@@ -22,10 +22,8 @@ sys.path.append(_LIBDIR)
 _LIBDIR = os.path.join(cesmroot,"cime","scripts","lib")
 sys.path.append(_LIBDIR)
 
-from npen.setup.case import (build_base_case,
-                                per_run_case_updates,
+from tinkertool.setup.case import (build_base_case,
                                 clone_base_case)
-from npen.setup.namelist import setup_usr_nlstring
 
 def read_config(config_file):
     with open(config_file) as f:

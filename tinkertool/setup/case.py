@@ -28,7 +28,7 @@ else:
 
 
 
-from npen.setup.namelist import setup_usr_nlstring
+from tinkertool.setup.namelist import setup_usr_nlstring
 
 def write_user_nl_file(caseroot, usernlfile, user_nl_str):
     """
