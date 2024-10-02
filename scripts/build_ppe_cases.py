@@ -46,6 +46,7 @@ def main():
     parser.add_argument("--nl-cice", "-cice", default="./user_nl_cice.ini", type=str, help="Path to user defined namelist file (CICE)")
     parser.add_argument("--nl-clm", "-ice", default="./user_nl_clm.ini", type=str, help="Path to user defined namelist file (CLM)")
     parser.add_argument("--nl-docn", "-docn", default="./user_nl_docn.ini", type=str, help="Path to user defined namelist file (DOCN)")
+    parser.add_argument("--build-base-only", action="store_true", help="Only build the base case")
     args = parser.parse_args()
     
     basecasename = args.basecasename
@@ -126,12 +127,15 @@ def main():
                                cesmroot=cesmroot)
 
     # Loop over the number of simulations and clone the base case
-    start_num = 1
-    for i, idx in zip(range(start_num, num_sims+start_num), ensemble_num):
-        print (f"Building case number: {i:03d}")
-        ensemble_idx = f"{basecasename}.{i:03d}"
-        temp_dict = {k : v[idx] for k,v in paramdict.items()}
-        clone_base_case(baseroot,caseroot, overwrite, temp_dict, ensemble_idx)
+    if args.build_base_only:
+        print("Only building base case")
+    else:
+        start_num = 1
+        for i, idx in zip(range(start_num, num_sims+start_num), ensemble_num):
+            print (f"Building case number: {i:03d}")
+            ensemble_idx = f"{basecasename}.{i:03d}"
+            temp_dict = {k : v[idx] for k,v in paramdict.items()}
+            clone_base_case(baseroot,caseroot, overwrite, temp_dict, ensemble_idx)
 
     inptrs.close()
 
