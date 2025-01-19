@@ -14,8 +14,7 @@ with open(config_path) as f:
     config = configparser.ConfigParser()
     config.read_file(f)
 cesmroot = config['create_case']['cesmroot']
-
-if cesmroot is None:
+if cesmroot is None or os.path.isdir(cesmroot) is False:
     raise SystemExit("ERROR: CESM_ROOT must be defined in environment")
 _LIBDIR = os.path.join(cesmroot,"cime","scripts","Tools")
 sys.path.append(_LIBDIR)

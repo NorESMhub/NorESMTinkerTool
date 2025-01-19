@@ -2,15 +2,13 @@ import datetime, glob, shutil
 import os, sys
 from netCDF4 import Dataset
 from itertools import islice
-from argparse              import RawTextHelpFormatter
-import argparse as ap
 import subprocess
 # Check if the environment variable is set
 
 try: 
     import standard_script_setup
 except ImportError:
-    print("ERROR: default_simulation_setup.py not found")
+    print("ERROR: default_simulation_setup.py not found (Part of CIME)")
     raise SystemExit
 
 if os.environ.get('CIMEROOT') is not None:
