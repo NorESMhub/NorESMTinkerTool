@@ -1,7 +1,7 @@
 # NorESMTinkerTool
-_ A safe space for tinkers _ 
+_ A safe space for tinkering _ 
 
-Python tool can for setting up, running and analysing perturbed parameter ensembles with the Norwegian Earth System Model
+Python tool for setting up, running and analysing perturbed parameter ensembles with the Norwegian Earth System Model
 (NorESM). 
 By encuraging tinkering to greater extent we can better learn how the model works. 
 
