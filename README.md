@@ -112,7 +112,7 @@ Each section correspond to namelist group.
 ## Creating the Parameter File
 
 To creating the PPE itself, requires a parameter file in NetCDF format. This have yet to be integrated into the package, but can be done manually. Currently a PPE can only be created of CAM parameters. Though should be easy to add more components in the future
-```
+```python
 import xarray as xr
 import numpy as np
 import scipy.stats as stc
