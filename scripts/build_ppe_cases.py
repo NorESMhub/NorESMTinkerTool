@@ -9,20 +9,21 @@ import pkg_resources
 import copy
 
 config_path = pkg_resources.resource_filename('config','default_simulation_setup.ini')
-
 with open(config_path) as f:
     config = configparser.ConfigParser()
     config.read_file(f)
-cesmroot = config['create_case']['cesmroot']
-if cesmroot is None or os.path.isdir(cesmroot) is False:
-    raise SystemExit("ERROR: CESM_ROOT must be defined in environment")
-_LIBDIR = os.path.join(cesmroot,"cime","scripts","Tools")
-sys.path.append(_LIBDIR)
-_LIBDIR = os.path.join(cesmroot,"cime","scripts","lib")
-sys.path.append(_LIBDIR)
 
-from tinkertool.setup.case import (build_base_case,
-                                clone_base_case)
+def add_CIME_paths_and_import(cesmroot):
+    _LIBDIR = os.path.join(cesmroot,"cime","scripts","Tools")
+    sys.path.append(_LIBDIR)
+    _LIBDIR = os.path.join(cesmroot,"cime","scripts","lib")
+    sys.path.append(_LIBDIR)
+    try:
+        from tinkertool.setup.case import (build_base_case,
+                                    clone_base_case)
+    except ImportError:
+        print(f"ERROR: CIME not found in {cesmroot}, update CESMROOT environment variable or set --cesm-root")
+    global build_base_case, clone_base_case    
 
 def read_config(config_file):
     with open(config_file) as f:
@@ -46,6 +47,7 @@ def main():
     parser.add_argument("--nl-clm", "-ice", default="./user_nl_clm.ini", type=str, help="Path to user defined namelist file (CLM)")
     parser.add_argument("--nl-docn", "-docn", default="./user_nl_docn.ini", type=str, help="Path to user defined namelist file (DOCN)")
     parser.add_argument("--build-base-only", action="store_true", help="Only build the base case")
+    parser.add_argument("--cesm-root", "-cr", default=None, type=str, help="Path to CESM root directory, if not provided, will use CESMROOT environment variable")
     args = parser.parse_args()
     
     basecasename = args.basecasename
@@ -53,7 +55,16 @@ def main():
     overwrite = args.overwrite
     pdim = args.pdim
     config_setup = args.config_setup
-
+    cesmroot = args.cesm_root
+    if cesmroot is None:
+        cesmroot = os.environ.get('CESMROOT')
+        if cesmroot is None:
+            print("CESM_ROOT not defined in environment, using default from configuration file")
+            cesmroot = config['create_case']['cesmroot']
+        
+    if cesmroot is None:
+        raise SystemExit("ERROR: CESM_ROOT must be defined in environment or in configuration file")
+    add_CIME_paths_and_import(cesmroot)
     # get namelist names from args
     namelist = [a for a in dir(args) if a.startswith('nl_')]
 

@@ -3,15 +3,7 @@ import os, sys
 from netCDF4 import Dataset
 from itertools import islice
 import subprocess
-# Check if the environment variable is set
-
-try: 
-    import standard_script_setup
-except ImportError:
-    print("ERROR: default_simulation_setup.py not found (Part of CIME)")
-    raise SystemExit
-
-if os.environ.get('CIMEROOT') is not None:
+try:
     import CIME.utils
     CIME.utils.check_minimum_python_version(3, 8)
     CIME.utils.stop_buffering_output()
@@ -21,9 +13,14 @@ if os.environ.get('CIMEROOT') is not None:
     from CIME.case             import Case
     from CIME.utils            import safe_copy
     from CIME.locked_files          import lock_file, unlock_file
-else:
-    raise ValueError("ERROR: CIMEROOT must be defined in environment")
-
+except ImportError:
+    print("ERROR: CIME not found, update CESMROOT environment variable")
+    raise SystemExit
+try: 
+    import standard_script_setup
+except ImportError:
+    print("ERROR: default_simulation_setup.py not found (Part of CIME)")
+    raise SystemExit
 
 
 from tinkertool.setup.namelist import setup_usr_nlstring
