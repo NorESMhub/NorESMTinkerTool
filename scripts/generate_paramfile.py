@@ -29,6 +29,7 @@ chem_mech_in = []
 for v in SOA_y_scale_chem_mech_in:
     print(v)
     outfile = make_chem_in.generate_chem_in_ppe(v)
+    print(outfile)
     chem_mech_in.append(outfile)
 
 

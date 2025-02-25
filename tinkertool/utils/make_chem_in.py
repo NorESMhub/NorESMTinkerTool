@@ -20,14 +20,11 @@ def generate_chem_in_ppe(scale_factor,
         The name of the input file to use.
     """
     # %%
-    input_file = None
-    outfolder = 'chem_mech_files'
-    scale_factor=1.5
     if input_file is None:
         input_file = "config/chem_mech_default.in"
     if not Path(outfolder).exists():
         Path(outfolder).mkdir(parents=True)
-    outputfile = Path(outfolder)/f'chem_mech_scale_{scale_factor}.in'
+    outputfile = Path(outfolder)/f'chem_mech_scale_{scale_factor:.3f}.in'
 
     with open(input_file, 'r') as f:
         lines = f.readlines()
