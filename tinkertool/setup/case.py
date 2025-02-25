@@ -3,6 +3,7 @@ import os, sys
 from netCDF4 import Dataset
 from itertools import islice
 import subprocess
+# %%
 try:
     import CIME.utils
     CIME.utils.check_minimum_python_version(3, 8)
@@ -87,12 +88,13 @@ def _per_run_case_updates(case: CIME.case, paramdict: dict, ens_idx: str):
     case.case_setup()
     # Add xmlchange for chem_mech_file:
     if chem_mech_file is not None:
+        # %%
+        comm = 'cp {} {}'.format(chem_mech_file, caseroot)
+        print(comm)
+        subprocess.run(comm, shell=True, cwd='.')
         comm = './xmlchange  --append CAM_CONFIG_OPTS="-usr_mech_infile \$CASEROOT/{}" --file env_build.xml'.format(chem_mech_file)
         print(comm)
-        subprocess.run( comm, cwd=caseroot)
-        comm = './xmlchange  --append CAM_CONFIG_OPTS="-usr_mech_infile \$CASEROOT/{}" --file env_build.xml'.format(chem_mech_file)
-        print(comm)
-        subprocess.run( comm, cwd=caseroot)
+        subprocess.run( comm, cwd=caseroot, shell=True)
     print(">> Clone {} create_namelists".format(ens_idx))
     case.create_namelists()
     print(">> Clone {} submit".format(ens_idx))
