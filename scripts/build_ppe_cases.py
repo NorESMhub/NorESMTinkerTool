@@ -7,7 +7,7 @@ import argparse as ap
 import configparser
 import pkg_resources
 import copy
-
+# %%
 config_path = pkg_resources.resource_filename('config','default_simulation_setup.ini')
 with open(config_path) as f:
     config = configparser.ConfigParser()
@@ -102,6 +102,7 @@ def main():
     print ("Parameter file is "+paramfile)
 
     # read in NetCDF parameter file
+    # %%
     inptrs = Dataset(paramfile,'r')
     print ("Variables in paramfile:")
     print (inptrs.variables.keys())
@@ -113,7 +114,7 @@ def main():
 
     print ("Number of sims = {}".format(num_sims))
     print ("Number of params = {}".format(num_vars))
-
+    # %%
 
     # Save a pointer to the netcdf variables
     paramdict = inptrs.variables
@@ -121,12 +122,13 @@ def main():
     del paramdict[pdim]
 
     print ("paramdict keys:", paramdict.keys())
-    
+    # %%
     baseroot = config['ppe_settings']['baseroot']
     baseidentifier = config['ppe_settings'].get('baseidentifier', args.base_case_id)
 
     cesmroot = config['create_case']['cesmroot']
     # Create and build the base case that all PPE cases are cloned from
+    # %%
     caseroot = build_base_case(baseroot=baseroot, 
                                basecasename=basecasename,
                                overwrite=overwrite, 
@@ -135,19 +137,29 @@ def main():
                                basecase_startval=baseidentifier,
                                namelist_collection_dict=namelist_collection_dict, 
                                cesmroot=cesmroot)
-
     # Loop over the number of simulations and clone the base case
     if args.build_base_only:
         print("Only building base case")
     else:
         start_num = 1
         for i, idx in zip(range(start_num, num_sims+start_num), ensemble_num):
+            # %%
             print (f"Building case number: {i:03d}")
             ensemble_idx = f"{basecasename}.{i:03d}"
             temp_dict = {k : v[idx] for k,v in paramdict.items()}
+            # Special treatment for chem_mech.in changes:
+            if 'chem_mech.in' in temp_dict:
+                # remove all chem_mech_in keys that are not chem_mech_in (there can anyway only be one chem_mech.in file)
+                for v in temp_dict:
+                    if v[-12:]=='chem_mech_in' and len(v)>12:
+                        del temp_dict[v]
+
+            # %%
             clone_base_case(baseroot,caseroot, overwrite, temp_dict, ensemble_idx)
-
+            # %%
     inptrs.close()
-
+# %%
 if __name__ == "__main__":
+    # %%
     main()
+    # %%

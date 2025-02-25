@@ -58,6 +58,13 @@ def _per_run_case_updates(case: CIME.case, paramdict: dict, ens_idx: str):
     rundir = os.path.dirname(rundir)
     rundir = f"{rundir}/run.{ens_idx.split('.')[-1]}"
     case.set_value("RUNDIR",rundir)
+    # smb++ extract the chem_mech_in_file
+    chem_mech_file = None
+    if 'chem_mech_in' in paramdict.keys():
+        chem_mech_file = paramdict['chem_mech_in']
+        del paramdict['chem_mech_in']
+    # smb --
+    #f'./xmlchange  --append CAM_CONFIG_OPTS="-usr_mech_infile \$CASEROOT/{CAM_CONFIG_OPS_chem_mech_file}" --file env_build.xml'
     case.flush()
     lock_file("env_case.xml",caseroot=caseroot)
     print("...Casename is {}".format(casename))
@@ -78,6 +85,14 @@ def _per_run_case_updates(case: CIME.case, paramdict: dict, ens_idx: str):
     file1.close()
     print(">> Clone {} case_setup".format(ens_idx))
     case.case_setup()
+    # Add xmlchange for chem_mech_file:
+    if chem_mech_file is not None:
+        comm = './xmlchange  --append CAM_CONFIG_OPTS="-usr_mech_infile \$CASEROOT/{}" --file env_build.xml'.format(chem_mech_file)
+        print(comm)
+        subprocess.run( comm, cwd=caseroot)
+        comm = './xmlchange  --append CAM_CONFIG_OPTS="-usr_mech_infile \$CASEROOT/{}" --file env_build.xml'.format(chem_mech_file)
+        print(comm)
+        subprocess.run( comm, cwd=caseroot)
     print(">> Clone {} create_namelists".format(ens_idx))
     case.create_namelists()
     print(">> Clone {} submit".format(ens_idx))

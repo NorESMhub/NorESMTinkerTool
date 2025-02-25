@@ -3,7 +3,8 @@ from pathlib import Path
 # %%
 
 def generate_chem_in_ppe(scale_factor,
-                          outfolder = 'chem_mech_files',input_file = None):
+                          outfolder = 'chem_mech_files',input_file = None,
+                         silent=True):
     """
     Generate a chemistry namelist file for a given scale factor and input file.
     Command line usage example:
@@ -40,19 +41,20 @@ def generate_chem_in_ppe(scale_factor,
                         if ';' in line:
                             replace = True
             if replace:
-                print(line)
+
                 yld= line.split('->')[1].split('*')[0].strip()
                 new_yld = float(yld)*scale_factor
                 new_yld = f'{new_yld:.3f}'
                 replacement_text = line.replace(yld, new_yld)
-                print(f'Replacing \n {line} \n with \n {replacement_text}')
+                if not silent:
+                    print(f'Replacing \n {line} \n with \n {replacement_text}')
                 outfile.write(replacement_text )
 
             else:
                     outfile.write(line)
 
     # %%
-    return
+    return str(outputfile)
 
 
 if __name__ == '__main__':
