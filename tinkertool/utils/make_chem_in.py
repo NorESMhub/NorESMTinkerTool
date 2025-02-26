@@ -3,7 +3,7 @@ from pathlib import Path
 # %%
 
 def generate_chem_in_ppe(scale_factor,
-                          outfolder = 'chem_mech_files',input_file = None,
+                          outfolder_base = '', outfolder_name = 'chem_mech_files',input_file = None,
                          silent=True):
     """
     Generate a chemistry namelist file for a given scale factor and input file.
@@ -19,9 +19,10 @@ def generate_chem_in_ppe(scale_factor,
     input_file : str
         The name of the input file to use.
     """
-    # %%
     if input_file is None:
         input_file = "config/chem_mech_default.in"
+
+    outfolder = outfolder_base + outfolder_name
     if not Path(outfolder).exists():
         Path(outfolder).mkdir(parents=True)
     outputfile = Path(outfolder)/f'chem_mech_scale_{scale_factor:.3f}.in'
@@ -50,7 +51,6 @@ def generate_chem_in_ppe(scale_factor,
             else:
                     outfile.write(line)
 
-    # %%
     return str(outputfile)
 
 

@@ -3,6 +3,8 @@ import numpy as np
 import scipy.stats as stc
 from tinkertool.utils import make_chem_in
 
+param_file_outpath = 'NorESM_testParams_001_31.nc'
+
 def scale_values(values, a, b):
     "Scale values from [0, 1] to [a, b] range"
     return a + (b - a) * values
@@ -51,6 +53,6 @@ out_ds['oslo_aero_lifeCycleSigma(8)']=xr.DataArray(oslo_aero_lifeCycleSigma_8, c
 out_ds['oslo_aero_lifeCycleNumberMedianRadius(1)']=xr.DataArray(oslo_aero_lifecyclenumbermedianradius_1, coords={'nmb_sim':np.arange(nmb_sim)})
 out_ds['oslo_aero_lifeCycleNumberMedianRadius(8)']=xr.DataArray(oslo_aero_lifecyclenumbermedianradius_8, coords={'nmb_sim':np.arange(nmb_sim)})
 # Save the dataset to a NetCDF file
-out_ds.to_netcdf("NorESM_testParams_001_31.nc")
+out_ds.to_netcdf(param_file_outpath)
 
 # %%

@@ -7,6 +7,7 @@ import argparse as ap
 import configparser
 import pkg_resources
 import copy
+from pathlib import Path
 # %%
 config_path = pkg_resources.resource_filename('config','default_simulation_setup.ini')
 with open(config_path) as f:
@@ -100,7 +101,8 @@ def main():
     print ("Starting SCAM PPE case creation, building, and submission script")
     print ("Base case name is {}".format(basecasename))
     print ("Parameter file is "+paramfile)
-
+    # Get path dir where paramfile is located (will look for potential chem_mech.in files there)
+    path_paramfile_dir = Path(paramfile).resolve().parent
     # read in NetCDF parameter file
     # %%
     inptrs = Dataset(paramfile,'r')
@@ -129,13 +131,13 @@ def main():
     cesmroot = config['create_case']['cesmroot']
     # Create and build the base case that all PPE cases are cloned from
     # %%
-    caseroot = build_base_case(baseroot=baseroot, 
+    caseroot = build_base_case(baseroot=baseroot,
                                basecasename=basecasename,
-                               overwrite=overwrite, 
+                               overwrite=overwrite,
                                case_settings=config['create_case'],
                                env_run_settings=config['env_run'],
                                basecase_startval=baseidentifier,
-                               namelist_collection_dict=namelist_collection_dict, 
+                               namelist_collection_dict=namelist_collection_dict,
                                cesmroot=cesmroot)
     # Loop over the number of simulations and clone the base case
     if args.build_base_only:
@@ -143,19 +145,19 @@ def main():
     else:
         start_num = 1
         for i, idx in zip(range(start_num, num_sims+start_num), ensemble_num):
-            # %%
             print (f"Building case number: {i:03d}")
             ensemble_idx = f"{basecasename}.{i:03d}"
             temp_dict = {k : v[idx] for k,v in paramdict.items()}
             # Special treatment for chem_mech.in changes:
-            if 'chem_mech.in' in temp_dict:
+            if 'chem_mech_in' in temp_dict:
                 # remove all chem_mech_in keys that are not chem_mech_in (there can anyway only be one chem_mech.in file)
-                for v in temp_dict:
+                keys_in_dic = list(temp_dict.keys())
+                for v in keys_in_dic:
                     if v[-12:]=='chem_mech_in' and len(v)>12:
+                        print(f'Deleting {v} from parameter directory' )
                         del temp_dict[v]
-
             # %%
-            clone_base_case(baseroot,caseroot, overwrite, temp_dict, ensemble_idx)
+            clone_base_case(baseroot,caseroot, overwrite, temp_dict, ensemble_idx, path_base_input = path_paramfile_dir)
             # %%
     inptrs.close()
 # %%
