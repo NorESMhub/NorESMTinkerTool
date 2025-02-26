@@ -89,9 +89,9 @@ def _per_run_case_updates(case: CIME.case, paramdict: dict, ens_idx: str):
     # Add xmlchange for chem_mech_file:
     if chem_mech_file is not None:
         # %%
-        comm = 'cp {} {}'.format(chem_mech_file, caseroot)
+        comm = 'cp {} {}'.format(chem_mech_file, caseroot+'/')
         print(comm)
-        subprocess.run(comm, shell=True, cwd='.')
+        subprocess.run(comm, shell=True)
         comm = './xmlchange  --append CAM_CONFIG_OPTS="-usr_mech_infile \$CASEROOT/{}" --file env_build.xml'.format(chem_mech_file)
         print(comm)
         subprocess.run( comm, cwd=caseroot, shell=True)
