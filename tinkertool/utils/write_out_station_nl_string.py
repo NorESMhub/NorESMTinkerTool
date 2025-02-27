@@ -25,7 +25,7 @@ def write_out_station_nm_string(path_station_file, history_field = 2):
     """
     # %%
     if path_station_file is None:
-        path_station_file = 'config/stations_combined.csv'
+        path_station_file = 'input_files/stations_combined.csv'
     # %%
     combined_df = pd.read_csv(path_station_file, index_col=0)
 
