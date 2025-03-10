@@ -44,7 +44,15 @@ def setup_usr_nlstring(user_nl_config: configparser.ConfigParser) -> None:
         user_nlstring += key + f" = '{diag_list[0]}',\n"
         for diag in diag_list[1:-1]:
           user_nlstring += f"         '{diag}',\n" 
-        user_nlstring +=  f"         '{diag_list[-1]}'\n"  
+        user_nlstring +=  f"         '{diag_list[-1]}'\n"
+
+      elif key.endswith("_specifier"):
+        emis_specfier = user_nl_config[section][key].split("\n")
+        user_nlstring += key + f" = '{emis_specfier[0]}',\n"
+        for emis in emis_specfier[1:-1]:
+          user_nlstring += f"                  '{emis}',\n"
+        user_nlstring += f"                  '{emis_specfier[-1]}'\n"
+
       else:
         user_nlstring += key + " = " + format_value(user_nl_config[section][key]) + "\n"
     user_nlstring += "/\n"
