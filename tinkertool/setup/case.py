@@ -88,6 +88,7 @@ def build_base_case(baseroot: str,
                     overwrite: bool,
                     case_settings: dict,
                     env_run_settings: dict,
+                    env_build_settings: dict,
                     basecase_startval: str,
                     namelist_collection_dict: dict,
                     cesmroot: str = os.environ.get('CESMROOT')
@@ -143,7 +144,9 @@ def build_base_case(baseroot: str,
             if env_run_settings.get("restart_n"):
                 case.set_value("REST_OPTION",env_run_settings["stop_option"])
                 case.set_value("REST_N",env_run_settings["restart_n"])
-
+            if env_build_settings.get("calendar"):
+                case.set_value("CALENDAR",env_build_settings["calendar"])
+            case.set_value("DEBUG",env_build_settings.get("debug", "FALSE"))
             case.set_value("CAM_CONFIG_OPTS", f"{case.get_value('CAM_CONFIG_OPTS',resolved=True)} {env_run_settings['cam_onopts']}")
         print(">> base case_setup...")
         case.case_setup()

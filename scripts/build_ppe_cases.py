@@ -132,6 +132,7 @@ def main():
                                overwrite=overwrite, 
                                case_settings=config['create_case'],
                                env_run_settings=config['env_run'],
+                               env_build_settings=config['env_build'],
                                basecase_startval=baseidentifier,
                                namelist_collection_dict=namelist_collection_dict, 
                                cesmroot=cesmroot)
