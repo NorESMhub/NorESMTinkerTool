@@ -7,7 +7,8 @@ import argparse as ap
 import configparser
 import pkg_resources
 import copy
-
+from pathlib import Path
+# %%
 config_path = pkg_resources.resource_filename('config','default_simulation_setup.ini')
 with open(config_path) as f:
     config = configparser.ConfigParser()
@@ -100,8 +101,10 @@ def main():
     print ("Starting SCAM PPE case creation, building, and submission script")
     print ("Base case name is {}".format(basecasename))
     print ("Parameter file is "+paramfile)
-
+    # Get path dir where paramfile is located (will look for potential chem_mech.in files there)
+    path_paramfile_dir = Path(paramfile).resolve().parent
     # read in NetCDF parameter file
+    # %%
     inptrs = Dataset(paramfile,'r')
     print ("Variables in paramfile:")
     print (inptrs.variables.keys())
@@ -113,7 +116,7 @@ def main():
 
     print ("Number of sims = {}".format(num_sims))
     print ("Number of params = {}".format(num_vars))
-
+    # %%
 
     # Save a pointer to the netcdf variables
     paramdict = inptrs.variables
@@ -121,22 +124,22 @@ def main():
     del paramdict[pdim]
 
     print ("paramdict keys:", paramdict.keys())
-    
+    # %%
     baseroot = config['ppe_settings']['baseroot']
     baseidentifier = config['ppe_settings'].get('baseidentifier', args.base_case_id)
 
     cesmroot = config['create_case']['cesmroot']
     # Create and build the base case that all PPE cases are cloned from
-    caseroot = build_base_case(baseroot=baseroot, 
+    # %%
+    caseroot = build_base_case(baseroot=baseroot,
                                basecasename=basecasename,
-                               overwrite=overwrite, 
+                               overwrite=overwrite,
                                case_settings=config['create_case'],
                                env_run_settings=config['env_run'],
                                env_build_settings=config['env_build'],
                                basecase_startval=baseidentifier,
-                               namelist_collection_dict=namelist_collection_dict, 
+                               namelist_collection_dict=namelist_collection_dict,
                                cesmroot=cesmroot)
-
     # Loop over the number of simulations and clone the base case
     if args.build_base_only:
         print("Only building base case")
@@ -146,9 +149,20 @@ def main():
             print (f"Building case number: {i:03d}")
             ensemble_idx = f"{basecasename}.{i:03d}"
             temp_dict = {k : v[idx] for k,v in paramdict.items()}
-            clone_base_case(baseroot,caseroot, overwrite, temp_dict, ensemble_idx)
-
+            # Special treatment for chem_mech.in changes:
+            if 'chem_mech_in' in temp_dict:
+                # remove all chem_mech_in keys that are not chem_mech_in (there can anyway only be one chem_mech.in file)
+                keys_in_dic = list(temp_dict.keys())
+                for v in keys_in_dic:
+                    if v[-12:]=='chem_mech_in' and len(v)>12:
+                        print(f'Deleting {v} from parameter directory' )
+                        del temp_dict[v]
+            # %%
+            clone_base_case(baseroot,caseroot, overwrite, temp_dict, ensemble_idx, path_base_input = path_paramfile_dir)
+            # %%
     inptrs.close()
-
+# %%
 if __name__ == "__main__":
+    # %%
     main()
+    # %%

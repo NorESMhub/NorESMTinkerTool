@@ -1,0 +1,215 @@
+,,,,,,,
+Variable name:,category,"Frequency (mon, 3-h) and spatial (e.g. 3h-global, 3h-station, mon-global, mon-region)","Operation ('A','I',or max)",Keep/reject: mon-global,Keep/reject: 3-h-station,"Dimensions (2D,3D)",
+FREQI',cld_prop,"mon-global, 3-h-station","A,I",K,K,3d,
+FREQL',cld_prop,"mon-global, 3-h-station","A,I",K,K,3d,
+FCTI',cld_prop,"mon-global, 3-h-station","A,I",K,K,2d,
+FCTL',cld_prop,"mon-global, 3-h-station","A,I",K,K,2d,
+FICE',cld_prop,"mon-global, 3-h-station","A,I",SR,Sr,3d,
+ACTNI',cld_prop,"mon-global, 3-h-station","A,I",K,SK,2d,
+ACTNL',cld_prop,"mon-global, 3-h-station","A,I",K,SK,2d,
+ACTREI',cld_prop,"mon-global, 3-h-station","A,I",K,SK,2d,
+ACTREL',cld_prop,"mon-global, 3-h-station","A,I",K,SK,2d,
+CLDFREE',cld_prop,mon-global,A,K,,2d,
+CLDHGH',cld_prop,mon-global,A,K,,2d,
+CLDLOW',cld_prop,mon-global,A,K,,2d,
+CLDMED',cld_prop,mon-global,A,K,,2d,
+CLDTOT',cld_prop,mon-global,A,K,,2d,
+CLOUD',cld_prop,mon-global,A,K,,3d,
+CONCLD',cld_prop,mon-global,A,SR,,3d,
+TGCLDCWP',cld_prop,"mon-global, 3-h-station","A,I",K,K,2d,
+TGCLDIWP',cld_prop,"mon-global, 3-h-station","A,I",K,K,2d,
+TGCLDLWP',cld_prop,"mon-global, 3-h-station","A,I",K,K,2d,
+TOT_CLD_VISTAU',cld_rad,"mon-global, 3-h-station","A,I",SR,SK,3d,Why SR?
+TOT_ICLD_VISTAU',cld_rad,"mon-global, 3-h-station","A,I",SR,SK,3d,Why SR?
+PBLH',met,"mon-global, 3-h-station","A,I",K,SK,2d,
+RELHUM',met,"mon-global, 3-h-station","A,I",K,R,3d,
+T',met,"mon-global, 3-h-station","A,I",K,K,3d,
+WSUB',met,"mon-global, 3-h-station","A,I",K,K,3d,
+PRECC',prec,3h-global?,A,K,,2d,
+PRECL',prec,3h-global?,A,K,,2d,
+PRECSC',prec,3h-global?,A,K,,2d,
+PRECSL',prec,3h-global?,A,K,,2d,
+SFisoprene',emi,mon-global,A,K,,2d,
+SFmonoterp',emi,mon-global,A,K,,2d,
+SFDMS',emi,mon-global,A,K,,2d,
+N_AER',aer_prop,mon-global,"A,I",K,R,3d,
+H2SO4',gas_mmr,3-h-station,"A,I",SR,,3d,
+monoterp',gas_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+isoprene',gas_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+SOA_LV',gas_mmr,"mon-global, 3-h-station","A,I",K,,3d,
+SOA_SV',gas_mmr,"mon-global, 3-h-station","A,I",K,,3d,
+SO2',gas_mmr,"mon-global, 3-h-station","A,I",SR,r,3d,
+SO4_A1',aer_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+SO4_A1_OCW',aer_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+SO4_A2',aer_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+SO4_A2_OCW',aer_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+SO4_AC',aer_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+SO4_AC_OCW',aer_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+SO4_NA',aer_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+SO4_NA_OCW',aer_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+SO4_PR',aer_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+SO4_PR_OCW',aer_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+SOA_A1',aer_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+SOA_A1_OCW',aer_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+SOA_NA',aer_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+SOA_NA_OCW',aer_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+OM_AC',aer_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+OM_AC_OCW',aer_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+OM_AI',aer_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+OM_AI_OCW',aer_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+OM_NI',aer_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+OM_NI_OCW',aer_mmr,"mon-global, 3-h-station","A,I",k,,3d,
+SS_A1',aer_mmr,"mon-global, 3-h-station","A,I",Sr,r,3d,Why?
+SS_A1_OCW',aer_mmr,"mon-global, 3-h-station","A,I",Sr,r,3d,Why?
+SS_A2',aer_mmr,"mon-global, 3-h-station","A,I",Sr,r,3d,Why?
+SS_A2_OCW',aer_mmr,"mon-global, 3-h-station","A,I",Sr,r,3d,Why?
+SS_A3',aer_mmr,"mon-global, 3-h-station","A,I",Sr,r,3d,Why?
+SS_A3_OCW',aer_mmr,"mon-global, 3-h-station","A,I",Sr,r,3d,Why?
+BC_A',aer_mmr,"mon-global, 3-h-station","A,I",Sr,r,3d,Why?
+BC_AC',aer_mmr,"mon-global, 3-h-station","A,I",Sr,r,3d,Why?
+BC_AC_OCW',aer_mmr,"mon-global, 3-h-station","A,I",Sr,r,3d,Why?
+BC_AI',aer_mmr,"mon-global, 3-h-station","A,I",Sr,r,3d,Why?
+BC_AI_OCW',aer_mmr,"mon-global, 3-h-station","A,I",Sr,r,3d,Why?
+BC_AX',aer_mmr,"mon-global, 3-h-station","A,I",Sr,r,3d,Why?
+BC_A_OCW',aer_mmr,"mon-global, 3-h-station","A,I",Sr,r,3d,Why?
+BC_N',aer_mmr,"mon-global, 3-h-station","A,I",Sr,r,3d,Why?
+BC_NI',aer_mmr,"mon-global, 3-h-station","A,I",Sr,r,3d,Why?
+BC_NI_OCW',aer_mmr,"mon-global, 3-h-station","A,I",sr,r,3d,Why?
+BC_N_OCW',aer_mmr,"mon-global, 3-h-station","A,I",Sr,r,3d,Why?
+DMS',aer_mmr,"mon-global, 3-h-station","A,I",K,r,3d,
+DST_A2',aer_mmr,"mon-global, 3-h-station","A,I",K,r,3d,Why?
+DST_A2_OCW',aer_mmr,"mon-global, 3-h-station","A,I",K,r,3d,Why?
+DST_A3',aer_mmr,"mon-global, 3-h-station","A,I",K,r,3d,Why?
+DST_A3_OCW',aer_mmr,"mon-global, 3-h-station","A,I",K,r,3d,Why?
+cb_BC',aer_cb,mon-global,A,K,,2d,
+cb_BC_A',aer_cb,mon-global,A,k,,2d,
+cb_BC_AC',aer_cb,mon-global,A,k,,2d,
+cb_BC_AC_OCW',aer_cb,mon-global,A,k,,2d,
+cb_BC_AI',aer_cb,mon-global,A,k,,2d,
+cb_BC_AI_OCW',aer_cb,mon-global,A,k,,2d,
+cb_BC_AX',aer_cb,mon-global,A,k,,2d,
+cb_BC_A_OCW',aer_cb,mon-global,A,k,,2d,
+cb_BC_N',aer_cb,mon-global,A,k,,2d,
+cb_BC_NI',aer_cb,mon-global,A,k,,2d,
+cb_BC_NI_OCW',aer_cb,mon-global,A,k,,2d,
+cb_BC_N_OCW',aer_cb,mon-global,A,k,,2d,
+cb_DMS',aer_cb,mon-global,A,k,,2d,
+cb_DST_A2',aer_cb,mon-global,A,k,,2d,
+cb_DST_A2_OCW',aer_cb,mon-global,A,k,,2d,
+cb_DST_A3',aer_cb,mon-global,A,k,,2d,
+cb_DST_A3_OCW',aer_cb,mon-global,A,k,,2d,
+cb_DUST',aer_cb,mon-global,A,k,,2d,
+cb_H2O2',aer_cb,mon-global,A,k,,2d,
+cb_H2SO4',aer_cb,mon-global,A,k,,2d,
+cb_OM',aer_cb,mon-global,A,k,,2d,
+cb_OM_AC',aer_cb,mon-global,A,k,,2d,
+cb_OM_AC_OCW',aer_cb,mon-global,A,k,,2d,
+cb_OM_AI',aer_cb,mon-global,A,k,,2d,
+cb_OM_AI_OCW',aer_cb,mon-global,A,k,,2d,
+cb_OM_NI',aer_cb,mon-global,A,k,,2d,
+cb_OM_NI_OCW',aer_cb,mon-global,A,k,,2d,
+cb_SALT',aer_cb,mon-global,A,k,,2d,
+cb_SO2',aer_cb,mon-global,A,k,,2d,
+cb_SO4_A1',aer_cb,mon-global,A,k,,2d,
+cb_SO4_A1_OCW',aer_cb,mon-global,A,k,,2d,
+cb_SO4_A2',aer_cb,mon-global,A,k,,2d,
+cb_SO4_A2_OCW',aer_cb,mon-global,A,k,,2d,
+cb_SO4_AC',aer_cb,mon-global,A,k,,2d,
+cb_SO4_AC_OCW',aer_cb,mon-global,A,k,,2d,
+cb_SO4_NA',aer_cb,mon-global,A,k,,2d,
+cb_SO4_NA_OCW',aer_cb,mon-global,A,k,,2d,
+cb_SO4_PR',aer_cb,mon-global,A,k,,2d,
+cb_SO4_PR_OCW',aer_cb,mon-global,A,k,,2d,
+cb_SOA_A1',aer_cb,mon-global,A,k,,2d,
+cb_SOA_A1_OCW',aer_cb,mon-global,A,k,,2d,
+cb_SOA_LV',aer_cb,mon-global,A,k,,2d,
+cb_SOA_NA',aer_cb,mon-global,A,k,,2d,
+cb_SOA_NA_OCW',aer_cb,mon-global,A,k,,2d,
+cb_SOA_SV',aer_cb,mon-global,A,k,,2d,
+cb_SS_A1',aer_cb,mon-global,A,k,,2d,
+cb_SS_A1_OCW',aer_cb,mon-global,A,k,,2d,
+cb_SS_A2',aer_cb,mon-global,A,k,,2d,
+cb_SS_A2_OCW',aer_cb,mon-global,A,k,,2d,
+cb_SS_A3',aer_cb,mon-global,A,k,,2d,
+cb_SS_A3_OCW',aer_cb,mon-global,A,k,,2d,
+cb_SULFATE',aer_cb,mon-global,A,k,,2d,
+cb_isoprene',aer_cb,mon-global,A,k,,2d,
+cb_monoterp',aer_cb,mon-global,A,k,,2d,
+PMTOT',aer_prop,mon-global,A,k,,2d,
+PM2P5',aer_prop,mon-global,A,k,,3d,
+PM25',aer_prop,mon-global,A,k,,2d,
+NUCLRATE',aer_prop,"mon-global, 3-h-station","A,I",k,r,3d,
+FORMRATE',aer_prop,"mon-global, 3-h-station","A,I",k,k,3d,
+GRH2SO4',aer_prop,"mon-global, 3-h-station","A,I",k,r,3d,
+GRSOA',aer_prop,"mon-global, 3-h-station","A,I",k,r,3d,
+GR',aer_prop,"mon-global, 3-h-station","A,I",k,k,3d,
+COAGNUCL',aer_prop,"mon-global, 3-h-station","A,I",k,,3d,
+NCONC01',szdst,"mon-global, 3-h-station","A,I",,k,3d,
+NCONC02',szdst,"mon-global, 3-h-station","A,I",,k,3d,
+NCONC04',szdst,"mon-global, 3-h-station","A,I",,k,3d,
+NCONC05',szdst,"mon-global, 3-h-station","A,I",,k,3d,
+NCONC06',szdst,"mon-global, 3-h-station","A,I",,k,3d,
+NCONC07',szdst,"mon-global, 3-h-station","A,I",,k,3d,
+NCONC08',szdst,"mon-global, 3-h-station","A,I",sr,k,3d,Why?
+NCONC09',szdst,"mon-global, 3-h-station","A,I",sr,k,3d,Why?
+NCONC10',szdst,"mon-global, 3-h-station","A,I",sr,k,3d,Why?
+NCONC12',szdst,"mon-global, 3-h-station","A,I",sr,k,3d,Why?
+NCONC14',szdst,"mon-global, 3-h-station","A,I",sr,k,3d,Why?
+SIGMA01',szdst,"mon-global, 3-h-station","A,I",,k,3d,
+SIGMA02',szdst,"mon-global, 3-h-station","A,I",,k,3d,
+SIGMA04',szdst,"mon-global, 3-h-station","A,I",,k,3d,
+SIGMA05',szdst,"mon-global, 3-h-station","A,I",,k,3d,
+SIGMA06',szdst,"mon-global, 3-h-station","A,I",,k,3d,
+SIGMA07',szdst,"mon-global, 3-h-station","A,I",,k,3d,
+SIGMA08',szdst,"mon-global, 3-h-station","A,I",sr,k,3d,
+SIGMA09',szdst,"mon-global, 3-h-station","A,I",sr,k,3d,
+SIGMA10',szdst,"mon-global, 3-h-station","A,I",sr,k,3d,
+SIGMA12',szdst,"mon-global, 3-h-station","A,I",sr,k,3d,
+SIGMA14',szdst,"mon-global, 3-h-station","A,I",sr,k,3d,
+NMR01',szdst,"mon-global, 3-h-station","A,I",,k,3d,
+NMR02',szdst,"mon-global, 3-h-station","A,I",,k,3d,
+NMR04',szdst,"mon-global, 3-h-station","A,I",,k,3d,
+NMR05',szdst,"mon-global, 3-h-station","A,I",,k,3d,
+NMR06',szdst,"mon-global, 3-h-station","A,I",,k,3d,
+NMR07',szdst,"mon-global, 3-h-station","A,I",,k,3d,
+NMR08',szdst,"mon-global, 3-h-station","A,I",sr,k,3d,Why?
+NMR09',szdst,"mon-global, 3-h-station","A,I",sr,k,3d,Why?
+NMR10',szdst,"mon-global, 3-h-station","A,I",sr,k,3d,Why?
+NMR12',szdst,"mon-global, 3-h-station","A,I",Sr,k,3d,Why?
+NMR14',szdst,"mon-global, 3-h-station","A,I",Sr,k,3d,
+SOLIN,rad,mon-global,A,k,,2d,
+FSDS,rad,mon-global,A,k,,2d,
+FSDS_DSTA2,rad,mon-global,A,k,,2d,Need some code modification
+FSDS_DSTA3,rad,mon-global,A,k,,2d,Need some code modification
+FSUTOA,rad,mon-global,A,k,,2d,
+FSNS,rad,mon-global,A,k,,2d,
+FSDSC,rad,mon-global,A,k,,2d,
+FLUTC,rad,mon-global,A,k,,2d,
+FLUT,rad,mon-global,A,k,,2d,
+FLDS,rad,mon-global,A,k,,2d,
+FLNT_DRF,rad,mon-global,A,k,,2d,
+FSNT_DRF,rad,mon-global,A,k,,2d,
+FSNTCDRF,rad,mon-global,A,k,,2d,
+FSNT_DSTA2,rad,mon-global,A,k,,2d,
+FSNT_DSTA3,rad,mon-global,A,k,,2d,
+FLNT_DSTA2,rad,mon-global,A,k,,2d,Need some code modification
+FLNT_DSTA3,rad,mon-global,A,k,,2d,Need some code modification
+FSNTCDRF_DSTA2,rad,mon-global,A,k,,2d,Need some code modification
+FSNTCDRF_DSTA3,rad,mon-global,A,k,,2d,Need some code modification
+DOD10UM,rad,mon-global,A,,,2d,Need some code modification
+DOD10UMA2,rad,mon-global,A,sr,,2d,Need some code modification
+DOD10UMA3,rad,mon-global,A,sr,,2d,Need some code modification
+D550_DU,rad,"mon-global, 3-h-station","A,I",k,,2d,Need some code modification
+D550_DUA2,rad,mon-global,A,k,,2d,Need some code modification
+D550_DUA3,rad,mon-global,A,k,,2d,Need some code modification
+A550_DU,rad,mon-global,A,k,,2d,
+DOD550,rad,mon-global,A,k,,2d,
+ABS550AL,rad,mon-global,A,k,,2d,
+DST_A2DDF,aerdep,mon-global,A,k,,,
+DST_A2_OCWDDF,aerdep,mon-global,A,k,,,
+DST_A3DDF,aerdep,mon-global,A,k,,,
+DST_A3_OCWDDF,aerdep,mon-global,A,k,,,
+DST_A2SFWET,aerdep,mon-global,A,k,,,
+DST_A3SFWET,aerdep,mon-global,A,k,,,
+DST_A2_OCWSFWET,aerdep,mon-global,A,k,,,
+DST_A3_OCWSFWET,aerdep,mon-global,A,k,,,

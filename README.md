@@ -22,7 +22,7 @@ git clone https://github.com/Ovewh/NorESMTinkerTool.git && cd NorESMTinkerTool
 
 3. Install 
 ```
-pip -e install ./
+pip install -e  ./
 ```
 
 ## Usage
