@@ -1,6 +1,5 @@
 import sys
 from pathlib import Path
-# %%
 
 def generate_chem_in_ppe(scale_factor,
                           outfolder_base = '', outfolder_name = 'chem_mech_files',input_file = None,

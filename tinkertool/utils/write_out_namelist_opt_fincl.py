@@ -45,5 +45,3 @@ if __name__ == '__main__':
 
     namelist_str = get_namlist_string('3-h-station',2,filename_output_vars)
     print(namelist_str)
-
-# %%
