@@ -37,7 +37,7 @@ def write_user_nl_file(caseroot, usernlfile, user_nl_str):
         funl.write(user_nl_str)
     
 
-def _per_run_case_updates(case: CIME.case, paramdict: dict, ens_idx: str, path_base_input:str =''):
+def _per_run_case_updates(case: CIME.case, paramdict: dict, ens_idx: str, path_base_input:str ='',**kwargs):
     """
     Update and submit the new cloned case, setting namelist parameters according to paramdict
 
@@ -78,21 +78,40 @@ def _per_run_case_updates(case: CIME.case, paramdict: dict, ens_idx: str, path_b
     print(ens_idx.split('.')[-1])
 
     for var in paramdict.keys():
-        paramLines.append("{} = {}\n".format(var,paramdict[var]))    
+        if var.startswith('lifeCycleNumberMedianRadius'):
+            lifeCycleNumber = int(var.split('_')[-1])
+            lifeCylceList = kwargs.get('lifeCyclMedianRadius',None)
+            if lifeCylceList is None:
+                raise ValueError('A default lifeCylceList has to be specified in default_simulation_setup.ini')
+            lifeCylceList[lifeCycleNumber] = "{:.1E}".format(paramdict[var]).replace('E', 'D')
+            
+            paramLines.append("oslo_aero_lifecyclenumbermedianradius = "+','.join(lifeCylceList)+"\n")
+        elif var.startswith("lifeCycleSigma"):
+            lifeCycleNumber = int(var.split('_')[-1])
+            lifeCylceList = kwargs.get('lifeCycleSigma',None)
+            if lifeCylceList is None:
+                raise ValueError('A default lifeCylceList has to be specified in default_simulation_setup.ini')
+            lifeCylceList[lifeCycleNumber] = "{:.1E}".format(paramdict[var]).replace('E', 'D')
+            paramLines.append("oslo_aero_lifecyclesigma = "+','.join(lifeCylceList)+"\n")
+        else:
+            paramLines.append("{} = {}\n".format(var,paramdict[var]))
+
     usernlfile = os.path.join(caseroot,"user_nl_cam")
     file1 = open(usernlfile, "a")
     file1.writelines(paramLines)
     file1.close()
-    print(">> Clone {} case_setup".format(ens_idx))
-    case.case_setup()
-    # Add xmlchange for chem_mech_file:
+
     if chem_mech_file is not None:
         comm = 'cp {} {}'.format(chem_mech_file, caseroot+'/')
-        print(comm)
         subprocess.run(comm, shell=True)
-        comm = './xmlchange  --append CAM_CONFIG_OPTS="-usr_mech_infile \$CASEROOT/{}" --file env_build.xml'.format(chem_mech_file)
-        print(comm)
-        subprocess.run( comm, cwd=caseroot, shell=True)
+        unlock_file("env_build.xml",caseroot=caseroot)
+        value = case.get_value(" CAM_CONFIG_OPTS", resolved=False)
+        case.set_value("CAM_CONFIG_OPTS", f"{value} -usr_mech_infile {caseroot}/{chem_mech_file.name}")
+        case.flush()
+        lock_file("env_build.xml",caseroot=caseroot)
+ 
+    print(">> Clone {} case_setup".format(ens_idx))
+    case.case_setup()
     print(">> Clone {} create_namelists".format(ens_idx))
     case.create_namelists()
     print(">> Clone {} submit".format(ens_idx))
@@ -179,7 +198,7 @@ def build_base_case(baseroot: str,
         return caseroot
     
 
-def clone_base_case(baseroot, basecaseroot, overwrite, paramdict, ensemble_idx, path_base_input=''):
+def clone_base_case(baseroot, basecaseroot, overwrite, paramdict, ensemble_idx, path_base_input='', **kwargs):
     """
     Clone the base case and update the namelist parameters
     
@@ -207,7 +226,7 @@ def clone_base_case(baseroot, basecaseroot, overwrite, paramdict, ensemble_idx, 
         with Case(basecaseroot, read_only=False) as clone:
             clone.create_clone(cloneroot, keepexe=True)
     with Case(cloneroot, read_only=False) as case:
-        _per_run_case_updates(case, paramdict, ensemble_idx,path_base_input=path_base_input)
+        _per_run_case_updates(case, paramdict, ensemble_idx,path_base_input=path_base_input,**kwargs)
 
 def take(n, iterable):
     "Return first n items of the iterable as a list"

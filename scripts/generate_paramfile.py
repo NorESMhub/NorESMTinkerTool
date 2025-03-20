@@ -86,7 +86,7 @@ def main():
             out_array[1:] = scale_values(hyp_cube_parmas[:,i], minv, maxv)
             sample_points[param] = (["nmb_sim"],out_array)
     
-
+    # Generate chemistry mech files
     chem_mech_in = []
     if sample_points.get("SOA_y_scale_chem_mech_in", None):
         SOA_y_scale_chem_mech_in = sample_points["SOA_y_scale_chem_mech_in"]
