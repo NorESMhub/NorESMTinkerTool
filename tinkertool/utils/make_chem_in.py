@@ -24,6 +24,7 @@ def generate_chem_in_ppe(scale_factor,
     outfolder = outfolder_base + outfolder_name
     if not Path(outfolder).exists():
         Path(outfolder).mkdir(parents=True)
+    print(scale_factor)
     outputfile = Path(outfolder)/f'chem_mech_scale_{scale_factor:.3f}.in'
 
     with open(input_file, 'r') as f:
