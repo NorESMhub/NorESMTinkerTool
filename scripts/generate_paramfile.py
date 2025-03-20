@@ -61,9 +61,10 @@ def main():
     
 
     hypc = stc.qmc.LatinHypercube(nparams, scramble=args.scramble, optimization=optimization)
-    hyp_cube_parmas=hypc.random(nmb_sim)
+    hyp_cube_parmas=hypc.random(nmb_sim) 
 
     sample_points = {}
+    # Scale the values to the parameter ranges
     for i, param in enumerate(params): 
         pdata = config[param]
         if pdata.get("scale_fact", None):
@@ -74,10 +75,17 @@ def main():
             maxv = float(pdata["max"])
 
         if pdata.get("sampling") == 'log':
+            out_array = np.zeros(nmb_sim+1)
+            out_array[0] = float(pdata["default"])
             long_vals = scale_values(hyp_cube_parmas[:,i], np.log10(minv), np.log10(maxv))
-            sample_points[param] = (["nmb_sim"],10**long_vals)
+            out_array[1:] = 10**long_vals
+            sample_points[param] = (["nmb_sim"],out_array)
         else:
-            sample_points[param] = (["nmb_sim"],scale_values(hyp_cube_parmas[:,i], minv, maxv))        
+            out_array = np.zeros(nmb_sim+1) # Add one extra value to include the default value
+            out_array[0] = float(pdata["default"])
+            out_array[1:] = scale_values(hyp_cube_parmas[:,i], minv, maxv)
+            sample_points[param] = (["nmb_sim"],out_array)
+    
 
     chem_mech_in = []
     if sample_points.get("SOA_y_scale_chem_mech_in", None):
@@ -92,7 +100,7 @@ def main():
 
     out_ds = xr.Dataset(
         data_vars = sample_points,
-        coords={'nmb_sim':np.arange(nmb_sim)})
+        coords={'nmb_sim':np.arange(nmb_sim+1)})
     
     for k in out_ds.data_vars:
         out_ds[k].attrs['description'] = config[k].get('description', 'No description available')
