@@ -37,7 +37,14 @@ def write_user_nl_file(caseroot, usernlfile, user_nl_str):
         funl.write(user_nl_str)
     
 
-def _per_run_case_updates(case: CIME.case, paramdict: dict, ens_idx: str, path_base_input:str ='', lifeCycleMedianRadius=None, lifeCycleSigma=None):
+def _per_run_case_updates(case: CIME.case, 
+                          paramdict: dict, 
+                          ens_idx: str, 
+                          path_base_input:str ='', 
+                          keepexe: bool=False,
+                          build_only: bool =False,
+                          lifeCycleMedianRadius=None, 
+                          lifeCycleSigma=None):
     """
     Update and submit the new cloned case, setting namelist parameters according to paramdict
 
@@ -105,8 +112,8 @@ def _per_run_case_updates(case: CIME.case, paramdict: dict, ens_idx: str, path_b
         comm = 'cp {} {}'.format(chem_mech_file, caseroot+'/')
         subprocess.run(comm, shell=True)
         unlock_file("env_build.xml",caseroot=caseroot)
-        value = case.get_value(" CAM_CONFIG_OPTS", resolved=False)
-        case.set_value("CAM_CONFIG_OPTS", f"{value} -usr_mech_infile {caseroot}/{chem_mech_file.name}")
+        value = case.get_value("CAM_CONFIG_OPTS", resolved=False)
+        case.set_value("CAM_CONFIG_OPTS", f"{value} --usr_mech_infile {caseroot}/{chem_mech_file.name}")
         case.flush()
         lock_file("env_build.xml",caseroot=caseroot)
  
@@ -114,8 +121,13 @@ def _per_run_case_updates(case: CIME.case, paramdict: dict, ens_idx: str, path_b
     case.case_setup()
     print(">> Clone {} create_namelists".format(ens_idx))
     case.create_namelists()
-    print(">> Clone {} submit".format(ens_idx))
-    subprocess.run(["./case.submit"], cwd=caseroot)
+    if keepexe == False:
+        print(">> Clone {} build".format(ens_idx))
+        build.case_build(caseroot, case=case)
+    
+    if build_only==False:
+        print(">> Clone {} submit".format(ens_idx))
+        subprocess.run(["./case.submit"], cwd=caseroot)
 
 def build_base_case(baseroot: str, 
                     basecasename: str, 
@@ -198,7 +210,15 @@ def build_base_case(baseroot: str,
         return caseroot
     
 
-def clone_base_case(baseroot, basecaseroot, overwrite, paramdict, ensemble_idx, path_base_input='',keepexe=False , **kwargs):
+def clone_base_case(baseroot: str, 
+                    basecaseroot: str, 
+                    overwrite: bool, 
+                    paramdict: dict, 
+                    ensemble_idx: str, 
+                    path_base_input: str='',
+                    keepexe: bool=False,
+                    build_only: bool=False, 
+                    **kwargs):
     """
     Clone the base case and update the namelist parameters
     
@@ -231,7 +251,7 @@ def clone_base_case(baseroot, basecaseroot, overwrite, paramdict, ensemble_idx, 
         with Case(basecaseroot, read_only=False) as clone:
             clone.create_clone(cloneroot, keepexe=keepexe)
     with Case(cloneroot, read_only=False) as case:
-        _per_run_case_updates(case, paramdict, ensemble_idx,path_base_input=path_base_input,**kwargs)
+        _per_run_case_updates(case, paramdict, ensemble_idx,path_base_input=path_base_input,keepexe=keepexe, build_only=build_only,**kwargs)
 
 def take(n, iterable):
     "Return first n items of the iterable as a list"
