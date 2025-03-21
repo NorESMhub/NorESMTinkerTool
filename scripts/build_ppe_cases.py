@@ -129,6 +129,7 @@ def main():
     baseidentifier = config['ppe_settings'].get('baseidentifier', args.base_case_id)
 
     cesmroot = config['create_case']['cesmroot']
+
     # Create and build the base case that all PPE cases are cloned from
     caseroot = build_base_case(baseroot=baseroot,
                                basecasename=basecasename,
@@ -156,8 +157,11 @@ def main():
                     if v[-12:]=='chem_mech_in' and len(v)>12:
                         print(f'Deleting {v} from parameter directory' )
                         del temp_dict[v]
-            
-            clone_base_case(baseroot,caseroot, overwrite, temp_dict, ensemble_idx, path_base_input = path_paramfile_dir)
+            print(config['lifeCycleValues'].get('medianradius', None))
+            print(config['lifeCycleValues'].get('sigma', None))
+            clone_base_case(baseroot,caseroot, overwrite, temp_dict, ensemble_idx, path_base_input = path_paramfile_dir,
+                            lifeCycleMedianRadius = config['lifeCycleValues'].get('medianradius', None),
+                            lifeCycleSigma = config['lifeCycleValues'].get('sigma', None))
             
     inptrs.close()
 if __name__ == "__main__":

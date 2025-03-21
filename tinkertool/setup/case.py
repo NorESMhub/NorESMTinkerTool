@@ -37,7 +37,7 @@ def write_user_nl_file(caseroot, usernlfile, user_nl_str):
         funl.write(user_nl_str)
     
 
-def _per_run_case_updates(case: CIME.case, paramdict: dict, ens_idx: str, path_base_input:str ='',**kwargs):
+def _per_run_case_updates(case: CIME.case, paramdict: dict, ens_idx: str, path_base_input:str ='', lifeCycleMedianRadius=None, lifeCycleSigma=None):
     """
     Update and submit the new cloned case, setting namelist parameters according to paramdict
 
@@ -80,17 +80,17 @@ def _per_run_case_updates(case: CIME.case, paramdict: dict, ens_idx: str, path_b
     for var in paramdict.keys():
         if var.startswith('lifeCycleNumberMedianRadius'):
             lifeCycleNumber = int(var.split('_')[-1])
-            lifeCylceList = kwargs.get('lifeCyclMedianRadius',None)
-            if lifeCylceList is None:
+            if lifeCycleMedianRadius is None:
                 raise ValueError('A default lifeCylceList has to be specified in default_simulation_setup.ini')
+            lifeCylceList = lifeCycleMedianRadius.split(',')
             lifeCylceList[lifeCycleNumber] = "{:.1E}".format(paramdict[var]).replace('E', 'D')
             
             paramLines.append("oslo_aero_lifecyclenumbermedianradius = "+','.join(lifeCylceList)+"\n")
         elif var.startswith("lifeCycleSigma"):
             lifeCycleNumber = int(var.split('_')[-1])
-            lifeCylceList = kwargs.get('lifeCycleSigma',None)
-            if lifeCylceList is None:
+            if lifeCycleSigma is None:
                 raise ValueError('A default lifeCylceList has to be specified in default_simulation_setup.ini')
+            lifeCylceList = lifeCycleSigma.split(',')
             lifeCylceList[lifeCycleNumber] = "{:.1E}".format(paramdict[var]).replace('E', 'D')
             paramLines.append("oslo_aero_lifecyclesigma = "+','.join(lifeCylceList)+"\n")
         else:
@@ -198,7 +198,7 @@ def build_base_case(baseroot: str,
         return caseroot
     
 
-def clone_base_case(baseroot, basecaseroot, overwrite, paramdict, ensemble_idx, path_base_input='', **kwargs):
+def clone_base_case(baseroot, basecaseroot, overwrite, paramdict, ensemble_idx, path_base_input='',keepexe=False , **kwargs):
     """
     Clone the base case and update the namelist parameters
     
@@ -213,6 +213,11 @@ def clone_base_case(baseroot, basecaseroot, overwrite, paramdict, ensemble_idx, 
     paramdict : dict
         Dictionary of namelist parameters to be updated
     ensemble_idx : str
+        The ensemble index for the new case
+    path_base_input : str
+        The path to the base input files
+    **kwargs : dict
+        Additional keyword arguments to be passed to the case updates
     
     """
 
@@ -224,7 +229,7 @@ def clone_base_case(baseroot, basecaseroot, overwrite, paramdict, ensemble_idx, 
         shutil.rmtree(cloneroot)
     if not os.path.isdir(cloneroot):
         with Case(basecaseroot, read_only=False) as clone:
-            clone.create_clone(cloneroot, keepexe=True)
+            clone.create_clone(cloneroot, keepexe=keepexe)
     with Case(cloneroot, read_only=False) as case:
         _per_run_case_updates(case, paramdict, ensemble_idx,path_base_input=path_base_input,**kwargs)
 
