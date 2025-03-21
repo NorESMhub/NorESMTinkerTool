@@ -48,6 +48,8 @@ def main():
     parser.add_argument("--nl-clm", "-ice", default="./user_nl_clm.ini", type=str, help="Path to user defined namelist file (CLM)")
     parser.add_argument("--nl-docn", "-docn", default="./user_nl_docn.ini", type=str, help="Path to user defined namelist file (DOCN)")
     parser.add_argument("--build-base-only", action="store_true", help="Only build the base case")
+    parser.add_argument("--build-only", action="store_true", help="Only build the PPE and not submit them to the queue")
+    parser.add_argument("--keepexe","-k", action="store_true", help="Whether to reuse the executable for the base case or build again for ensemble")
     parser.add_argument("--cesm-root", "-cr", default=None, type=str, help="Path to CESM root directory, if not provided, will use CESMROOT environment variable")
     args = parser.parse_args()
     
@@ -57,6 +59,8 @@ def main():
     pdim = args.pdim
     config_setup = args.config_setup
     cesmroot = args.cesm_root
+    keepexe = args.keepexe
+    build_only = args.build_only
     if cesmroot is None:
         cesmroot = os.environ.get('CESMROOT')
         if cesmroot is None:
@@ -160,6 +164,7 @@ def main():
             print(config['lifeCycleValues'].get('medianradius', None))
             print(config['lifeCycleValues'].get('sigma', None))
             clone_base_case(baseroot,caseroot, overwrite, temp_dict, ensemble_idx, path_base_input = path_paramfile_dir,
+                            keepexe = keepexe, build_only = build_only,
                             lifeCycleMedianRadius = config['lifeCycleValues'].get('medianradius', None),
                             lifeCycleSigma = config['lifeCycleValues'].get('sigma', None))
             
