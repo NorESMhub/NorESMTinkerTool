@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tinkertool"
-version = "0.1.0"
+version = "0.2.0"
 description = "Toolchain for setup and post processing of Perturbed parameter Ensembles in NorESM"
 authors = ["Ove <ovehaugv@outlook.com>"]
 license = "MIT"
