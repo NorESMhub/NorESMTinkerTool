@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tinkertool"
-version = "0.2.0"
+version = "0.2.1"
 description = "Toolchain for setup and post processing of Perturbed parameter Ensembles in NorESM"
 authors = ["Ove <ovehaugv@outlook.com>"]
 license = "MIT"
@@ -27,3 +27,4 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.scripts]
 create-ppe = "scripts.build_ppe_cases:main"
 generate-paramfile = "scripts.generate_paramfile:main"
+aerosol-ppe-cam-nl= "aerosol_ppe_cam_nl_updates:main"
