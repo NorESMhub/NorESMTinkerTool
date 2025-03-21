@@ -1,14 +1,15 @@
-import xarray as xr
-import numpy as np
-import scipy.stats as stc
-from tinkertool.utils import make_chem_in
 import argparse as ap
 import configparser
-import pkg_resources
-import os, sys
 import copy
-import argparse as ap
+import os
+import sys
 from datetime import datetime
+
+import numpy as np
+import pkg_resources
+import scipy.stats as stc
+import xarray as xr
+from tinkertool.utils import make_chem_in
 
 config_path = pkg_resources.resource_filename('config','default_param_ranges.ini')
 

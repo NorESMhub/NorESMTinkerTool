@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
       
-import os, sys
-from netCDF4 import Dataset
-from itertools import islice
 import argparse as ap
 import configparser
-import pkg_resources
 import copy
+import os
+import sys
+from itertools import islice
 from pathlib import Path
+
+import pkg_resources
+from netCDF4 import Dataset
 
 config_path = pkg_resources.resource_filename('config','default_simulation_setup.ini')
 with open(config_path) as f:
@@ -20,8 +22,7 @@ def add_CIME_paths_and_import(cesmroot):
     _LIBDIR = os.path.join(cesmroot,"cime","scripts","lib")
     sys.path.append(_LIBDIR)
     try:
-        from tinkertool.setup.case import (build_base_case,
-                                    clone_base_case)
+        from tinkertool.setup.case import build_base_case, clone_base_case
     except ImportError:
         print(f"ERROR: CIME not found in {cesmroot}, update CESMROOT environment variable or set --cesm-root")
     global build_base_case, clone_base_case    
