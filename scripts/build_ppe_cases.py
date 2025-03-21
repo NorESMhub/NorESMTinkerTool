@@ -7,6 +7,7 @@ import argparse as ap
 import configparser
 import pkg_resources
 import copy
+from pathlib import Path
 
 config_path = pkg_resources.resource_filename('config','default_simulation_setup.ini')
 with open(config_path) as f:
@@ -47,6 +48,8 @@ def main():
     parser.add_argument("--nl-clm", "-ice", default="./user_nl_clm.ini", type=str, help="Path to user defined namelist file (CLM)")
     parser.add_argument("--nl-docn", "-docn", default="./user_nl_docn.ini", type=str, help="Path to user defined namelist file (DOCN)")
     parser.add_argument("--build-base-only", action="store_true", help="Only build the base case")
+    parser.add_argument("--build-only", action="store_true", help="Only build the PPE and not submit them to the queue")
+    parser.add_argument("--keepexe","-k", action="store_true", help="Whether to reuse the executable for the base case or build again for ensemble")
     parser.add_argument("--cesm-root", "-cr", default=None, type=str, help="Path to CESM root directory, if not provided, will use CESMROOT environment variable")
     args = parser.parse_args()
     
@@ -56,6 +59,8 @@ def main():
     pdim = args.pdim
     config_setup = args.config_setup
     cesmroot = args.cesm_root
+    keepexe = args.keepexe
+    build_only = args.build_only
     if cesmroot is None:
         cesmroot = os.environ.get('CESMROOT')
         if cesmroot is None:
@@ -100,8 +105,10 @@ def main():
     print ("Starting SCAM PPE case creation, building, and submission script")
     print ("Base case name is {}".format(basecasename))
     print ("Parameter file is "+paramfile)
-
+    # Get path dir where paramfile is located (will look for potential chem_mech.in files there)
+    path_paramfile_dir = Path(paramfile).resolve().parent
     # read in NetCDF parameter file
+    
     inptrs = Dataset(paramfile,'r')
     print ("Variables in paramfile:")
     print (inptrs.variables.keys())
@@ -113,7 +120,7 @@ def main():
 
     print ("Number of sims = {}".format(num_sims))
     print ("Number of params = {}".format(num_vars))
-
+    
 
     # Save a pointer to the netcdf variables
     paramdict = inptrs.variables
@@ -126,17 +133,17 @@ def main():
     baseidentifier = config['ppe_settings'].get('baseidentifier', args.base_case_id)
 
     cesmroot = config['create_case']['cesmroot']
+
     # Create and build the base case that all PPE cases are cloned from
-    caseroot = build_base_case(baseroot=baseroot, 
+    caseroot = build_base_case(baseroot=baseroot,
                                basecasename=basecasename,
-                               overwrite=overwrite, 
+                               overwrite=overwrite,
                                case_settings=config['create_case'],
                                env_run_settings=config['env_run'],
                                env_build_settings=config['env_build'],
                                basecase_startval=baseidentifier,
-                               namelist_collection_dict=namelist_collection_dict, 
+                               namelist_collection_dict=namelist_collection_dict,
                                cesmroot=cesmroot)
-
     # Loop over the number of simulations and clone the base case
     if args.build_base_only:
         print("Only building base case")
@@ -146,9 +153,21 @@ def main():
             print (f"Building case number: {i:03d}")
             ensemble_idx = f"{basecasename}.{i:03d}"
             temp_dict = {k : v[idx] for k,v in paramdict.items()}
-            clone_base_case(baseroot,caseroot, overwrite, temp_dict, ensemble_idx)
-
+            # Special treatment for chem_mech.in changes:
+            if 'chem_mech_in' in temp_dict:
+                # remove all chem_mech_in keys that are not chem_mech_in (there can anyway only be one chem_mech.in file)
+                keys_in_dic = list(temp_dict.keys())
+                for v in keys_in_dic:
+                    if v[-12:]=='chem_mech_in' and len(v)>12:
+                        print(f'Deleting {v} from parameter directory' )
+                        del temp_dict[v]
+            print(config['lifeCycleValues'].get('medianradius', None))
+            print(config['lifeCycleValues'].get('sigma', None))
+            clone_base_case(baseroot,caseroot, overwrite, temp_dict, ensemble_idx, path_base_input = path_paramfile_dir,
+                            keepexe = keepexe, build_only = build_only,
+                            lifeCycleMedianRadius = config['lifeCycleValues'].get('medianradius', None),
+                            lifeCycleSigma = config['lifeCycleValues'].get('sigma', None))
+            
     inptrs.close()
-
 if __name__ == "__main__":
     main()
