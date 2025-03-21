@@ -90,7 +90,7 @@ def _per_run_case_updates(case: CIME.case,
             if lifeCycleMedianRadius is None:
                 raise ValueError('A default lifeCylceList has to be specified in default_simulation_setup.ini')
             lifeCylceList = lifeCycleMedianRadius.split(',')
-            lifeCylceList[lifeCycleNumber] = "{:.1E}".format(paramdict[var]).replace('E', 'D')
+            lifeCylceList[lifeCycleNumber] = "{:.1E}".format(paramdict[var]).replace('E', 'D').replace('+', '')
             
             paramLines.append("oslo_aero_lifecyclenumbermedianradius = "+','.join(lifeCylceList)+"\n")
         elif var.startswith("lifeCycleSigma"):
@@ -98,7 +98,7 @@ def _per_run_case_updates(case: CIME.case,
             if lifeCycleSigma is None:
                 raise ValueError('A default lifeCylceList has to be specified in default_simulation_setup.ini')
             lifeCylceList = lifeCycleSigma.split(',')
-            lifeCylceList[lifeCycleNumber] = "{:.1E}".format(paramdict[var]).replace('E', 'D')
+            lifeCylceList[lifeCycleNumber] = "{:.1E}".format(paramdict[var]).replace('E', 'D').replace('+', '')
             paramLines.append("oslo_aero_lifecyclesigma = "+','.join(lifeCylceList)+"\n")
         else:
             paramLines.append("{} = {}\n".format(var,paramdict[var]))

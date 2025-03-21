@@ -161,8 +161,6 @@ def main():
                     if v[-12:]=='chem_mech_in' and len(v)>12:
                         print(f'Deleting {v} from parameter directory' )
                         del temp_dict[v]
-            print(config['lifeCycleValues'].get('medianradius', None))
-            print(config['lifeCycleValues'].get('sigma', None))
             clone_base_case(baseroot,caseroot, overwrite, temp_dict, ensemble_idx, path_base_input = path_paramfile_dir,
                             keepexe = keepexe, build_only = build_only,
                             lifeCycleMedianRadius = config['lifeCycleValues'].get('medianradius', None),
