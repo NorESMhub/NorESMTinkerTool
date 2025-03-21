@@ -79,13 +79,15 @@ def main():
             out_array[0] = float(pdata["default"])
             long_vals = scale_values(hyp_cube_parmas[:,i], np.log10(minv), np.log10(maxv))
             out_array[1:] = 10**long_vals
-            sample_points[param] = (["nmb_sim"],out_array)
+
+
         else:
             out_array = np.zeros(nmb_sim+1) # Add one extra value to include the default value
             out_array[0] = float(pdata["default"])
             out_array[1:] = scale_values(hyp_cube_parmas[:,i], minv, maxv)
-            sample_points[param] = (["nmb_sim"],out_array)
-    
+        if pdata.get("ndigits", None):
+            out_array = np.around(out_array, int(pdata["ndigits"]))
+        sample_points[param] = (["nmb_sim"],out_array)
     # Generate chemistry mech files
     chem_mech_in = []
     if sample_points.get("SOA_y_scale_chem_mech_in", None):
