@@ -38,9 +38,8 @@ def write_out_station_nm_string(path_station_file, history_field = 2):
     
     dft['fincl2lonlat'] =dft.T.apply(lambda x: '%s_%s'%(x['lon_str'],x['lat_str']))
     str_namelist = dft['fincl2lonlat'].to_list()
-    str_namelist = "','".join(str_namelist)
-    nl_string = f"fincl{history_field:d}lonlat='{str_namelist}'"
-    print(nl_string)
+    str_namelist = "\n".join(str_namelist)
+    nl_string = f"fincl{history_field:d}lonlat={str_namelist}"
     # %%
     return nl_string
 
