@@ -78,7 +78,7 @@ def main():
     station_variables_str = station_data_string.split('=')[1].strip()
     config['camexp'][station_variable_name_str] = station_variables_str
     # Write update control atm file
-    config['camexp']['avgflag_pertape'] = ", ".join(args.pertape_flags)
+    config['camexp']['avgflag_pertape'] = ",".join(args.pertape_flags)
     with open(args.output_file, 'w') as f:
         config.write(f)
 
