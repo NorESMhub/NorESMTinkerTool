@@ -8,10 +8,10 @@ import sys
 from itertools import islice
 from pathlib import Path
 
-import pkg_resources
+import importlib.resources as pkg_resources
 from netCDF4 import Dataset
 
-config_path = pkg_resources.resource_filename('config','default_simulation_setup.ini')
+config_path = pkg_resources.path('config','default_simulation_setup.ini')
 with open(config_path) as f:
     config = configparser.ConfigParser()
     config.read_file(f)
@@ -82,13 +82,13 @@ def main():
             print(f"WARNING: {temp_nl} not found")
             # could more default namelist files here
             if nl == 'nl_cam':
-                user_nl_path = pkg_resources.resource_filename('config','default_control_atm.ini')
+                user_nl_path = pkg_resources.path('config','default_control_atm.ini')
                 
                 print(f"Using default CAM namelist file: {user_nl_path}")
                 namelist_collection_dict['nl_cam'] = read_config(user_nl_path)
 
             elif nl == 'nl_clm':
-                user_nl_path = pkg_resources.resource_filename('config','default_control_lnd.ini')
+                user_nl_path = pkg_resources.path('config','default_control_lnd.ini')
                 
                 print(f"Using default CLM namelist file: {user_nl_path}")
                 namelist_collection_dict['nl_clm'] = read_config(user_nl_path)

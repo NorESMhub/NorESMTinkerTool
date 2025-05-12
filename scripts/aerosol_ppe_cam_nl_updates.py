@@ -2,12 +2,12 @@ import argparse as ap
 import configparser
 from tinkertool.utils.write_out_station_nl_string import write_out_station_nm_string
 from tinkertool.utils.write_out_namelist_opt_fincl import get_namlist_string
-import pkg_resources
+import importlib.resources as pkg_resources
 import copy
 
-config_path = pkg_resources.resource_filename('config','default_control_atm.ini')
-station_csv = pkg_resources.resource_filename('input_files', 'stations_combined.csv')
-fincl_csv = pkg_resources.resource_filename('input_files', 'output_variables.csv')
+config_path = pkg_resources.path('config','default_control_atm.ini')
+station_csv = pkg_resources.path('input_files', 'stations_combined.csv')
+fincl_csv = pkg_resources.path('input_files', 'output_variables.csv')
 
 def read_config(config_file):
     with open(config_file) as f:
