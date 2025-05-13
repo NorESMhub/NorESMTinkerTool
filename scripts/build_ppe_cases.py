@@ -154,6 +154,13 @@ def main():
             print (f"Building case number: {i:03d}")
             ensemble_idx = f"{basecasename}.{i:03d}"
             temp_dict = {k : v[idx] for k,v in paramdict.items()}
+            componentdict = {}
+            for k in temp_dict.keys():
+                if hasattr(paramdict[k], 'esm_component') and paramdict[k].esm_component is not None:
+                    componentdict[k] = paramdict[k].esm_component
+                else:
+                    componentdict[k] = assumed_esm_component
+
             # Special treatment for chem_mech.in changes:
             if 'chem_mech_in' in temp_dict:
                 # remove all chem_mech_in keys that are not chem_mech_in (there can anyway only be one chem_mech.in file)
@@ -162,11 +169,50 @@ def main():
                     if v[-12:]=='chem_mech_in' and len(v)>12:
                         print(f'Deleting {v} from parameter directory' )
                         del temp_dict[v]
-            clone_base_case(baseroot,caseroot, overwrite, temp_dict, ensemble_idx, path_base_input = path_paramfile_dir,
-                            keepexe = keepexe, build_only = build_only,
-                            lifeCycleMedianRadius = config['lifeCycleValues'].get('medianradius', None),
-                            lifeCycleSigma = config['lifeCycleValues'].get('sigma', None))
-            
+                        del componentdict[v]
+
+            clone_base_case(
+                baseroot=baseroot,
+                basecaseroot=caseroot,
+                overwrite=overwrite,
+                paramdict=temp_dict,
+                componentdict=componentdict,
+                ensemble_idx=ensemble_idx,
+                path_base_input=path_paramfile_dir,
+                keepexe=keepexe,
+                build_only=build_only,
+                lifeCycleMedianRadius = config['lifeCycleValues'].get('medianradius', None),
+                lifeCycleSigma = config['lifeCycleValues'].get('sigma', None),
+                verbose=verbose,
+            )
+            namelist = [arg for arg in dir(args) if arg.startswith('nl_')]
+    namelist_collection_dict = {}
+    for nl in namelist:
+        temp_nl = getattr(args, nl)
+        if not os.path.isfile(temp_nl):
+            print(f"WARNING: {temp_nl} not found")
+            # could more default namelist files here
+            if nl == 'nl_cam':
+                user_nl_path = pkg_resources.resource_filename('config','default_control_atm.ini')
+
+                print(f"Using default CAM namelist file: {user_nl_path}")
+                namelist_collection_dict['nl_cam'] = read_config(user_nl_path)
+
+            elif nl == 'nl_clm':
+                user_nl_path = pkg_resources.resource_filename('config','default_control_lnd.ini')
+
+                print(f"Using default CLM namelist file: {user_nl_path}")
+                namelist_collection_dict['nl_clm'] = read_config(user_nl_path)
+
+        else:
+            namelist_collection_dict[nl] = read_config(temp_nl)
+    if os.path.isfile(config_setup):
+        with open(config_setup) as f:
+            usr_config = configparser.ConfigParser()
+            usr_config.read_file(f)
+        config = config.update(usr_config)
+    else:
+        print("WARNING: Using default configuration file, no user defined configuration file found")
     inptrs.close()
 if __name__ == "__main__":
     main()

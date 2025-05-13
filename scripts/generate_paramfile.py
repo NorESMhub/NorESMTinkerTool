@@ -26,18 +26,25 @@ def main():
     global config_path
     parser = ap.ArgumentParser(
         description="Generates a Latin Hyper Cube parameter file for PPE experiment")
-    parser.add_argument("param_file_outpath", type=str, help="Path to the output parameter file")
-    parser.add_argument("--param-ranges-file", "-prange", default=None, type=str, help="Path to the parameter ranges file")
-    parser.add_argument("--nmb-sim", default=30, type=int, help="Number of ensemble members")
-    parser.add_argument("--optimization", "-opt", type=str,default=None, 
-                        help="Whether to enable optimazation after sampling, valid random-cd or lloyd")
-    parser.add_argument("--scramble", "-sc", action="store_false", 
-                        help="When False, center samples within cells of a multi-dimensional grid. Otherwise, samples are randomly placed within cells of the grid.")
-    parser.add_argument("--params", "-p", nargs="+", type=str, 
-                        help="List of parameters to using in the sampling, have to be defined in the parameter ranges file, else all parameters will be used")
-
-    
-    
+    parser.add_argument("param_file_outpath", type=str,
+        help="Path to the output parameter file")
+    parser.add_argument("--param-ranges-file", "-prange", type=str, default=None,
+        help="Path to the parameter ranges file, default None will use NorESMTinkerTool/config/default_param_ranges.ini")
+    parser.add_argument("--nmb-sim", type=int, default=30,
+        help="Number of ensemble members, default 30")
+    parser.add_argument("--optimization", "-opt", type=str, default=None,
+        help="Whether to enable optimazation after sampling, valid random-cd or lloyd. Default None.")
+    parser.add_argument("--avoid-scramble", "-asc", action="store_true",
+        help="Overwrite the default scramble of hypercube, i.e. scramble=False to center samples within cells of a multi-dimensional grid. If it is not called, samples are randomly placed within cells of the grid.")
+    parser.add_argument("--params", "-p", nargs="+", type=str,
+        help="List of parameters to be sampled, have to be defined in --param-ranges-file. If unscpecifiend all parameters in --param-ranges-file will be used")
+    parser.add_argument("--assume-component", "-ac", type=str, default='cam',
+        help="Assume component for parameter. This is used if component is not specified for an entry in --param-ranges-file. Default is 'cam'.")
+    parser.add_argument("--exclude-default", "-exd", action="store_true",
+        help="Whether to exclude the default parameter value in the output file in nmb_sim=0. Using this flag will skip nmb_sim=0. Default is to include default value.")
+    parser.add_argument("-v", "--verbose", action="count", default=0,
+        help="Increase verbosity level (use -v, or -vv for more detail)"
+    )
     args = parser.parse_args()
     param_file_outpath = args.param_file_outpath
     # Create a hypercube for five parameters with 30 ensemble members
@@ -53,8 +60,19 @@ def main():
     else:
         params = config.sections()
         nparams = len(params)
-    if args.optimization:
-        optimization = args.optimization
+    if verbose:
+        print(f"{'Number of parameters'.ljust(width)}:", nparams)
+        print(f"{'Parameters to be sampled'.ljust(width)}:", params)
+    # --assume-components
+    assumed_esm_component = args.assume_component
+    if verbose:
+        print(f"{'Assume component'.ljust(width)}:", assumed_esm_component)
+    # --exclude_default
+    exclude_default = args.exclude_default
+    if exclude_default:
+        nmb_sim_dim = np.arange(1, nmb_sim+1)
+        if verbose:
+            print(f"{'Excluding defaults, nmb_sim_dim'.ljust(width)}: [1, {nmb_sim}]",)
     else:
         optimization = None
     
@@ -101,12 +119,14 @@ def main():
 
     out_ds = xr.Dataset(
         data_vars = sample_points,
-        coords={'nmb_sim':np.arange(nmb_sim+1)})
-    
-    for k in out_ds.data_vars:
-        out_ds[k].attrs['description'] = config[k].get('description', 'No description available')
-        out_ds[k].attrs['default'] = config[k].get('default', 'No default value available')
-        out_ds[k].attrs['sampling'] = config[k].get('sampling', 'No sampling method available')
+        coords={'nmb_sim':nmb_sim_dim})
+
+    for param in out_ds.data_vars:
+        out_ds[param].attrs['description'] = config[param].get('description', 'No description available')
+        out_ds[param].attrs['default'] = config[param].get('default', 'No default value available')
+        out_ds[param].attrs['sampling'] = config[param].get('sampling', 'No sampling method available')
+        out_ds[param].attrs['esm_component'] = config[param].get('esm_component', assumed_esm_component)
+
     # Add variables with irregular names
     if chem_mech_in:
         out_ds['chem_mech_in'] = (['nmb_sim'], chem_mech_in)

@@ -37,10 +37,11 @@ def write_user_nl_file(caseroot, usernlfile, user_nl_str):
         funl.write(user_nl_str)
     
 
-def _per_run_case_updates(case: CIME.case, 
-                          paramdict: dict, 
-                          ens_idx: str, 
-                          path_base_input:str ='', 
+def _per_run_case_updates(case: CIME.case,
+                          paramdict: dict,
+                          componentdict: dict,
+                          ens_idx: str,
+                          path_base_input:str ='',
                           keepexe: bool=False,
                           build_only: bool =False,
                           lifeCycleMedianRadius=None, 
@@ -54,6 +55,8 @@ def _per_run_case_updates(case: CIME.case,
         The case object to be updated
     paramdict : dict
         Dictionary of namelist parameters to be updated
+    componentdict : dict
+        Dictionary of component names for the parameters
     ens_idx : str
         The ensemble index for the new case
     """
@@ -72,19 +75,23 @@ def _per_run_case_updates(case: CIME.case,
     if 'chem_mech_in' in paramdict.keys():
         chem_mech_file = Path(path_base_input)/paramdict['chem_mech_in']
         del paramdict['chem_mech_in']
+        del componentdict['chem_mech_in']
     case.flush()
     lock_file("env_case.xml",caseroot=caseroot)
     print("...Casename is {}".format(casename))
     print("...Caseroot is {}".format(caseroot))
     print("...Rundir is {}".format(rundir))
 
-    # Add user_nl updates for each run                                                        
+    # --- Add user_nl updates for each run
+    # find all comonents that we are editing
+    components = list(set(componentdict.values()))
 
-    paramLines = []
+    paramLinesDict = {component: [] for component in components}
     print('ensemble_index')
     print(ens_idx.split('.')[-1])
 
     for var in paramdict.keys():
+        paramLines = paramLinesDict[componentdict[var]]
         if var.startswith('lifeCycleNumberMedianRadius'):
             lifeCycleNumber = int(var.split('_')[-1])
             if lifeCycleMedianRadius is None:
@@ -103,10 +110,12 @@ def _per_run_case_updates(case: CIME.case,
         else:
             paramLines.append("{} = {}\n".format(var,paramdict[var]))
 
-    usernlfile = os.path.join(caseroot,"user_nl_cam")
-    file1 = open(usernlfile, "a")
-    file1.writelines(paramLines)
-    file1.close()
+    for component in components:
+        paramLines = paramLinesDict[component]
+        if len(paramLines) > 0:
+            usernlfile = os.path.join(caseroot, f"user_nl_{component}")
+            with open(usernlfile, "a") as file:
+                file.writelines(paramLines)
 
     if chem_mech_file is not None:
         comm = 'cp {} {}'.format(chem_mech_file, caseroot+'/')
@@ -210,11 +219,12 @@ def build_base_case(baseroot: str,
         return caseroot
     
 
-def clone_base_case(baseroot: str, 
-                    basecaseroot: str, 
-                    overwrite: bool, 
-                    paramdict: dict, 
-                    ensemble_idx: str, 
+def clone_base_case(baseroot: str,
+                    basecaseroot: str,
+                    overwrite: bool,
+                    paramdict: dict,
+                    componentdict: dict,
+                    ensemble_idx: str,
                     path_base_input: str='',
                     keepexe: bool=False,
                     build_only: bool=False, 
@@ -232,6 +242,8 @@ def clone_base_case(baseroot: str,
         Overwrite existing cases
     paramdict : dict
         Dictionary of namelist parameters to be updated
+    componentdict : dict
+        Dictionary of component names for the parameters
     ensemble_idx : str
         The ensemble index for the new case
     path_base_input : str
@@ -251,7 +263,16 @@ def clone_base_case(baseroot: str,
         with Case(basecaseroot, read_only=False) as clone:
             clone.create_clone(cloneroot, keepexe=keepexe)
     with Case(cloneroot, read_only=False) as case:
-        _per_run_case_updates(case, paramdict, ensemble_idx,path_base_input=path_base_input,keepexe=keepexe, build_only=build_only,**kwargs)
+        _per_run_case_updates(
+            case=case,
+            paramdict=paramdict,
+            componentdict=componentdict,
+            ens_idx=ensemble_idx,
+            path_base_input=path_base_input,
+            keepexe=keepexe,
+            build_only=build_only,
+            **kwargs
+        )
 
 def take(n, iterable):
     "Return first n items of the iterable as a list"
