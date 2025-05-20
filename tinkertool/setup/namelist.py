@@ -6,7 +6,7 @@ def format_value(value: str) -> bool:
     """
     if value.lower() in ['.true.', '.false.']:
       return value.lower()
-    elif value.isnumeric():    
+    elif value.isnumeric():
       return value
     elif value.replace(",","").isnumeric():
       return value
@@ -25,7 +25,7 @@ def format_value(value: str) -> bool:
 def setup_usr_nlstring(user_nl_config: configparser.ConfigParser) -> None:
   """
   Takes inn configparser objects of default namelist settings for setting dianoistics and control namelist settings.
-  
+
   Parameters:
   -----------
   user_nl_config : configparser.ConfigParser
@@ -43,7 +43,7 @@ def setup_usr_nlstring(user_nl_config: configparser.ConfigParser) -> None:
         diag_list = user_nl_config[section][key].split("\n")
         user_nlstring += key + f" = '{diag_list[0]}',\n"
         for diag in diag_list[1:-1]:
-          user_nlstring += f"         '{diag}',\n" 
+          user_nlstring += f"         '{diag}',\n"
         user_nlstring +=  f"         '{diag_list[-1]}'\n"
 
       elif key.endswith("_specifier"):
