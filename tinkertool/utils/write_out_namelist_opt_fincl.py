@@ -1,8 +1,6 @@
 # %%
 import sys
-
 import pandas as pd
-
 
 look_for = '3-h-station'
 
@@ -22,7 +20,7 @@ def get_namlist_string(look_for, fincl_n, filename_output_vars, operation):
     operation_filter = df_output_mon_glob["Operation ('A','I',or max)"] == operation
     df_output_mon_glob = df_output_mon_glob[operation_filter]
     df_output_mon_glob.index = df_output_mon_glob.reset_index()[var_col_n].apply(lambda x: x.strip("'"))
-    df_output_mon_glob.loc[:, 'namelist_name'] = df_output_mon_glob.index 
+    df_output_mon_glob.loc[:, 'namelist_name'] = df_output_mon_glob.index
     namelist_name = df_output_mon_glob['namelist_name'].to_list()
     namelist_str = "fincl" + str(fincl_n) + " = "
     for i, name in enumerate(namelist_name):

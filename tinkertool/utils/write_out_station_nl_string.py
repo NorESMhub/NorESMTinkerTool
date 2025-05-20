@@ -35,7 +35,7 @@ def write_out_station_nm_string(path_station_file, history_field = 2):
 
     dft['lon_str'] = dft['lon'].apply(lambda x: lon_str(x))
     dft['lat_str'] = dft['lat'].apply(lambda x: lat_str(x))
-    
+
     dft['fincl2lonlat'] =dft.T.apply(lambda x: '%s_%s'%(x['lon_str'],x['lat_str']))
     str_namelist = dft['fincl2lonlat'].to_list()
     str_namelist = "\n".join(str_namelist)
