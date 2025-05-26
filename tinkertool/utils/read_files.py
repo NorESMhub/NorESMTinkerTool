@@ -25,6 +25,7 @@ def read_config(
     config_file = Path(config_file).resolve()
     with open(config_file) as f:
         config = configparser.ConfigParser()
+        config.optionxform = str # Preserve case sensitivity of option names
         config.read_file(f)
 
     config.input_file = config_file
