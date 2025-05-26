@@ -295,9 +295,11 @@ def build_base_case(
             print(">> base case write user_nl files...")
 
         # write user_nl files
-        for nl in namelist_collection_dict:
-            user_nl_str = setup_usr_nlstring(namelist_collection_dict[nl])
-            write_user_nl_file(caseroot, f"user_{nl}", user_nl_str)
+        for nl_control_filename in namelist_collection_dict.keys():
+            # get the component name from the file name assuming control_<component>.ini
+            component_name = nl_control_filename.split('_')[1].split('.')[0]
+            user_nl_str = setup_usr_nlstring(namelist_collection_dict[nl_control_filename], component_name=component_name)
+            write_user_nl_file(caseroot, f"user_nl_{component_name}", user_nl_str)
 
         if verbose:
             print(">> base case_build...")
