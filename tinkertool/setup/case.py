@@ -6,23 +6,45 @@ import shutil
 import subprocess
 from pathlib import Path
 from itertools import islice
-# %%
+
+from tinkertool.setup.namelist import setup_usr_nlstring, write_user_nl_file
+from tinkertool.setup.setup_cime_connection import add_CIME_paths
+
+try:
+    add_CIME_paths(cesmroot=os.environ.get('CESMROOT'))
+except ImportError:
+    print("ERROR: add_CIME_paths failed, update CESMROOT environment variable")
+    raise SystemExit
+
 try:
     import CIME
-    import CIME.utils
-    CIME.utils.check_minimum_python_version(3, 8)
-    CIME.utils.stop_buffering_output()
-    import CIME.build as build
-    from CIME.case import Case
-    from CIME.utils import safe_copy
-    from CIME.locked_files import lock_file, unlock_file
 except ImportError:
     print("ERROR: CIME not found, update CESMROOT environment variable")
     raise SystemExit
 try:
-    import standard_script_setup
+    from CIME.Tools.standard_script_setup import check_minimum_python_version
+    check_minimum_python_version(3, 8)
 except ImportError:
-    print("ERROR: default_simulation_setup.py not found (Part of CIME)")
+    print('ERROR: CIME.Tools.standard_script_setup not found, or unable to use check_minimum_python_version()')
+try:
+    os.environ["PYTHONUNBUFFERED"] = "1"
+except ImportError:
+    print("ERROR: os.environ not found, unable to set PYTHONUNBUFFERED")
+    raise SystemExit
+try:
+    import CIME.build as build
+except ImportError:
+    print("ERROR: CIME.build not found, or unable to find build module")
+    raise SystemExit
+try:
+    from CIME.case import Case
+except ImportError:
+    print("ERROR: CIME.case not found, or unable to find Case class")
+    raise SystemExit
+try:
+    from CIME.locked_files import lock_file, unlock_file
+except ImportError:
+    print("ERROR: CIME.locked_files not found, or unable to find lock_file() and unlock_file()")
     raise SystemExit
 
 
