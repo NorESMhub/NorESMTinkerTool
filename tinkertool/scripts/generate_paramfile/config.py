@@ -24,6 +24,25 @@ class BaseConfig:
     log_file:   Path = field(default=None, metadata={"help": "Path to the log file where logs will be written. If None, logs will not be saved to a file."})
     log_mode:   str = field(default="w", metadata={"help": "Mode for opening the log file ('w' for write, 'a' for append)"})
 
+    def __post_init__(self):
+
+        # check the arguments
+        # verbose
+        if self.verbose not in [0, 1, 2, 3]:
+            raise ValueError(f"Invalid verbosity level: {self.verbose}. Must be 0, 1, 2, or 3.")
+        # log_file
+        if self.log_file is not None:
+            if not self.log_file.exists():
+                self.log_file.parent.mkdir(parents=True, exist_ok=True)
+                self.log_file.touch()
+        # log_mode
+        if self.log_mode not in ["w", "a"]:
+            raise ValueError(f"Invalid log mode: {self.log_mode}. Must be 'w' or 'a'.")
+
+        # set up logging
+        if not logging.getLogger('tinkertool_log').handlers:
+            setup_logging(self.verbose, self.log_file, self.log_mode, 'tinkertool_log')
+
     @classmethod
     def help(cls):
         print(f"Dataclass '{cls.__name__}' expects the following fields:")
@@ -46,23 +65,8 @@ class BaseConfig:
         else:
             print("\n".join(lines))
 
-    def check_and_handle_arguments(self):
-        """Check and handle arguments for the PPE configuration."""
-        # verbose
-        if self.verbose not in [0, 1, 2, 3]:
-            raise ValueError(f"Invalid verbosity level: {self.verbose}. Must be 0, 1, 2, or 3.")
-        # log_file
-        if self.log_file is not None:
-            validate_file(self.log_file, '.log', "log file", new_file=True)
-            if not self.log_file.exists():
-                self.log_file.parent.mkdir(parents=True, exist_ok=True)
-                self.log_file.touch()
-
-        # log_mode
-        if self.log_mode not in ["w", "a"]:
-            raise ValueError(f"Invalid log mode: {self.log_mode}. Must be 'w' or 'a'.")
-        if not logging.getLogger().hasHandlers():
-            setup_logging(self.verbose, self.log_file, self.log_mode)
+    def get_checked_and_derived_config(self):
+        pass
 
 @dataclass
 class ParameterFileConfig(BaseConfig):
@@ -79,17 +83,45 @@ class ParameterFileConfig(BaseConfig):
     exclude_default: bool = field(default=False, metadata={"help": "Whether to exclude the default parameter value in the output file in nmb_sim=0. Using this flag will skip nmb_sim=0. Default is to include default value."})
 
     def __post_init__(self):
+        # run the parent __post_init__ method
+        super().__post_init__()
+        # check the arguments
+        # param_ranges_inpath
         if self.param_ranges_inpath is None:
             raise ValueError("param_ranges_inpath is required!")
+        validate_file(self.param_ranges_inpath, '.ini', "Parameter ranges file as .ini format", new_file=False)
+        # param_sample_outpath
         if self.param_sample_outpath is None:
             raise ValueError("param_sample_outpath is required!")
+        validate_file(self.param_sample_outpath, '.nc', "output parameter file with .nc extension", new_file=True)
+        # nmb_sim
+        check_type(self.nmb_sim, int)
+        if self.nmb_sim <= 0:
+            raise ValueError(f"Number of ensemble members must be greater than 0. Given: {self.nmb_sim}.")
+        # optimization
+        if self.optimization is not None:
+            check_type(self.optimization, str)
+            if self.optimization not in ['random-cd', 'lloyd']:
+                raise ValueError(f"Invalid optimization method: {self.optimization}. Must be 'random-cd' or 'lloyd'.")
+        # avoid_scramble
+        check_type(self.avoid_scramble, bool)
+        # params
+        if self.params is not None:
+            check_type(self.params, list)
+            for param in self.params:
+                check_type(param, str)
+        # assume_component
+        valid_components = ['cam', 'cice', 'clm']
+        if self.assumed_esm_component not in valid_components:
+            raise ValueError(f"Invalid component: {self.assumed_esm_component}. Must be one of {valid_components}.")
+        # exclude_default
+        check_type(self.exclude_default, bool)
 
-    def check_and_handle_arguments(self):
+    def get_checked_and_derived_config(self):
         """Check and handle arguments for the parameter file generation configuration."""
-        super().check_and_handle_arguments()
+        super().get_checked_and_derived_config()
 
         # param_ranges_inpath
-        validate_file(self.param_ranges_inpath, '.ini', "Parameter ranges file as .ini format", new_file=False)
         param_ranges = read_config(self.param_ranges_inpath)
         # params
         if self.params is not None:
@@ -101,7 +133,6 @@ class ParameterFileConfig(BaseConfig):
             self.params = param_ranges.sections()
         nparams = len(self.params)
         # param_sample_outpath
-        validate_file(self.param_sample_outpath, '.nc', "output parameter file with .nc extension", new_file=True)
         if self.param_sample_outpath.exists():
             overwrite = input(f"Output file {self.param_sample_outpath} already exists. Overwrite? (y/n): ").strip().lower()
             if overwrite != 'y':
@@ -118,25 +149,14 @@ class ParameterFileConfig(BaseConfig):
             else:
                 validate_file(self.chem_mech_file, '.in', "Chemistry mechanism file", new_file=False)
         # tinkertool_output_dir
-        self.tinkertool_output_dir = self.tinkertool_output_dir or default_output_dir
+        self.tinkertool_output_dir = self.tinkertool_output_dir if self.tinkertool_output_dir is not None else default_output_dir
         if not self.tinkertool_output_dir.is_dir():
             self.tinkertool_output_dir.mkdir(parents=True, exist_ok=True)
-        # nmb_sim
-        if self.nmb_sim <= 0:
-            raise ValueError(f"Number of ensemble members must be greater than 0. Given: {self.nmb_sim}.")
-        # optimization
-        if self.optimization is not None:
-            if self.optimization not in ['random-cd', 'lloyd']:
-                raise ValueError(f"Invalid optimization method: {self.optimization}. Must be 'random-cd' or 'lloyd'.")
         # avoid_scramble
         if self.avoid_scramble:
             scramble = False
         else:
             scramble = True
-        # assume_component
-        valid_components = ['cam', 'cice', 'clm']
-        if self.assumed_esm_component not in valid_components:
-            raise ValueError(f"Invalid component: {self.assumed_esm_component}. Must be one of {valid_components}.")
         # exclude_default
         if self.exclude_default:
             if self.nmb_sim == 0:
@@ -164,5 +184,22 @@ class CheckedParameterFileConfig(ParameterFileConfig):
     nmb_sim_dim: np.ndarray = field(default=None, metadata={"help": "Array of ensemble member indices"})
     change_chem_mech: bool = field(default=None, metadata={"help": "Whether to change the chemistry mechanism file"})
 
-    def check_and_handle_arguments(self):
-        logging.info(f"Checking and handling arguments for {self.__class__.__name__} is not needed.")
+    def __post_init__(self):
+        # run the parent __post_init__ method
+        super().__post_init__()
+        # check the arguments
+        # param_ranges
+        check_type(self.param_ranges, configparser.ConfigParser)
+        if not self.param_ranges.sections():
+            raise ValueError(f"Parameter ranges file {self.param_ranges_inpath} is empty or invalid.")
+        # nparams
+        check_type(self.nparams, int)
+        # scramble
+        check_type(self.scramble, bool)
+        # nmb_sim_dim
+        check_type(self.nmb_sim_dim, np.ndarray)
+        # change_chem_mech
+        check_type(self.change_chem_mech, bool)
+
+    def get_checked_and_derived_config(self):
+        logging.info(f"{self.__class__.__name__} is a datacall with all derived fields, no further checks are needed.")
