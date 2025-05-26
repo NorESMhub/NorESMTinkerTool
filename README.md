@@ -253,10 +253,10 @@ Common for both the CLI and scripting is that you will have to provide the same 
 
 The simulation setup is expected to be a `.ini` file which must contain extensive information on the PPE cases. Current setup uses the following sections; `create_case`, `env_run`, `env_build`, `ppe_settings`, `namelist_control` and `lifeCycleValues`.
 
-**crate_case** - This section holds key-value pairs used for creating a new case, i.e. what one does when running `./cime/scripts/create_newcase <args>`. *Required* keys are `cesm_root`, `res`, `compset_name`, `project`, `mach`, `walltime` and so a valid section will consist of:
+**crate_case** - This section holds key-value pairs used for creating a new case, i.e. what one does when running `./cime/scripts/create_newcase <args>`. *Required* keys are `cesmroot`, `res`, `compset_name`, `project`, `mach`, `walltime` and so a valid section will consist of:
 ```ini
 [create_case]
-cesm_root   = <absolute path to NorESM>
+cesmroot   = <absolute path to NorESM>
 res         = <long resolution name or alias>
 compset     = <long compeset name or alias>
 project     = <project name>
@@ -286,7 +286,7 @@ CAM_CONFIG_OPTS = <replacement to existing CAM_CONFIG_OPTS>
 cam_onopts      = <string to add to existing CAM_CONFIG_OPTS>
 
 [env_build]
-CALENDAR  = GREGORIAN
+CALENDAR  = <calendar type>
 ```
 
 It is possible to use additional key-value pairs in this section as well. As key-value pairs are given to `Case.set_value()` (where `Case` is an object defined from `NorESM/cime/CIME/case/case.py`) available/unused are available by running `./xmlquery --listall` in a case directory. To see information for a key run `./xmlquery <key> --full`. **NOTE**: Additional key-value pairs to those already discussed are attempted set using a loop over remaining pairs, a warning is raised if it is not successfull but program will not exit. This is done *after* the handling of the other keys.
@@ -309,13 +309,11 @@ Further key-value pairs is not implemented as of now.
 
 ```ini
 [namelist_control]
-control_atm = <path to control_atm.ini or None (example in input_file_templates/template_control_atm.ini)>
-control_cpl = <path to control_cpl.ini or None (example in input_file_templates/template_control_cpl.ini)>
-control_cice = <path to control_cice.ini or None (example in input_file_templates/template_control_cice.ini)>
+control_cam = <path to control_cam.ini or None (example in input_file_templates/template_control_atm.ini)>
 control_clm = <path to control_clm.ini or None(example in input_file_templates/template_control_clm.ini)>
-control_docn = <path to control_docn.ini or None(example in input_file_templates/template_control_docn.ini)
 ```
 
+**NOTE:** The tinkertool uses the <component> part of `control_<component>.ini` to know which `user_nl_<component>` file to replace. Therefor use `control_<component>.ini` strictly for the filename.
 If a `control_<component>` key is `= None` the model default one is used, otherwise the `.ini` file is used to create a string replacing user_nl_<component> via the follow ini-file syntax, e.g.:
 
 ```
@@ -353,8 +351,8 @@ fincl1 = AQRAIN
 ...
 ```
 Each section correspond to namelist group. Valid namelist variables are described in `namelist_definition*.xml` files:
-* CAM - `NorESM/components/cam/bld/namelist_files/namelist_definition.xml`
-* ...
+* cam - `NorESM/components/cam/bld/namelist_files/namelist_definition.xml`
+* clm - `NorESM/components/clm/bld/namelist_files/namelist_definition_ctsm.xml`
 
 **NOTE**: You do not need to add the name of the parameters you are pertermbing to these .ini files.
 

@@ -25,6 +25,6 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-create-ppe = "scripts.build_ppe_cases:main"
-generate-paramfile = "scripts.generate_paramfile:main"
-aerosol-ppe-cam-nl= "aerosol_ppe_cam_nl_updates:main"
+create-ppe = "tinkertool.scripts.create_ppe.main:main"
+generate-paramfile = "tinkertool.scripts.generate_paramfile.main:main"
+aerosol-ppe-cam-nl = "tinkertool.scripts.aerosol_ppe_cam_nl_updates:main"
