@@ -59,6 +59,7 @@ class CreatePPEConfig(PPEConfig):
     simulation_setup_path:  Path = field(default=None, metadata={"help": "Path to user defined configuration file for simulation setup."})
     build_base_only:        bool = field(default=False, metadata={"help": "Only build the base case - not PPE members"})
     build_only:             bool = field(default=False, metadata={"help": "Only build the PPE and not submit them to the queue"})
+    clone_only_during_build:bool = field(default=False, metadata={"help": "Only clone the base case and not build the PPE members. This is useful if you have already built the base_case."})
     keepexe:                bool = field(default=False, metadata={"help": "Reuse the executable for the base case instead of building a new one for each member"})
     overwrite:              bool = field(default=False, metadata={"help": "Overwrite existing cases if they exist"})
 
