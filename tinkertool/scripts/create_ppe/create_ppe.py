@@ -121,6 +121,142 @@ def build_ppe(config: BuildPPEConfig):
 
     return cases
 
+def check_build(config: SubmitPPEConfig) -> bool:
+    """Check if the build was successful by checking for case.build success in each case directories CaseStatus
+
+    Parameters
+    ----------
+    config : SubmitPPEConfig
+        Configuration object containing the cases to check and logging settings.
+    Returns
+    -------
+    bool
+        True if all cases have a successful build, False otherwise.
+    """
+
+    # check if SumitPPEConfig is valid
+    config: CheckedSubmitPPEConfig = config.get_checked_and_derived_config()
+
+    # set up logging if not already set
+    logger = logging.getLogger('tinkertool_log')
+    if not logger.handlers:
+        setup_logging(config.verbose, config.log_file, config.log_mode, 'tinkertool_log')
+        logger.info_detailed('tinkertool_log logger set up')
+
+    all_build_success = True
+    for case in config.cases:
+        case_status_file = os.path.join(case, 'CaseStatus')
+        if not os.path.exists(case_status_file):
+            logger.error(f"CaseStatus file not found in {case}.")
+            all_build_success = False
+            continue
+
+        with open(case_status_file, 'r') as file:
+            found = False
+            for line in file:
+                if 'case.build success' in line:
+                    found = True
+                    break
+
+        if found:
+            logger.info_detailed(f"Build successful for case {case}.")
+        else:
+            logger.error(f"Build failed for case {case}. cat {case.joinpath('CaseStatus')} for details.")
+            all_build_success = False
+
+    return all_build_success
+
+def prestage_ensemble(config: SubmitPPEConfig) -> bool:
+    """Prestage the ensemble members by copying the base case input files to each member's input directory.
+
+    Parameters
+    ----------
+    config : PrestageEnsembleConfig
+        Configuration object containing the cases to prestage and logging settings.
+    """
+
+    # check if PrestageEnsembleConfig is valid
+    config: CheckedSubmitPPEConfig = config.get_checked_and_derived_config()
+
+    # set up logging if not already set
+    logger = logging.getLogger('tinkertool_log')
+    if not logger.handlers:
+        setup_logging(config.verbose, config.log_file, config.log_mode, 'tinkertool_log')
+        logger.info_detailed('tinkertool_log logger set up')
+
+    logger.info(">> Starting SCAM PPE prestaging")
+
+    all_prestage_success = True
+    for caseroot in config.cases:
+        with Case(caseroot, read_only=False) as case:
+
+            rundir = Path(case.get_value('RUNDIR')).resolve()
+            run_type = case.get_value('RUN_TYPE')
+            run_refdir = Path(case.get_value('RUN_REFDIR')).resolve()
+            if case.get_value('GET_REFCASE') == 'TRUE':
+                logger.warning(
+                    f"Case {case} has \n\
+                    > 'GET_REFCASE'='TRUE' with \n\
+                    > 'RUN_REFDIR'={run_refdir} \n\
+                    skipping manual prestaging. \
+                    Note that this might cause a crash if cases are submitted simultaneously."
+                )
+            else:
+                # copy the netcdf files from the 'RUN_REFDIR' to the 'RUNDIR'
+                # and set 'RUN_REFDIR'='RUNDIR'. This is needed to ensure that the
+                # cases can run independently and do not interfere with each other.
+                ref_netcdf_files = [str(file) for file in run_refdir.glob('*.nc')]
+                if ref_netcdf_files:
+                    try:
+                        subprocess.run(
+                            [
+                                'rsync', '--archive',
+                                *ref_netcdf_files,
+                                rundir
+                            ],
+                            cwd=caseroot,
+                            executable='/bin/bash',
+                            check=True,
+                            shell=True
+                        )
+                    except subprocess.CalledProcessError as e:
+                        error_msg = f"Failed to prestage ref_netcdf_files files for case {caseroot}."
+                        logger.error(error_msg)
+                    case.set_value('RUN_REFDIR', rundir)
+                else:
+                    logger.warning(f"No netcdf files found in {run_refdir}. Skipping prestaging for case {caseroot}.")
+                    all_prestage_success = False
+
+                if run_type == 'branch':
+                    # in a branch run, we need to prestage the rpointer files as well
+                    # copy the rpointer files from the original run_refdir to the rundir
+                    # and set 'DRV_RESTART_POINTER' to the rpointer file name with the correct date and time
+                    rpointer_files = [str(file) for file in run_refdir.glob('rpointer*')]
+                    if rpointer_files:
+                        try:
+                            subprocess.run(
+                                [
+                                    'rsync', '--archive',
+                                    *rpointer_files,
+                                    rundir
+                                ],
+                                cwd=caseroot,
+                                executable='/bin/bash',
+                                check=True,
+                                shell=True
+                            )
+                        except subprocess.CalledProcessError as e:
+                            error_msg = f"Failed to prestage rpointer files for case {caseroot}."
+                            logger.error(error_msg)
+
+                        case.set_value('DRV_RESTART_POINTER', f"rpointer.cpl.{case.get_value('RUN_REFDATE')}-{case.get_value('RUN_REFTOD')}")
+                    else:
+                        logger.warning(f"No rpointer files found in {run_refdir}. Skipping prestaging for case {caseroot}.")
+                        all_prestage_success = False
+
+    logger.info(f">> {len(config.cases)} cases prestaged successfully.")
+    return all_prestage_success
+
 def submit_ppe(config: SubmitPPEConfig):
 
     # check if SumitPPEConfig is valid
