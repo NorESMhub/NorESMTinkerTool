@@ -2,7 +2,6 @@ import os
 import logging
 
 from tinkertool.utils.logging import setup_logging
-from tinkertool.utils.run_subprocess import run_command
 from tinkertool.setup.case import build_base_case, clone_base_case
 from tinkertool.scripts.create_ppe.config import (
     CreatePPEConfig,
@@ -11,6 +10,44 @@ from tinkertool.scripts.create_ppe.config import (
     SubmitPPEConfig,
     CheckedSubmitPPEConfig
 )
+from tinkertool.setup.setup_cime_connection import add_CIME_paths
+
+try:
+    if os.environ.get('CESMROOT') is None:
+        raise ImportError("CESMROOT environment variable not set")
+    add_CIME_paths(cesmroot=os.environ.get('CESMROOT'))
+except ImportError:
+    print("ERROR: add_CIME_paths failed, update CESMROOT environment variable")
+    raise SystemExit
+try:
+    from CIME.case import Case
+except ImportError:
+    print("ERROR: CIME.case not found, or unable to find Case class")
+    raise SystemExit
+
+unsuccessful_build_msg = """> Build was not successful for all cases. Please check the logs. \n
+    > Exiting PPE creation process.
+    > If you want to submit the cases after a successful build script using python:
+    >> from pathlib import Path
+    >> from tinkertool.scripts.create_ppe.create_ppe import check_build, prestage_ensemble, submit_ppe
+    >> from tinkertool.scripts.create_ppe.config import SubmitPPEConfig, PrestageEnsembleConfig
+    >> ensemble_members = [Path(case).resolve() for case in Path('<baseroot>')iterdir() if case.is_dir() and 'ensemble_member' in case.name]
+    >> submit_config = SubmitPPEConfig(cases=ensemble_members, verbose=<verbose_lvl>, log_file=<log_file>, log_mode=<log_mode>)
+    >> if not check_build(submit_config):
+    >>     raise RuntimeError("Build was not successful for all cases. Please check the logs.")
+    >> if not prestage_ensemble(submit_config):
+    >>     raise RuntimeError("Prestage was not successful for all cases. Please check the logs.")
+    >> submit_ppe(submit_config)
+
+    > or equivalently in bash using the CLI:
+
+    >> ensemble_members=( $(find <baseroot> -type d -name '*ensemble_member*' -exec realpath {} \;)
+    >> check-build "${ensemble_members[@]}"  -vv -l <log_file> -lm <log_mode>
+    >> prestage-ensemble "${ensemble_members[@]}" -vv -l <log_file> -lm <log_mode>
+    >> submit-ppe "${ensemble_members[@]}" -vv -l <log_file> -lm <log_mode>
+    >> for details on the commands, run 'check-build --help', 'prestage-ensemble --help' and 'submit-ppe --help'
+
+"""
 
 def create_ppe(config: CreatePPEConfig):
 
@@ -36,14 +73,22 @@ def create_ppe(config: CreatePPEConfig):
     # then build the ppe cases
     cases = build_ppe(build_config)
 
-    if not config.build_only:
-        # create SubmitPPEConfig object from config and cases
-        submit_config = SubmitPPEConfig(
+    submit_config = SubmitPPEConfig(
             cases=cases,
             verbose=config.verbose,
             log_file=config.log_file,
             log_mode=config.log_mode
         )
+    # check if build was successful
+    check_build_success = check_build(submit_config)
+    if not check_build_success:
+        logger.error(unsuccessful_build_msg)
+        return
+
+
+
+    if not config.build_only:
+        # create SubmitPPEConfig object from config and cases
         submit_ppe(submit_config)
 
     logger.info("> Finished SCAM PPE creation")
@@ -63,8 +108,6 @@ def build_ppe(config: BuildPPEConfig):
 
     logger.info(">> Starting SCAM PPE case building")
     logger.info_detailed(f"Building with config: {config.describe(return_string=True)}")
-
-    cases = []
 
     if not config.clone_only_during_build:
         basecaseroot = build_base_case(
@@ -88,6 +131,7 @@ def build_ppe(config: BuildPPEConfig):
         logger.info(">> No ensembles created as build_base_only is set to True.")
         return None
     else:
+        cases = []
         for i, idx in zip(config.ensemble_num, range(len(config.ensemble_num))):
             logger.info_detailed(f"Building ensemble {i} of {config.num_sims}")
             ensemble_idx = f"{i:03d}"
@@ -117,7 +161,7 @@ def build_ppe(config: BuildPPEConfig):
                 **clone_base_case_kwargs
             )
             cases.append(clonecaseroot)
-            logger.info(f">> Ensemble {i} of {config.num_sims} created successfully.")
+            logger.info(f">> Ensemble {i} of {config.ensemble_num[-1]} created successfully.")
 
     return cases
 
