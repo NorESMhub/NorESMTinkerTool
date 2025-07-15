@@ -136,10 +136,12 @@ def submit_ppe(config: SubmitPPEConfig):
 
     # iterate over the cases and submit them
     for case in config.cases:
-
-        run_command(
-            f'./case.submit',
-            error_msg=f"Failed to submit case {case}",
+        os.chdir(case)
+        logger.info_detailed(f"Submitting case {case.name}")
+        logger.debug(f"Current working directory: {os.getcwd()}")
+        subprocess.run(
+            ['./case.submit'],
+            check=True,
             cwd=case
         )
         logger.info_detailed(f"Clone {case.name} submitted successfully.")
