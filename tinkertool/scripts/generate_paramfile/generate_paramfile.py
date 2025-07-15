@@ -21,8 +21,8 @@ def generate_paramfile(config: ParameterFileConfig):
 
     # check if ParameterFileConfig is valid
     logging.debug(f"Checking config: {config.describe(return_string=True)}")
-    config: CheckedParameterFileConfig = config.check_and_handle_arguments()
-    logging.getLogger().info_detailed(f">> Generating with config: {config.describe(return_string=True)}")
+    config: CheckedParameterFileConfig = config.get_checked_and_derived_config()
+    logging.getLogger('tinkertool_log').info_detailed(f">> Generating with config: {config.describe(return_string=True)}")
 
     # Generate Latin Hypercube sample
     logging.debug("Generating Latin Hypercube sample")
@@ -82,7 +82,7 @@ def generate_paramfile(config: ParameterFileConfig):
                 )
                 chem_mech_in.append(outfile)
 
-                logging.getLogger().info_detailed(f"{outfile} generated with SOA_y_scale_chem_mech_in = {scale_factor}")
+                logging.getLogger('tinkertool_log').info_detailed(f"{outfile} generated with SOA_y_scale_chem_mech_in = {scale_factor}")
 
             del sample_points["SOA_y_scale_chem_mech_in"]
 
@@ -95,7 +95,7 @@ def generate_paramfile(config: ParameterFileConfig):
         out_ds[param].attrs['description'] = config.param_ranges[param].get('description', 'No description available')
         out_ds[param].attrs['default'] = config.param_ranges[param].get('default', 'No default value available')
         out_ds[param].attrs['sampling'] = config.param_ranges[param].get('sampling', 'No sampling method available')
-        out_ds[param].attrs['esm_component'] = config.param_ranges[param].get('esm_component', config.assumed_esm_component)
+        out_ds[param].attrs['esm_component'] = config.param_ranges[param].get('component', config.assumed_esm_component).lower()
 
     # Add variables with irregular names
     if config.change_chem_mech:
