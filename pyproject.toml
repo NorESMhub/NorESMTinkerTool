@@ -7,7 +7,7 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.12"
+python = ">=3.11,<3.14"
 netcdf4 = "^1.6.3"
 xarray = "^2024.9.0"
 scipy = {version = "^1.14.1", optional = true}
@@ -17,6 +17,10 @@ black = "^24.8.0"
 isort = "^5.13.2"
 jupyterlab = "^4.2.5"
 
+[tool.poetry.group.docs.dependencies]
+mkdocs = "^1.6.0"
+mkdocs-material = "^9.5.19"
+
 [tool.poetry.extras]
 sampling = ["scipy"]
 
@@ -25,6 +29,6 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-create-ppe = "scripts.build_ppe_cases:main"
-generate-paramfile = "scripts.generate_paramfile:main"
+create-ppe = "tinkertool.scripts.create_ppe.main:main"
+generate-paramfile = "tinkertool.scripts.generate_paramfile.main:main"
 aerosol-ppe-cam-nl= "aerosol_ppe_cam_nl_updates:main"

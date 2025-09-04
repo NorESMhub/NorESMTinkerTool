@@ -1,5 +1,5 @@
-from cli import parse_cli_args
-from create_ppe import create_ppe
+from tinkertool.scripts.create_ppe.cli import parse_cli_args
+from tinkertool.scripts.create_ppe.create_ppe import create_ppe
 
 def main():
     config = parse_cli_args()

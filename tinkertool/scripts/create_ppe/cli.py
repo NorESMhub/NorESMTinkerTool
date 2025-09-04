@@ -1,5 +1,5 @@
 import argparse
-from config import CreatePPEConfig
+from tinkertool.scripts.create_ppe.config import CreatePPEConfig
 from pathlib import Path
 
 def parse_cli_args() -> CreatePPEConfig:

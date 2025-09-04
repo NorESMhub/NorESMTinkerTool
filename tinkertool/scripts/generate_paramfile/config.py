@@ -14,7 +14,7 @@ from tinkertool.utils.make_chem_in import generate_chem_in_ppe, check_if_chem_me
 # ------------------------ #
 # --- Global variables --- #
 # ------------------------ #
-default_chem_mech = Path(pkg_resources.resource_filename('default_config','default_chem_mech.in')).resolve()
+default_chem_mech = Path(pkg_resources.resource_filename('tinkertool.default_config','default_chem_mech.in')).resolve()
 default_output_dir = Path(__file__).parent.parent.parent.joinpath('output')    # NorESMTinkerTool/output
 
 @dataclass

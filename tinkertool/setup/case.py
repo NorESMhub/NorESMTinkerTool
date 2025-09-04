@@ -13,7 +13,7 @@ from tinkertool.setup.setup_cime_connection import add_CIME_paths
 
 try:
     add_CIME_paths(cesmroot=os.environ.get('CESMROOT'))
-except ImportError:
+except TypeError:
     print("ERROR: add_CIME_paths failed, update CESMROOT environment variable")
     raise SystemExit
 
