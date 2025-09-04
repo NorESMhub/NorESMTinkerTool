@@ -1,16 +1,25 @@
 import numpy as np
 
-def scale_values(values, lower_bnd , upper_bnd) -> np.ndarray: 
-    """
-    Scales an array of values from 0 to 1 to be within the range of lower_bnd and upper_bnd.
+def scale_values(
+    values: np.ndarray,
+    a: float,
+    b: float
+) -> np.ndarray:
+    """Scale values from [0, 1] to [a, b] range
 
     Parameters
     ----------
     values : np.ndarray
-        The array of values to be scaled.
-    lower_bnd : float
-        The lower bound of the range to scale the values to.
-    upper_bnd : float
-    
+        arrays of values to be scaled. The values should be in the range [0, 1]
+    a : float
+        lower bound of the range to scale to
+    b : float
+        upper bound of the range to scale to
+
+    Returns
+    -------
+    np.ndarray
+        scaled values in the range [a, b]
     """
+
     return a + (b - a) * values
