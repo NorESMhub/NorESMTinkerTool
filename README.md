@@ -21,8 +21,6 @@ Note that the package requires python >=3.10,<3.12 to be active in your envirome
 git clone https://github.com/Ovewh/NorESMTinkerTool.git && cd NorESMTinkerTool
 ```
 
-You are now in `<tinkerroot>`.
-
 3. Install
 
 ```
@@ -172,12 +170,10 @@ see `tinkertool/utils/csv_to_ini.py` for more documentation on `df_to_ini` funct
 ### Create PPE
 
 To Create the PPE we use `create-ppe` program. This uses only the libraries provided by the basic installation.
+The create PPE functionality can be accessed via the command line interface (CLI) or by using the internal API.
 
-There are two options for creating a ppe after installing tinkertool:
-* A command line interface (CLI) callable from `<tinkerroot>`. Running
 ```sh
-python main.py --help
-usage: main.py [-h] [--build-base-only] [--build-only] [--keepexe] [--overwrite] [-v] simulation_setup_path
+create-ppe --help
 
 Build PPE cases for NorESM
 
