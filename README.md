@@ -5,7 +5,7 @@ Python tool for setting up, running and analysing perturbed parameter ensembles 
 (NorESM).
 By encuraging tinkering to greater extent we can better learn how the model works.
 
-![logo](./img/logo.jpg)
+![logo](./docs/img/logo.jpg)
 
 ## Installation
 

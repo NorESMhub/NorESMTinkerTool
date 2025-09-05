@@ -31,4 +31,4 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.scripts]
 create-ppe = "tinkertool.scripts.create_ppe.main:main"
 generate-paramfile = "tinkertool.scripts.generate_paramfile.main:main"
-aerosol-ppe-cam-nl= "aerosol_ppe_cam_nl_updates:main"
+aerosol-ppe-cam-nl= "scripts.aerosol_ppe_cam_nl_updates:main"
