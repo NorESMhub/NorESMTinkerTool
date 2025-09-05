@@ -6,7 +6,7 @@ This section describes how to use the NorESMTinkerTool package, within a python 
 - [Generate parameter file for PPE](#generate-parameter-file-for-ppe)
 - [Create PPE](#create-ppe)
 
-## Prerequisites
+## 📣 Prerequisites
 
 Before the package can be used, the path to the NorESM directory must be set, by specifying the `CESMROOT` enviromental variable, such that it can find the required CIME libraries.
 

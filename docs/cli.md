@@ -13,7 +13,7 @@ The CLI contains two main programs:
 - [Generate parameter file for PPE](#generate-parameter-file-for-ppe)
 - [Create PPE](#create-ppe)
 
-## Prerequisites
+## 📣 Prerequisites
 
 Before the package can be used, the path to the NorESM directory must be set, by specifying the `CESMROOT` enviromental variable, such that it can find the required CIME libraries.
 
@@ -54,7 +54,7 @@ parameter values between its minimum and maximum bounds.
 There are two options for creating the parameterfile, (1) using the CLI tool:
 
 ### Command Line Interface (CLI)
-This can 
+A description of the fuctionalities of the CLI tool is found by running `generate-paramfile --help`:
 ```bash
 usage: generate-paramfile [-h] [--chem-mech-file CHEM_MECH_FILE] [--tinkertool-output-dir TINKERTOOL_OUTPUT_DIR] [--nmb-sim NMB_SIM] [--optimization OPTIMIZATION] [--avoid-scramble]
                           [--params PARAMS [PARAMS ...]] [--assumed-esm-component ASSUMED_ESM_COMPONENT] [--exclude-default] [--verbose] [--log-file LOG_FILE] [--log-mode LOG_MODE]
