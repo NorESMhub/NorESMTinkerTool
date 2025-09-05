@@ -1,14 +1,13 @@
 import traceback
 from pathlib import Path
 from typing import Union
+
 from tinkertool.utils.type_check_decorator import type_check_decorator
+
 
 @type_check_decorator
 def validate_file(
-    file_path:          Path,
-    expected_suffix:    str,
-    description:        str,
-    new_file:           bool
+    file_path: Path, expected_suffix: str, description: str, new_file: bool
 ):
     if not file_path.suffix == expected_suffix:
         raise SystemExit(f"ERROR: {file_path} is not a valid {description}")
@@ -17,16 +16,17 @@ def validate_file(
             Warning(f"WARNING: {file_path} already exists. It will be overwritten.")
         if not new_file and not file_path.exists():
             traceback.print_stack()
-            raise SystemExit(f"ERROR: {file_path} does not exist. Please provide a valid file path.")
+            raise SystemExit(
+                f"ERROR: {file_path} does not exist. Please provide a valid file path."
+            )
+
 
 @type_check_decorator
-def validate_directory(
-    directory_path: Path,
-    description: str
-):
+def validate_directory(directory_path: Path, description: str):
     if not directory_path.is_dir():
         traceback.print_stack()
         raise SystemExit(f"ERROR: {directory_path} is not a valid {description}")
+
 
 def check_type(
     obj: object,

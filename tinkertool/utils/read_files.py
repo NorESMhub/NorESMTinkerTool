@@ -1,11 +1,10 @@
-import copy
 import configparser
-from typing import Union
+import copy
 from pathlib import Path
+from typing import Union
 
-def read_config(
-    config_file: Union[str, Path]
-) -> configparser.ConfigParser:
+
+def read_config(config_file: Union[str, Path]) -> configparser.ConfigParser:
     """Read a .ini config file and return a ConfigParser object.
 
     Parameters
@@ -25,7 +24,7 @@ def read_config(
     config_file = Path(config_file).resolve()
     with open(config_file) as f:
         config = configparser.ConfigParser()
-        config.optionxform = str # Preserve case sensitivity of option names
+        config.optionxform = str  # Preserve case sensitivity of option names
         config.read_file(f)
 
     config.input_file = config_file

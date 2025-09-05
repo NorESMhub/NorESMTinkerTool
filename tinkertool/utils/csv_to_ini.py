@@ -1,12 +1,14 @@
-import pandas as pd
-from typing import Union
 from pathlib import Path
+from typing import Union
+
+import pandas as pd
+
 
 def df_to_ini(
-    df:                 pd.DataFrame,
-    ini_file_path:      Union[str, Path],
-    section_column:     str,
-    columns_to_include: Union[str, list, dict, None] = None
+    df: pd.DataFrame,
+    ini_file_path: Union[str, Path],
+    section_column: str,
+    columns_to_include: Union[str, list, dict, None] = None,
 ):
     """Convert a DataFrame to an INI file format.
 
@@ -49,7 +51,7 @@ def df_to_ini(
     ini_file_path = Path(ini_file_path)
 
     # Write the DataFrame to an INI file
-    with ini_file_path.open('w') as ini_file:
+    with ini_file_path.open("w") as ini_file:
         for _, row in ini_df.iterrows():
             section_name = str(row[section_column]).strip()
             ini_file.write(f"[{section_name}]\n")
@@ -61,6 +63,6 @@ def df_to_ini(
 
                 value = row[col]
                 if isinstance(value, (list, tuple)):
-                    value = ', '.join(map(str, value))
+                    value = ", ".join(map(str, value))
                 ini_file.write(f"{out_col} = {value}\n")
             ini_file.write("\n")
