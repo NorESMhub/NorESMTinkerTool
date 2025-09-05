@@ -1,4 +1,12 @@
-# Usage
+# Commandline interface (CLI)
+
+This section describes the CLI of NorESMTinkerTool.
+The CLI contains two main programs:
+
+- `generate-paramfile`: Generate parameter file for PPE. 
+- `create-ppe`: Create PPE experiment.
+
+
 
 ## 📚 Contents
 - [Prerequisites](#prerequisites)
@@ -12,6 +20,8 @@ Before the package can be used, the path to the NorESM directory must be set, by
 ```
 export CESMROOT=/path/to/NorESM
 ```
+
+The CLI also requires that `simulation_setup.ini` file is created, see [Base Configuration of PPE runs](configuration.md) for more information.
 
 The package then has the following use cases:
 
@@ -83,38 +93,3 @@ options:
 
 ```
 
-The interal api can also be used to include `tinkertool` within a script. The main function only takes a ParameterFileConfig object as input. Basic usage
-```python
-from pathlib import Path
-from tinkertool.scripts.generate_paramfile.config import ParameterFileConfig
-from tinkertool.scripts.generate_paramfile.generate_paramfile import generate_paramfile
-
-parmfile_config = ParameterFileConfig(
-  param_ranges_inpath=Path(<param_ranges.ini>).resolve(),
-  param_sample_outpath=Path(<param_samples.nc>).resolve(),
-  chem_mech_file=Path(<NorESMTinkerTool/default_config/default_chem_mech.in>).resolve(),
-  tinkertool_output_dir=Path(<NorESMTinkerTool/output>).resolve(),
-  nmb_sim=30,
-  optimization=None,
-  avoid_scramble=False,
-  params=None,
-  assumed_esm_component='cam',
-  exclude_default=False,
-  verbose=0,
-  log_file=None,
-  log_mode='w'
-)
-```
-
-Common for both the CLI and scripting is that you will have to provide the same arguments. See the `generate_paramfile --help` print above for details. For `param_ranges_inpath` the expected format used by the script is:
-```ini
-[parameter_name]
-component = <component name (used to assign the parameter to a component namelist file)>
-description = <short description of the parameter>
-justification = <justification for sampling range>
-min = <lower bound for sampling>
-max = <upper bound for sampling>
-default = <default value for the parameter in the model version>
-ndigits = <number of digits to use in sampling, i.e. sampling resolution>
-sampling = <linear/log> (linear or log_10 scale sampling)
-```

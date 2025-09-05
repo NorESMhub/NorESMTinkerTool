@@ -5,7 +5,7 @@ from tinkertool.utils.write_out_namelist_opt_fincl import get_namlist_string
 import importlib.resources as pkg_resources
 import copy
 
-config_path = pkg_resources.path('config','default_control_atm.ini')
+config_path = pkg_resources.path('config_examples','default_control_atm.ini')
 station_csv = pkg_resources.path('input_files', 'stations_combined.csv')
 fincl_csv = pkg_resources.path('input_files', 'output_variables.csv')
 

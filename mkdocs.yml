@@ -4,5 +4,8 @@ theme:
 nav:
   - Home: index.md
   - Installation: installation.md
-  - Usage: usage.md
+  - Configuration: configuration.md
+  - CLI: cli.md
+  - API Usage: usage.md
   - API: api.md
+  - Examples: examples.md

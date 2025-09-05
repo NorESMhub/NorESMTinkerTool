@@ -1,16 +1,7 @@
 # Welcome to NorESMTinkerTool
-_ A safe space for tinkering _
+> _A safe space for tinkering_
+>
 
-NorESMTinkertool is a toolchain developed in python, designed to facilitate the setup, production and analysis of perturbed parameter ensembles (PPEs) with the Norwegian Earth System model (NorESM). Through make tinkering easy and fun we can better learn how the model works. 
-  
-## 📚 Contents
+NorESMTinkerTool is a toolchain developed in Python, designed to facilitate the setup, production, and analysis of perturbed parameter ensembles (PPEs) with the Norwegian Earth System Model (NorESM). By making tinkering easy and fun, we can better learn how the model works.
 
-- [Installation](installation.md)
-- [Usage](usage.md)
-- [API Reference](api.md)
-- [Examples](examples.md)
-- [FAQ](faq.md)
-- [Contributing](contributing.md)
-- [Changelog](changelog.md)
-
----
+![logo](./img/logo.jpg)
