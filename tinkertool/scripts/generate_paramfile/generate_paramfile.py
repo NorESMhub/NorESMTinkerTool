@@ -21,6 +21,19 @@ def generate_latin_hypercube_sample_points(config: CheckedParameterFileConfig) -
     Returns a dict mapping parameter name -> (["nmb_sim"], values_array).
     """
     logging.debug("Setting up Latin Hypercube")
+    # Set up logging
+    setup_logging(config.verbose, config.log_file, config.log_mode)
+    logging.info("> Starting parameter file generation")
+
+    # check if ParameterFileConfig is valid
+    logging.debug(f"Checking config: {config.describe(return_string=True)}")
+    config: CheckedParameterFileConfig = config.get_checked_and_derived_config()
+    logging.getLogger().info_detailed(
+        f">> Generating with config: {config.describe(return_string=True)}"
+    )
+
+    # Generate Latin Hypercube sample
+    logging.debug("Generating Latin Hypercube sample")
     hypc = stats.qmc.LatinHypercube(
         config.nparams, scramble=config.scramble, optimization=config.optimization
     )
