@@ -5,7 +5,7 @@ from dataclasses import MISSING, dataclass, field, fields
 from pathlib import Path
 
 import numpy as np
-import pkg_resources
+import importlib.resources as pkg_resources
 
 from tinkertool.utils.check_arguments import (
     check_type,
@@ -22,9 +22,8 @@ from tinkertool.utils.read_files import read_config
 # ------------------------ #
 # --- Global variables --- #
 # ------------------------ #
-default_chem_mech = Path(
-    pkg_resources.resource_filename("tinkertool.default_config", "default_chem_mech.in")
-).resolve()
+with pkg_resources.path("tinkertool.default_config", "default_chem_mech.in") as p:
+    default_chem_mech = p.resolve()
 default_output_dir = Path(__file__).parent.parent.parent.joinpath(
     "output"
 )  # NorESMTinkerTool/output
