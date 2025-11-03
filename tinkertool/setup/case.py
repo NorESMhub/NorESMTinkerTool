@@ -12,7 +12,10 @@ from tinkertool.setup.namelist import setup_usr_nlstring, write_user_nl_file
 from tinkertool.setup.setup_cime_connection import add_CIME_paths
 
 try:
-    add_CIME_paths(cesmroot=os.environ.get('CESMROOT'))
+    environ_CESMROOT = os.environ.get('CESMROOT')
+    if environ_CESMROOT is None:
+        raise ImportError("CESMROOT environment variable not set")
+    add_CIME_paths(cesmroot=environ_CESMROOT)
 except ImportError:
     print("ERROR: add_CIME_paths failed, update CESMROOT environment variable")
     raise SystemExit
