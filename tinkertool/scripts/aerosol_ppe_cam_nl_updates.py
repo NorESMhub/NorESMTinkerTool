@@ -20,7 +20,8 @@
 # --- Import libraries --- #
 # ------------------------ #
 import argparse
-import pkg_resources
+
+import importlib.resources as pkg_resources
 
 from tinkertool.utils.read_files import read_config
 from tinkertool.utils.write_out_namelist_opt_fincl import get_namlist_string
@@ -29,9 +30,12 @@ from tinkertool.utils.write_out_station_nl_string import write_out_station_nm_st
 # ------------------------ #
 # --- Global variables --- #
 # ------------------------ #
-config_path = pkg_resources.resource_filename('config','default_control_atm.ini')
-station_csv = pkg_resources.resource_filename('input_files', 'stations_combined.csv')
-fincl_csv = pkg_resources.resource_filename('input_files', 'output_variables.csv')
+with pkg_resources.path("config_examples", "default_control_atm.ini") as p:
+    config_path = p.resolve()
+with pkg_resources.path("input_files", "stations_combined.csv") as p:
+    station_csv = p.resolve()
+with pkg_resources.path("input_files", "output_variables.csv") as p:
+    fincl_csv = p.resolve()
 
 # --------------------- #
 # --- Main function --- #
