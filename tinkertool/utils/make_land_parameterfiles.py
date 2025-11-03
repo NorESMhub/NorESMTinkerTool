@@ -6,6 +6,12 @@ import collections.abc
 import xarray as xr
 
 def make_new_ctsm_pamfile(pam_change_dict, orig_pamfile = "/cluster/shared/noresm/inputdata/lnd/clm2/paramdata/ctsm60_params.5.3.045_noresm_v14_c251031.nc", file_dump = "ctsm_pamfile.nc"):
+    """
+    Make a new ctsn pamfile for the PPE,
+
+    The pam_change_dict has parameter should have name of parameter to change as key, and change value as value. For scalar parameters this is
+    assumed to be the new value of the parameter. For vector parameters the value is assumed to be a scaling value to scale the value in the original file with
+    """
     if not os.path.exists(orig_pamfile):
         print(f"Original ctsm parameterfile {orig_pamfile} not found")
         raise FileNotFoundError(f"Original ctsm parameterfile {orig_pamfile} not found")
@@ -31,6 +37,13 @@ def make_new_ctsm_pamfile(pam_change_dict, orig_pamfile = "/cluster/shared/nores
         
 
 def make_new_fates_pamfile(pam_change_dict, orig_pamfile = "/cluster/shared/noresm/inputdata/lnd/clm2/paramdata/fates_params_sci.1.85.1_api.40.0.0_14pft_nor_sci1_api1_c251031.nc"):
+    """
+    Make a new fates pamfile for the PPE,
+
+    The pam_change_dict has parameter should have name of parameter to change as key, and change value as value. For scalar parameters this is
+    assumed to be the new value of the parameter. For vector parameters the value is assumed to be a scaling value to scale the value in the original file with
+    """
+
     if not os.path.exists(orig_pamfile):
         print(f"Original ctsm parameterfile {orig_pamfile} not found")
         raise FileNotFoundError(f"Original ctsm parameterfile {orig_pamfile} not found")
