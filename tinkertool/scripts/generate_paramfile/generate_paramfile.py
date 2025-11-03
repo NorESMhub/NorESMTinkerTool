@@ -23,7 +23,7 @@ def generate_paramfile(config: ParameterFileConfig):
 
     # check if ParameterFileConfig is valid
     logging.debug(f"Checking config: {config.describe(return_string=True)}")
-    config: CheckedParameterFileConfig = config.check_and_handle_arguments()
+    config: CheckedParameterFileConfig = config.get_checked_and_derived_config()
     logging.getLogger().info_detailed(
         f">> Generating with config: {config.describe(return_string=True)}"
     )
