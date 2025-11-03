@@ -119,7 +119,6 @@ def generate_latin_hypercube_sample_points(checked_config: CheckedParameterFileC
 
     logging.debug(f"Hypersample shape ({checked_config.nmb_sim_dim}, n_params - n_interdependent_params): {hyp_cube_params.shape}")
 
-    logging.debug("Scaling the values to the parameter ranges")
     sample_points = {}
     # Scale the values to the parameter ranges
     # and add component information

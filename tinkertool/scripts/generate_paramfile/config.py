@@ -167,6 +167,8 @@ class ParameterFileConfig(BaseConfig):
                 nmb_sim_dim = np.arange(0, 2 * nparams + 1)
         else:
             nmb_sim_dim = np.arange(0, self.nmb_sim + 1)
+        if self.one_at_the_time:
+            nmb_sim_dim = np.arange(0, 2 * nparams + 1)
 
 
 
