@@ -220,6 +220,12 @@ def generate_paramfile(config: ParameterFileConfig):
         out_ds["chem_mech_in"] = (["nmb_sim"], chem_mech_in)
     current_time = datetime.now().replace(microsecond=0)
     # Assigning to your attribute
+    if config.one_at_the_time:
+        out_ds.attrs['title'] = "Parameter file for creating one-at-a-time tests"
+        out_ds.attrs['description'] = "This parameter file is generated for one-at-a-time sensitivity tests."
+    else:
+        out_ds.attrs['title'] = "Parameter file for Latin Hypercube sampling"
+        out_ds.attrs['description'] = "This parameter file is generated using Latin Hypercube sampling."
     out_ds.attrs["created"] = f"Created " + current_time.strftime("%Y-%m-%d %H:%M:%S")
     out_ds.to_netcdf(config.param_sample_outpath)
 
