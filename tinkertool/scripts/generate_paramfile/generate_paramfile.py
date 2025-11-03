@@ -214,7 +214,6 @@ def generate_paramfile(config: ParameterFileConfig):
         )
 
     # Add variables with irregular names
-    print(config.change_chem_mech)
     if config.change_chem_mech and config.perturbed_chem_mech:
         logging.debug("Adding chemistry mechanism files to dataset")
         out_ds["chem_mech_in"] = (["nmb_sim"], chem_mech_in)
