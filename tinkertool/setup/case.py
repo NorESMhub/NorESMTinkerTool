@@ -109,10 +109,9 @@ def _per_run_case_updates(
     logger.info(">> Building clone case {}...".format(ens_idx))
 
     caseroot = case.get_value("CASEROOT")
-    basecasename = os.path.basename(caseroot)
+    casename = os.path.basename(caseroot)
     unlock_file("env_case.xml",caseroot=caseroot)
-    casename = f"{basecasename}{ens_idx}"
-    case.set_value("CASE",casename)
+    case.set_value("CASE", casename)
     rundir = case.get_value("RUNDIR")
     rundir = os.path.dirname(rundir)
     rundir = f"{rundir}/run.{ens_idx.split('.')[-1]}"
