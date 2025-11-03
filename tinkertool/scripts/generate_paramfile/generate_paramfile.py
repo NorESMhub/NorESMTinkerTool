@@ -82,17 +82,10 @@ def generate_one_at_a_time_sample_points(config: CheckedParameterFileConfig) -> 
     nparams = len(config.params)
     sample_points = {}
 
-    if n_total <= 1:
-        for param in config.params:
-            pdata = config.param_ranges[param]
-            out_array = np.array([float(pdata.get("default", 0.0))])
-            sample_points[param] = (["nmb_sim"], out_array)
-        return sample_points
-
     # Determine how many variation sims per parameter
     n_variations_base = (n_total - 1) // nparams
     remainder = (n_total - 1) % nparams
-    variations_per_param = [n_variations_base + (1 if i < remainder else 0) for i in range(nparams)]
+    variations_per_param = 2
 
     # Prepare matrix filled with defaults
     values = np.zeros((n_total, nparams), dtype=float)
@@ -105,7 +98,7 @@ def generate_one_at_a_time_sample_points(config: CheckedParameterFileConfig) -> 
     idx = 1  # start after default
     for j, param in enumerate(config.params):
         pdata = config.param_ranges[param]
-        # compute min/max for this parameter
+        
         if pdata.get("scale_fact", None):
             minv = float(pdata["default"]) - float(pdata["default"]) * float(
                 pdata["scale_fact"]
@@ -117,12 +110,12 @@ def generate_one_at_a_time_sample_points(config: CheckedParameterFileConfig) -> 
             minv = float(pdata["min"])
             maxv = float(pdata["max"])
 
-        n_var = variations_per_param[j]
+        n_var = variations_per_param
         if n_var <= 0:
             continue
 
         var_vals = np.linspace(minv, maxv, n_var)
-
+        print(var_vals)
         for k in range(n_var):
             if idx >= n_total:
                 break
@@ -186,8 +179,15 @@ def generate_paramfile(config: ParameterFileConfig):
     )
 
     # Create sample points using the requested sampling strategy
+    n_total = len(config.nmb_sim_dim)
+    
     if config.one_at_the_time:
         sample_points = generate_one_at_a_time_sample_points(config)
+    elif n_total <= 1:
+        for param in config.params:
+            pdata = config.param_ranges[param]
+            out_array = np.array([float(pdata.get("default", 0.0))])
+            sample_points[param] = (["nmb_sim"], out_array)
     else:
         sample_points = generate_latin_hypercube_sample_points(config)
 
