@@ -24,7 +24,7 @@ class ParameterFileConfig(BaseConfig):
     # Core required fields (validated in __post_init__)
     param_ranges_inpath:        Path = field(metadata={"help": "Path to the parameter ranges file in .ini format"})
     param_sample_outpath:       Path = field(metadata={"help": "Path to the output parameter file with .nc extension"})
-    nmb_sim:                    int = field(metadata={"help": "Number of ensemble members."})
+    nmb_sim:                    int | None = field(default=None, metadata={"help": "Number of ensemble members. (Not required if one_at_the_time is set.)"})
     # Optional parameter file specific fields
     chem_mech_file:             Path | None = field(default=None, metadata={"help": "Path to the chemistry mechanism file, default None will will not modify chemistry mechanism."})
     ctsm_default_param_file:    Path | None = field(default=None, metadata={"help": "Path to the default CTSM parameter file in netCDF format, default None will not modify CTSM parameters"})
@@ -34,7 +34,10 @@ class ParameterFileConfig(BaseConfig):
     avoid_scramble:             bool = field(default=False, metadata={"help": "Overwrite the default scramble of hypercube, i.e. scramble=False to center samples within cells of a multi-dimensional grid. If it is not called, samples are randomly placed within cells of the grid."})
     params:                     list | None = field(default=None, metadata={"help": "List of parameters to be sampled, have to be defined in param_ranges_inpath. If unspecified all parameters in param_ranges_inpath will be used"})
     exclude_default:            bool = field(default=False, metadata={"help": "Whether to exclude the default parameter value in the output file in nmb_sim=0. Using this flag will skip nmb_sim=0. Default is to include default value."})
-
+    one_at_the_time:            bool = field(default=False, metadata={
+            "help": "Whether to generate parameter file for one-at-a-time sensitivity analysis instead of Latin Hyper Cube sampling. If this flag is used, nmb_sim is ignored and the output file will contain (2 * number of parameters + 1) members."
+        })
+    # Will have the same fields as the BaseConfig class, but with additional fields for the parameter file generation
     def __post_init__(self):
         # check the arguments
         # param_ranges_inpath

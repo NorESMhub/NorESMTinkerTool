@@ -261,7 +261,6 @@ def generate_one_at_a_time_sample_points(checked_config: CheckedParameterFileCon
 
 
 def generate_paramfile(config: ParameterFileConfig):
-
     # Set up logging
     logging.info("> Starting parameter file generation")
 
