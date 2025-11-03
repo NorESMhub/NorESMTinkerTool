@@ -89,13 +89,18 @@ def generate_one_at_a_time_sample_points(config: CheckedParameterFileConfig) -> 
 
     # Prepare matrix filled with defaults
     values = np.zeros((n_total, nparams), dtype=float)
+
     for j, param in enumerate(config.params):
         pdata = config.param_ranges[param]
-        default_val = float(pdata.get("default", 0.0))
+        default_val = float(pdata.get("default", None))
+        if default_val is None:
+            raise ValueError(f"Parameter {param} has no default value defined.")
         values[:, j] = default_val
 
-    # Fill variation slots
-    idx = 1  # start after default
+    if config.exclude_default == False:
+        idx = 1  # start after default
+    else:
+        idx = 0  # start at beginning
     for j, param in enumerate(config.params):
         pdata = config.param_ranges[param]
         
