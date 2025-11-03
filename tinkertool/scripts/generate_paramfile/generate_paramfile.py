@@ -20,18 +20,8 @@ def generate_latin_hypercube_sample_points(config: CheckedParameterFileConfig) -
 
     Returns a dict mapping parameter name -> (["nmb_sim"], values_array).
     """
-    logging.debug("Setting up Latin Hypercube")
-    # Set up logging
-    setup_logging(config.verbose, config.log_file, config.log_mode)
-    logging.info("> Starting parameter file generation")
 
-    # check if ParameterFileConfig is valid
-    logging.debug(f"Checking config: {config.describe(return_string=True)}")
-    config: CheckedParameterFileConfig = config.get_checked_and_derived_config()
-    logging.getLogger().info_detailed(
-        f">> Generating with config: {config.describe(return_string=True)}"
-    )
-
+    logging.debug("> Starting parameter file generation")
     # Generate Latin Hypercube sample
     logging.debug("Generating Latin Hypercube sample")
     hypc = stats.qmc.LatinHypercube(
@@ -158,6 +148,7 @@ def generate_chem_mech_files(sample_points: dict, config: CheckedParameterFileCo
     This mutates `sample_points` by removing the
     'SOA_y_scale_chem_mech_in' entry when present.
     """
+    
     chem_mech_in = []
     if sample_points.get("SOA_y_scale_chem_mech_in", None):
         SOA_y_scale_chem_mech_in = sample_points["SOA_y_scale_chem_mech_in"]
@@ -183,14 +174,13 @@ def generate_chem_mech_files(sample_points: dict, config: CheckedParameterFileCo
 
 
 def generate_paramfile(config: ParameterFileConfig):
-
     # Set up logging
     setup_logging(config.verbose, config.log_file, config.log_mode)
     logging.info("> Starting parameter file generation")
 
     # check if ParameterFileConfig is valid
     logging.debug(f"Checking config: {config.describe(return_string=True)}")
-    config: CheckedParameterFileConfig = config.check_and_handle_arguments()
+    config: CheckedParameterFileConfig = config.get_checked_and_derived_config()
     logging.getLogger().info_detailed(
         f">> Generating with config: {config.describe(return_string=True)}"
     )
@@ -224,7 +214,9 @@ def generate_paramfile(config: ParameterFileConfig):
         )
 
     # Add variables with irregular names
-    if config.change_chem_mech:
+    print(config.change_chem_mech)
+    if config.change_chem_mech and config.perturbed_chem_mech:
+        logging.debug("Adding chemistry mechanism files to dataset")
         out_ds["chem_mech_in"] = (["nmb_sim"], chem_mech_in)
     current_time = datetime.now().replace(microsecond=0)
     # Assigning to your attribute

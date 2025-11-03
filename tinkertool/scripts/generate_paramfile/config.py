@@ -167,6 +167,12 @@ class ParameterFileConfig(BaseConfig):
             "help": "Whether to exclude the default parameter value in the output file in nmb_sim=0. Using this flag will skip nmb_sim=0. Default is to include default value."
         },
     )
+    perturbed_chem_mech: bool = field(
+        default=False,
+        metadata={
+            "help": "Whether to do perturbations that requires changes to the chemistry preprocessing."
+        },
+    )
 
     def __post_init__(self):
         # run the parent __post_init__ method

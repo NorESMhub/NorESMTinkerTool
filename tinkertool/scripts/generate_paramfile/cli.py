@@ -85,6 +85,12 @@ def parse_cli_args() -> ParameterFileConfig:
         help="Whether to exclude the default parameter value in the output file in nmb_sim=0. Using this flag will skip nmb_sim=0. Default is to include default value.",
     )
     parser.add_argument(
+        "--perturbe-chem-mech",
+        "-pcm",
+        action="store_true",
+        help="Whether to do perturbations that requires changes to the chemistry preprocessing.",
+    )
+    parser.add_argument(
         "--verbose",
         "-v",
         default=0,
@@ -128,4 +134,6 @@ def parse_cli_args() -> ParameterFileConfig:
         verbose=args.verbose,
         log_file=Path(args.log_file).resolve() if args.log_file else None,
         log_mode=args.log_mode,
+        perturbed_chem_mech=args.perturbe_chem_mech,
+        one_at_the_time=args.one_at_a_time,
     )
