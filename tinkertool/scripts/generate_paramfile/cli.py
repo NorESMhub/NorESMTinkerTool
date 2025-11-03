@@ -1,8 +1,10 @@
 import argparse
 from pathlib import Path
-
+import importlib.resources as pkg_resources
 from tinkertool.scripts.generate_paramfile.config import ParameterFileConfig
 
+with pkg_resources.path("tinkertool.default_config", "default_param_ranges.ini") as p:
+    default_param_ranges_path = p.resolve()
 
 def parse_cli_args() -> ParameterFileConfig:
     # --- Define CLI arguments
@@ -10,15 +12,18 @@ def parse_cli_args() -> ParameterFileConfig:
         description="Generates a Latin Hyper Cube parameter file for PPE experiment"
     )
     parser.add_argument(
-        "param_ranges_inpath",
-        type=str,
-        help="Path to the parameter ranges file in .ini format, default ranges are found in NorESMTinkerTool/default_config/default_param_ranges.ini",
-    )
-    parser.add_argument(
         "param_sample_outpath",
         type=str,
         help="Path to the output parameter file with .nc extension.",
     )
+    parser.add_argument(
+        "--param_file",
+        "-pf",
+        type=str,
+        default=default_param_ranges_path,
+        help="Path to the parameter ranges file in .ini format, default ranges are found in NorESMTinkerTool/default_config/default_param_ranges.ini",
+    )
+
     parser.add_argument(
         "--chem-mech-file",
         "-cmf",
@@ -61,6 +66,12 @@ def parse_cli_args() -> ParameterFileConfig:
         help="List of parameters to be sampled, have to be defined in param_ranges_inpath. If unspecified all parameters in param_ranges_inpath will be used",
     )
     parser.add_argument(
+        "--one-at-a-time",
+        "-oat",
+        action="store_true",
+        help="Whether to generate parameter file for one-at-a-time sensitivity analysis instead of Latin Hyper Cube sampling. If this flag is used, nmb_sim is ignored and the output file will contain (2 * number of parameters + 1) members.",
+    )
+    parser.add_argument(
         "--assumed-esm-component",
         "-ac",
         type=str,
@@ -98,8 +109,8 @@ def parse_cli_args() -> ParameterFileConfig:
     args = parser.parse_args()
 
     return ParameterFileConfig(
-        param_ranges_inpath=Path(args.param_ranges_inpath).resolve(),
         param_sample_outpath=Path(args.param_sample_outpath).resolve(),
+        param_ranges_inpath=Path(args.param_file).resolve(),
         chem_mech_file=(
             Path(args.chem_mech_file).resolve() if args.chem_mech_file else None
         ),

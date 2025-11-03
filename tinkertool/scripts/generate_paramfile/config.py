@@ -149,6 +149,12 @@ class ParameterFileConfig(BaseConfig):
             "help": "List of parameters to be sampled, have to be defined in param_ranges_inpath. If unspecified all parameters in param_ranges_inpath will be used"
         },
     )
+    one_at_the_time: bool = field(
+        default=False,
+        metadata={
+            "help": "Whether to generate parameter file for one-at-a-time sensitivity analysis instead of Latin Hyper Cube sampling. If this flag is used, nmb_sim is ignored and the output file will contain (2 * number of parameters + 1) members."
+        },
+    )
     assumed_esm_component: str = field(
         default="cam",
         metadata={
@@ -211,6 +217,7 @@ class ParameterFileConfig(BaseConfig):
                 f"Invalid component: {self.assumed_esm_component}. Must be one of {valid_components}."
             )
         # exclude_default
+        check_type(self.one_at_the_time, bool)
         check_type(self.exclude_default, bool)
 
     def get_checked_and_derived_config(self):
@@ -281,6 +288,8 @@ class ParameterFileConfig(BaseConfig):
             nmb_sim_dim = np.arange(1, self.nmb_sim + 1)
         else:
             nmb_sim_dim = np.arange(0, self.nmb_sim + 1)
+        if self.one_at_the_time:
+            nmb_sim_dim = np.arange(0, 2 * nparams + 1)
 
         return CheckedParameterFileConfig(
             **self.__dict__,
