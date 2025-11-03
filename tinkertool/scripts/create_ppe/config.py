@@ -1,3 +1,4 @@
+import os
 import logging
 import configparser
 import numpy as np
@@ -130,6 +131,10 @@ class CreatePPEConfig(BaseConfig):
         # - create_case
         cesmroot = Path(simulation_setup['create_case']['cesmroot']).resolve()
         validate_directory(cesmroot, "CESM root directory")
+        if os.environ.get('CESMROOT') != cesmroot:
+            logging.warning(f"CESMROOT environment variable is set to {os.environ.get('CESMROOT')}, but the simulation setup file specifies {cesmroot}.")
+            logging.warning("This may cause issues with CIME paths. Consider choosing one cesmroot.")
+
         add_CIME_paths_and_import(cesmroot)
 
         return CheckedCreatePPEConfig(
@@ -159,7 +164,7 @@ class CheckedCreatePPEConfig(CreatePPEConfig):
     assumed_esm_component:  str = field(default=None, metadata={"help": "Assumed ESM component for entries that does not have a specified component attribute in paramfile"})
     # - paramfile
     paramfile_path:         Path = field(default=None, metadata={"help": "Path to the paramfile"})
-    pdim:                   str = field(default=None, metadata={"help": "Dimension of ensamble member count in paramfile"})
+    pdim:                   str = field(default=None, metadata={"help": "Dimension of ensemble member count in paramfile"})
     paramdict:              dict = field(default=None, metadata={"help": "Dictionary of parameters in the paramfile"})
     componentdict:          dict = field(default=None, metadata={"help": "Dictionary of ESM components in the paramfile"})
     num_sims:               int = field(default=None, metadata={"help": "Number of ensemble members"})

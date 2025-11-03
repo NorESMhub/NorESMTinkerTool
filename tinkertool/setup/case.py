@@ -12,7 +12,10 @@ from tinkertool.setup.namelist import setup_usr_nlstring, write_user_nl_file
 from tinkertool.setup.setup_cime_connection import add_CIME_paths
 
 try:
-    add_CIME_paths(cesmroot=os.environ.get('CESMROOT'))
+    environ_CESMROOT = os.environ.get('CESMROOT')
+    if environ_CESMROOT is None:
+        raise ImportError("CESMROOT environment variable not set")
+    add_CIME_paths(cesmroot=environ_CESMROOT)
 except ImportError:
     print("ERROR: add_CIME_paths failed, update CESMROOT environment variable")
     raise SystemExit
@@ -106,10 +109,9 @@ def _per_run_case_updates(
     logger.info(">> Building clone case {}...".format(ens_idx))
 
     caseroot = case.get_value("CASEROOT")
-    basecasename = os.path.basename(caseroot)
+    casename = os.path.basename(caseroot)
     unlock_file("env_case.xml",caseroot=caseroot)
-    casename = f"{basecasename}{ens_idx}"
-    case.set_value("CASE",casename)
+    case.set_value("CASE", casename)
     rundir = case.get_value("RUNDIR")
     rundir = os.path.dirname(rundir)
     rundir = f"{rundir}/run.{ens_idx.split('.')[-1]}"
@@ -163,11 +165,11 @@ def _per_run_case_updates(
     if chem_mech_file is not None:
         comm = 'cp {} {}'.format(chem_mech_file, caseroot+'/')
         subprocess.run(comm, shell=True)
-        unlock_file("env_build.xml",caseroot=caseroot)
+        unlock_file("env_build.xml", caseroot=caseroot)
         value = case.get_value("CAM_CONFIG_OPTS", resolved=False)
         case.set_value("CAM_CONFIG_OPTS", f"{value} --usr_mech_infile {caseroot}/{chem_mech_file.name}")
         case.flush()
-        lock_file("env_build.xml",caseroot=caseroot)
+        lock_file("env_build.xml", caseroot=caseroot)
 
 
     logger.info(">> Clone {} case_setup".format(ens_idx))
@@ -229,7 +231,6 @@ def build_base_case(
                 compset_name=case_settings.pop("compset"),
                 grid_name=case_settings.pop("res"),
                 machine_name=case_settings.pop("mach"),
-                walltime=case_settings.pop("walltime"),
                 project=case_settings.pop("project"),
                 driver="nuopc",
                 run_unsupported=True,
@@ -266,6 +267,8 @@ def build_base_case(
         logger.info(">>> Setting environment run settings...")
         # set the run settings
         case.set_value("RUN_TYPE", env_run_settings.pop("RUN_TYPE"))
+        case.set_value('JOB_WALLCLOCK_TIME', env_run_settings.pop('JOB_WALLCLOCK_TIME_RUN'), subgroup='case.run')
+        case.set_value('JOB_WALLCLOCK_TIME', env_run_settings.pop('JOB_WALLCLOCK_TIME_ARCHIVE'), subgroup='case.st_archive')
         if env_run_settings.get("GET_REFCASE") is not None:
             case.set_value("GET_REFCASE", env_run_settings.pop("GET_REFCASE"))
         if env_run_settings.get("RUN_REFCASE") is not None:
@@ -284,7 +287,7 @@ def build_base_case(
 
         if env_run_settings.get('CAM_CONFIG_OPTS') is not None:
             if env_run_settings.get('cam_onopts'):
-                Warning.warning(
+                logging.warning(
                     "Both 'CAM_CONFIG_OPTS' and 'cam_onopts' were provided. "
                     "'CAM_CONFIG_OPTS' will overwrite all previous options including 'cam_onopts'."
                 )
@@ -322,10 +325,8 @@ def build_base_case(
             user_nl_str = setup_usr_nlstring(namelist_collection_dict[nl_control_filename], component_name=component_name)
             write_user_nl_file(caseroot, f"user_nl_{component_name}", user_nl_str)
 
-    logger.info(">> base case_build...")
-    os.chdir(caseroot)
-    subprocess.run(['./case.build'], check=True)
-    logger.info(">>> base case build completed successfully.")
+        logger.info(">> base case_build...")
+        build.case_build(caseroot, case=case)
 
     return caseroot
 
@@ -366,7 +367,7 @@ def clone_base_case(baseroot: str,
     """
 
     logger.info(">>> CLONING BASE CASE for member {}...".format(ensemble_idx))
-    cloneroot = os.path.join(baseroot, f'ensamble_member.{ensemble_idx}')
+    cloneroot = os.path.join(baseroot, f'ensemble_member.{ensemble_idx}')
 
     if overwrite and os.path.isdir(cloneroot):
         shutil.rmtree(cloneroot)

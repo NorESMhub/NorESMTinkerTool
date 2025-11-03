@@ -5,11 +5,12 @@ from tinkertool.utils.type_check_decorator import type_check_decorator
 
 @type_check_decorator
 def validate_file(
-    file_path:          Path,
+    file_path:          Path | str,
     expected_suffix:    str,
     description:        str,
     new_file:           bool
 ):
+    file_path = Path(file_path).resolve()
     if not file_path.suffix == expected_suffix:
         raise SystemExit(f"ERROR: {file_path} is not a valid {description}")
     else:
@@ -21,9 +22,10 @@ def validate_file(
 
 @type_check_decorator
 def validate_directory(
-    directory_path: Path,
+    directory_path: Path | str,
     description: str
 ):
+    directory_path = Path(directory_path).resolve()
     if not directory_path.is_dir():
         traceback.print_stack()
         raise SystemExit(f"ERROR: {directory_path} is not a valid {description}")

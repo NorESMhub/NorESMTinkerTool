@@ -1,11 +1,12 @@
 import sys
+import time
 import logging
 import configparser
 import numpy as np
 from pathlib import Path
 from dataclasses import dataclass, fields, field, MISSING
 
-import pkg_resources
+from importlib import resources
 from tinkertool.utils.logging import setup_logging
 from tinkertool.utils.read_files import read_config
 from tinkertool.utils.check_arguments import validate_file, validate_directory, check_type
@@ -14,14 +15,17 @@ from tinkertool.utils.make_chem_in import generate_chem_in_ppe, check_if_chem_me
 # ------------------------ #
 # --- Global variables --- #
 # ------------------------ #
-default_chem_mech = Path(pkg_resources.resource_filename('default_config','default_chem_mech.in')).resolve()
+_resource_path = resources.files("default_config").joinpath("default_chem_mech.in")
+if _resource_path is None:
+    raise FileNotFoundError("Could not locate default_chem_mech.in resource file")
+default_chem_mech = Path(str(_resource_path)).resolve()
 default_output_dir = Path(__file__).parent.parent.parent.joinpath('output')    # NorESMTinkerTool/output
 
 @dataclass
 class BaseConfig:
     """Base dataclass for parameter file generation configuration."""
     verbose:    int = field(default=0, metadata={"help": "Increase verbosity level (0: WARNING, 1: INFO, 2: INFO_DETAILED, 3: DEBUG)"})
-    log_file:   Path = field(default=None, metadata={"help": "Path to the log file where logs will be written. If None, logs will not be saved to a file."})
+    log_dir:    Path | str = field(default="", metadata={"help": "Path to the log directory where logs will be written. If not specified, logs will be printed in current work directory."})
     log_mode:   str = field(default="w", metadata={"help": "Mode for opening the log file ('w' for write, 'a' for append)"})
 
     def __post_init__(self):
@@ -30,11 +34,16 @@ class BaseConfig:
         # verbose
         if self.verbose not in [0, 1, 2, 3]:
             raise ValueError(f"Invalid verbosity level: {self.verbose}. Must be 0, 1, 2, or 3.")
-        # log_file
-        if self.log_file is not None:
-            if not self.log_file.exists():
-                self.log_file.parent.mkdir(parents=True, exist_ok=True)
-                self.log_file.touch()
+        # log_dir
+        if self.log_dir is not None:
+            self.log_dir = Path(self.log_dir).resolve()
+            if not self.log_dir.exists():
+                self.log_dir.mkdir(parents=True, exist_ok=True)
+            validate_directory(self.log_dir, "Log directory")
+        else:
+            self.log_dir = Path.cwd()
+        time_str = time.strftime("%Y%m%d-%H%M%S")
+        self.log_file = self.log_dir.joinpath(f'tinkertool_{time_str}.log')
         # log_mode
         if self.log_mode not in ["w", "a"]:
             raise ValueError(f"Invalid log mode: {self.log_mode}. Must be 'w' or 'a'.")
@@ -66,25 +75,29 @@ class BaseConfig:
             print("\n".join(lines))
 
     def get_checked_and_derived_config(self):
-        pass
+        return self
 
-@dataclass
+@dataclass(kw_only=True)
 class ParameterFileConfig(BaseConfig):
-    # Will have the same fields as the BaseConfig class, but with additional fields for the parameter file generation
-    param_ranges_inpath: Path = field(default=None, metadata={"help": "Path to the parameter ranges file in .ini format"})
-    param_sample_outpath: Path = field(default=None, metadata={"help": "Path to the output parameter file with .nc extension"})
-    chem_mech_file: Path = field(default=None, metadata={"help": "Path to the chemistry mechanism file, default None will use NorESMTinkerTool/default_config/default_chem_mech.in"})
-    tinkertool_output_dir: Path = field(default=None, metadata={"help": "Path to the output directory for files produced by TinkerTool, default None will use NorESMTinkerTool/output"})
-    nmb_sim: int = field(default=30, metadata={"help": "Number of ensemble members, default 30"})
-    optimization: str = field(default=None, metadata={"help": "Whether to enable optimazation after sampling, valid random-cd or lloyd. Default None."})
-    avoid_scramble: bool = field(default=False, metadata={"help": "Overwrite the default scramble of hypercube, i.e. scramble=False to center samples within cells of a multi-dimensional grid. If it is not called, samples are randomly placed within cells of the grid."})
-    params: list = field(default=None, metadata={"help": "List of parameters to be sampled, have to be defined in param_ranges_inpath. If unspecified all parameters in param_ranges_inpath will be used"})
-    assumed_esm_component: str = field(default='cam', metadata={"help": "Assume component for parameter. This is used if component is not specified for an entry in the parameter ranges file. Default is 'cam'."})
-    exclude_default: bool = field(default=False, metadata={"help": "Whether to exclude the default parameter value in the output file in nmb_sim=0. Using this flag will skip nmb_sim=0. Default is to include default value."})
+    """Parameter file generation configuration.
+
+    This class inherits from BaseConfig.
+    """
+
+    # Core required fields (validated in __post_init__)
+    param_ranges_inpath:    Path = field(metadata={"help": "Path to the parameter ranges file in .ini format"})
+    param_sample_outpath:   Path = field(metadata={"help": "Path to the output parameter file with .nc extension"})
+    nmb_sim:                int = field(metadata={"help": "Number of ensemble members."})
+    # Optional parameter file specific fields
+    chem_mech_file:         Path = field(default=default_chem_mech, metadata={"help": "Path to the chemistry mechanism file, default None will use NorESMTinkerTool/default_config/default_chem_mech.in"})
+    tinkertool_output_dir:  Path = field(default=default_output_dir, metadata={"help": "Path to the output directory for files produced by TinkerTool, default None will use NorESMTinkerTool/output"})
+    optimization:           str | None = field(default=None, metadata={"help": "Whether to enable optimazation after sampling, valid random-cd or lloyd. Default None."})
+    avoid_scramble:         bool = field(default=False, metadata={"help": "Overwrite the default scramble of hypercube, i.e. scramble=False to center samples within cells of a multi-dimensional grid. If it is not called, samples are randomly placed within cells of the grid."})
+    params:                 list | None = field(default=None, metadata={"help": "List of parameters to be sampled, have to be defined in param_ranges_inpath. If unspecified all parameters in param_ranges_inpath will be used"})
+    assumed_esm_component:  str = field(default='cam', metadata={"help": "Assume component for parameter. This is used if component is not specified for an entry in the parameter ranges file. Default is 'cam'."})
+    exclude_default:        bool = field(default=False, metadata={"help": "Whether to exclude the default parameter value in the output file in nmb_sim=0. Using this flag will skip nmb_sim=0. Default is to include default value."})
 
     def __post_init__(self):
-        # run the parent __post_init__ method
-        super().__post_init__()
         # check the arguments
         # param_ranges_inpath
         if self.param_ranges_inpath is None:
@@ -117,11 +130,17 @@ class ParameterFileConfig(BaseConfig):
         # exclude_default
         check_type(self.exclude_default, bool)
 
+        # run the parent __post_init__ method
+        super().__post_init__()
+
     def get_checked_and_derived_config(self):
         """Check and handle arguments for the parameter file generation configuration."""
         super().get_checked_and_derived_config()
 
         # param_ranges_inpath
+        if self.param_ranges_inpath is None:
+            raise ValueError("param_ranges_inpath is required!")
+        assert self.param_ranges_inpath is not None  # Help type checker
         param_ranges = read_config(self.param_ranges_inpath)
         # params
         if self.params is not None:
@@ -133,6 +152,7 @@ class ParameterFileConfig(BaseConfig):
             self.params = param_ranges.sections()
         nparams = len(self.params)
         # param_sample_outpath
+        assert self.param_sample_outpath is not None  # Help type checker
         if self.param_sample_outpath.exists():
             overwrite = input(f"Output file {self.param_sample_outpath} already exists. Overwrite? (y/n): ").strip().lower()
             if overwrite != 'y':
@@ -142,7 +162,7 @@ class ParameterFileConfig(BaseConfig):
             self.param_sample_outpath.parent.mkdir(parents=True, exist_ok=True)
         # chem_mech_file
         change_chem_mech = False
-        if check_if_chem_mech_is_perterbed(self.param_ranges_inpath):
+        if check_if_chem_mech_is_perterbed(str(self.param_ranges_inpath)):
             change_chem_mech = True
             if self.chem_mech_file is None:
                 self.chem_mech_file = default_chem_mech
@@ -174,15 +194,15 @@ class ParameterFileConfig(BaseConfig):
             change_chem_mech=change_chem_mech
         )
 
-@dataclass
+@dataclass(kw_only=True)
 class CheckedParameterFileConfig(ParameterFileConfig):
     """Checked dataclass for parameter file generation configuration."""
     # Will have the same fields as the ParameterFileConfig class, but with additional fields for the checked configuration
-    param_ranges: configparser.ConfigParser = field(default=None, metadata={"help": "Parsed parameter ranges file"})
-    nparams: int = field(default=None, metadata={"help": "Number of parameters to be sampled"})
-    scramble: bool = field(default=None, metadata={"help": "Whether to scramble the samples"})
-    nmb_sim_dim: np.ndarray = field(default=None, metadata={"help": "Array of ensemble member indices"})
-    change_chem_mech: bool = field(default=None, metadata={"help": "Whether to change the chemistry mechanism file"})
+    param_ranges:       configparser.ConfigParser = field(default_factory=lambda: configparser.ConfigParser(), metadata={"help": "Parsed parameter ranges file"})
+    nparams:            int = field(default=0, metadata={"help": "Number of parameters to be sampled"})
+    scramble:           bool = field(default=True, metadata={"help": "Whether to scramble the samples"})
+    nmb_sim_dim:        np.ndarray = field(default_factory=lambda: np.array([]), metadata={"help": "Array of ensemble member indices"})
+    change_chem_mech:   bool = field(default=False, metadata={"help": "Whether to change the chemistry mechanism file"})
 
     def __post_init__(self):
         # run the parent __post_init__ method
@@ -202,4 +222,5 @@ class CheckedParameterFileConfig(ParameterFileConfig):
         check_type(self.change_chem_mech, bool)
 
     def get_checked_and_derived_config(self):
-        logging.info(f"{self.__class__.__name__} is a datacall with all derived fields, no further checks are needed.")
+        logging.info(f"{self.__class__.__name__} is a dataclass with all derived fields, no further checks are needed.")
+        return self
