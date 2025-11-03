@@ -320,8 +320,9 @@ def generate_paramfile(config: ParameterFileConfig):
             ds[param].attrs['esm_component'] = component.lower()
 
     # Add variables with irregular names
-    if checked_config.change_chem_mech:
-        out_ds['chem_mech_in'] = (['nmb_sim'], chem_mech_in)
+    if config.change_chem_mech and config.perturbed_chem_mech:
+        logging.debug("Adding chemistry mechanism files to dataset")
+        out_ds["chem_mech_in"] = (["nmb_sim"], chem_mech_in)
     current_time = datetime.now().replace(microsecond=0)
     # Assigning to your attribute
     for ds in [raw_ds, out_ds]:
