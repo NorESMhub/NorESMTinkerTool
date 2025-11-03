@@ -18,7 +18,7 @@ Note that the package requires python >=3.10,<3.12 to be active in your envirome
 
 2. clone repository:
 ```
-git clone https://github.com/Ovewh/NorESMTinkerTool.git && cd NorESMTinkerTool
+git clone git@github.com:Johannesfjeldsaa/NorESMTinkerTool.git && cd NorESMTinkerTool
 ```
 
 You are now in `<tinkerroot>`.
@@ -59,6 +59,10 @@ The package then has the following use cases:
 
 1. Generate parameter file for PPE.
 2. Create PPE.
+    - build ensemble members
+    - check build
+    - prestage data
+    - submit ppe to queue
 
 Package usage is detailed further in the following subsections.
 
@@ -249,7 +253,7 @@ submit_ppe(submitppe_config)
 
 Common for both the CLI and scripting is that you will have to provide the same arguments. All input is self explanatory what to pass except the `simulation_setup.ini` file which you provide to 'simulation_setup_path' and which have to follow a specific template:
 
-### simulation_setup.ini
+#### simulation_setup.ini
 
 The simulation setup is expected to be a `.ini` file which must contain extensive information on the PPE cases. Current setup uses the following sections; `create_case`, `env_run`, `env_build`, `ppe_settings`, `namelist_control` and `lifeCycleValues`.
 
@@ -295,7 +299,7 @@ It is possible to use additional key-value pairs in this section as well. As key
 
 ```ini
 paramfile             = <absolute path to .nc parameter samples>
-pdim                  = <ensamlbe number dimension name in paramfile>
+pdim                  = <ensemlbe number dimension name in paramfile>
 baseroot              = <absolute path to where you want ppe cases>
 basecasename          = <name of basecase>
 basecase_id           = <number used id-ing the basecase, e.g. 000 if we include default or 001 if we exclude it>
@@ -355,4 +359,3 @@ Each section correspond to namelist group. Valid namelist variables are describe
 * clm - `NorESM/components/clm/bld/namelist_files/namelist_definition_ctsm.xml`
 
 **NOTE**: You do not need to add the name of the parameters you are pertermbing to these .ini files.
-
