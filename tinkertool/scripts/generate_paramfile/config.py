@@ -63,6 +63,14 @@ class ParameterFileConfig(BaseConfig):
             for param in self.params:
                 check_type(param, str)
         # exclude_default
+        # assume_component
+        valid_components = ["cam", "cice", "clm"]
+        if self.assumed_esm_component not in valid_components:
+            raise ValueError(
+                f"Invalid component: {self.assumed_esm_component}. Must be one of {valid_components}."
+            )
+        
+        check_type(self.one_at_the_time, bool)
         check_type(self.exclude_default, bool)
 
         # run the parent __post_init__ method
@@ -143,12 +151,21 @@ class ParameterFileConfig(BaseConfig):
         else:
             scramble = True
         # exclude_default
-        if self.exclude_default:
+        if self.exclude_default and not self.one_at_the_time:
             if self.nmb_sim == 0:
-                raise ValueError("nmb_sim=0 is not allowed when exclude_default=True. Please set nmb_sim>0 or exclude the flag.")
-            nmb_sim_dim = np.arange(1, self.nmb_sim+1)
+                raise ValueError(
+                    "nmb_sim=0 is not allowed when exclude_default=True. Please set nmb_sim>0 or exclude the flag."
+                )
+            nmb_sim_dim = np.arange(1, self.nmb_sim + 1)
+        elif self.one_at_the_time:
+            if self.exclude_default:
+                nmb_sim_dim = np.arange(1, 2 * nparams + 1)
+            else:
+                nmb_sim_dim = np.arange(0, 2 * nparams + 1)
         else:
-            nmb_sim_dim = np.arange(0, self.nmb_sim+1)
+            nmb_sim_dim = np.arange(0, self.nmb_sim + 1)
+
+
 
         return CheckedParameterFileConfig(
             **self.__dict__,

@@ -278,7 +278,7 @@ def generate_paramfile(config: ParameterFileConfig):
             out_array = np.array([float(pdata.get("default", 0.0))])
             sample_points[param] = (["nmb_sim"], out_array)
     else:
-        sample_points = generate_latin_hypercube_sample_points(config)
+        sample_points = generate_latin_hypercube_sample_points(checked_config)
 
     sample_points_with_files = sample_points.copy()
 
