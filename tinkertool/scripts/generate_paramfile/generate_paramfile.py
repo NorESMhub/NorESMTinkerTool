@@ -2,12 +2,19 @@ import logging
 import numpy as np
 import xarray as xr
 import scipy.stats as stats
-from pathlib import Path
 from datetime import datetime
+from typing import cast, Literal
 
 from tinkertool.utils.custom_logging import setup_logging, log_info_detailed
 from tinkertool.utils.sampling import scale_values
 from tinkertool.utils.make_chem_in import generate_chem_in_ppe
+from tinkertool.utils.make_land_parameterfiles import (
+    make_new_ctsm_pamfile,
+    make_new_fates_pamfile
+)
+from tinkertool.utils.check_arguments import validate_file
+from tinkertool.utils.read_files import safe_get_param_value
+from tinkertool.scripts.generate_paramfile import PARAMFILE_INPUT_TYPES
 from tinkertool.scripts.generate_paramfile.config import (
     ParameterFileConfig,
     CheckedParameterFileConfig
