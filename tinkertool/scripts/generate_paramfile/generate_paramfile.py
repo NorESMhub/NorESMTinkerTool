@@ -24,9 +24,7 @@ def generate_paramfile(config: ParameterFileConfig):
     # check if ParameterFileConfig is valid
     logging.debug(f"Checking config: {config.describe(return_string=True)}")
     config: CheckedParameterFileConfig = config.get_checked_and_derived_config()
-    logging.getLogger().info_detailed(
-        f">> Generating with config: {config.describe(return_string=True)}"
-    )
+    logging.getLogger('tinkertool_log').info_detailed(f">> Generating with config: {config.describe(return_string=True)}")
 
     # Generate Latin Hypercube sample
     logging.debug("Generating Latin Hypercube sample")
@@ -94,9 +92,7 @@ def generate_paramfile(config: ParameterFileConfig):
                 )
                 chem_mech_in.append(outfile)
 
-                logging.getLogger().info_detailed(
-                    f"{outfile} generated with SOA_y_scale_chem_mech_in = {scale_factor}"
-                )
+                logging.getLogger('tinkertool_log').info_detailed(f"{outfile} generated with SOA_y_scale_chem_mech_in = {scale_factor}")
 
             del sample_points["SOA_y_scale_chem_mech_in"]
 
@@ -116,7 +112,6 @@ def generate_paramfile(config: ParameterFileConfig):
         out_ds[param].attrs["esm_component"] = config.param_ranges[param].get(
             "esm_component", config.assumed_esm_component
         )
-
     # Add variables with irregular names
     if config.change_chem_mech:
         out_ds["chem_mech_in"] = (["nmb_sim"], chem_mech_in)

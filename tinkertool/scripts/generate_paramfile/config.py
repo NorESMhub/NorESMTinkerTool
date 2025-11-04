@@ -1,6 +1,7 @@
+import sys
+import time
 import configparser
 import logging
-import sys
 from dataclasses import MISSING, dataclass, field, fields
 from pathlib import Path
 
@@ -24,10 +25,12 @@ from tinkertool.utils.read_files import read_config
 # ------------------------ #
 with pkg_resources.path("tinkertool.default_config", "default_chem_mech.in") as p:
     default_chem_mech = p.resolve()
+    if default_chem_mech is None:
+        raise FileNotFoundError("Could not locate default_chem_mech.in resource file")
 default_output_dir = Path(__file__).parent.parent.parent.joinpath(
     "output"
-)  # NorESMTinkerTool/output
-
+)
+default_output_dir = Path(__file__).parent.parent.parent.joinpath('output')
 
 @dataclass
 class BaseConfig:
@@ -39,7 +42,7 @@ class BaseConfig:
             "help": "Increase verbosity level (0: WARNING, 1: INFO, 2: INFO_DETAILED, 3: DEBUG)"
         },
     )
-    log_file: Path = field(
+    log_file: Path | str = field(
         default=None,
         metadata={
             "help": "Path to the log file where logs will be written. If None, logs will not be saved to a file."
@@ -57,14 +60,17 @@ class BaseConfig:
         # check the arguments
         # verbose
         if self.verbose not in [0, 1, 2, 3]:
-            raise ValueError(
-                f"Invalid verbosity level: {self.verbose}. Must be 0, 1, 2, or 3."
-            )
-        # log_file
-        if self.log_file is not None:
-            if not self.log_file.exists():
-                self.log_file.parent.mkdir(parents=True, exist_ok=True)
-                self.log_file.touch()
+            raise ValueError(f"Invalid verbosity level: {self.verbose}. Must be 0, 1, 2, or 3.")
+        # log_dir
+        if self.log_dir is not None:
+            self.log_dir = Path(self.log_dir).resolve()
+            if not self.log_dir.exists():
+                self.log_dir.mkdir(parents=True, exist_ok=True)
+            validate_directory(self.log_dir, "Log directory")
+        else:
+            self.log_dir = Path.cwd()
+        time_str = time.strftime("%Y%m%d-%H%M%S")
+        self.log_file = self.log_dir.joinpath(f'tinkertool_{time_str}.log')
         # log_mode
         if self.log_mode not in ["w", "a"]:
             raise ValueError(f"Invalid log mode: {self.log_mode}. Must be 'w' or 'a'.")
@@ -102,20 +108,21 @@ class BaseConfig:
             print("\n".join(lines))
 
     def get_checked_and_derived_config(self):
-        pass
+        return self
 
-
-@dataclass
+@dataclass(kw_only=True)
 class ParameterFileConfig(BaseConfig):
-    # Will have the same fields as the BaseConfig class, but with additional fields for the parameter file generation
-    param_ranges_inpath: Path = field(
-        default=None,
-        metadata={"help": "Path to the parameter ranges file in .ini format"},
-    )
-    param_sample_outpath: Path = field(
-        default=None,
-        metadata={"help": "Path to the output parameter file with .nc extension"},
-    )
+    """Parameter file generation configuration.
+
+    This class inherits from BaseConfig.
+    """
+
+    # Core required fields (validated in __post_init__)
+    param_ranges_inpath:    Path = field(metadata={"help": "Path to the parameter ranges file in .ini format"})
+    param_sample_outpath:   Path = field(metadata={"help": "Path to the output parameter file with .nc extension"})
+    nmb_sim:                int = field(metadata={"help": "Number of ensemble members."})
+    # Optional parameter file specific fields
+    
     chem_mech_file: Path = field(
         default=None,
         metadata={
@@ -161,10 +168,7 @@ class ParameterFileConfig(BaseConfig):
             "help": "Whether to exclude the default parameter value in the output file in nmb_sim=0. Using this flag will skip nmb_sim=0. Default is to include default value."
         },
     )
-
     def __post_init__(self):
-        # run the parent __post_init__ method
-        super().__post_init__()
         # check the arguments
         # param_ranges_inpath
         if self.param_ranges_inpath is None:
@@ -213,11 +217,17 @@ class ParameterFileConfig(BaseConfig):
         # exclude_default
         check_type(self.exclude_default, bool)
 
+        # run the parent __post_init__ method
+        super().__post_init__()
+
     def get_checked_and_derived_config(self):
         """Check and handle arguments for the parameter file generation configuration."""
         super().get_checked_and_derived_config()
 
         # param_ranges_inpath
+        if self.param_ranges_inpath is None:
+            raise ValueError("param_ranges_inpath is required!")
+        assert self.param_ranges_inpath is not None  # Help type checker
         param_ranges = read_config(self.param_ranges_inpath)
         # params
         if self.params is not None:
@@ -231,6 +241,7 @@ class ParameterFileConfig(BaseConfig):
             self.params = param_ranges.sections()
         nparams = len(self.params)
         # param_sample_outpath
+        assert self.param_sample_outpath is not None  # Help type checker
         if self.param_sample_outpath.exists():
             overwrite = (
                 input(
@@ -248,7 +259,7 @@ class ParameterFileConfig(BaseConfig):
             self.param_sample_outpath.parent.mkdir(parents=True, exist_ok=True)
         # chem_mech_file
         change_chem_mech = False
-        if check_if_chem_mech_is_perterbed(self.param_ranges_inpath):
+        if check_if_chem_mech_is_perterbed(str(self.param_ranges_inpath)):
             change_chem_mech = True
             if self.chem_mech_file is None:
                 self.chem_mech_file = default_chem_mech
@@ -291,28 +302,16 @@ class ParameterFileConfig(BaseConfig):
             change_chem_mech=change_chem_mech,
         )
 
-
-@dataclass
+@dataclass(kw_only=True)
 class CheckedParameterFileConfig(ParameterFileConfig):
     """Checked dataclass for parameter file generation configuration."""
 
     # Will have the same fields as the ParameterFileConfig class, but with additional fields for the checked configuration
-    param_ranges: configparser.ConfigParser = field(
-        default=None, metadata={"help": "Parsed parameter ranges file"}
-    )
-    nparams: int = field(
-        default=None, metadata={"help": "Number of parameters to be sampled"}
-    )
-    scramble: bool = field(
-        default=None, metadata={"help": "Whether to scramble the samples"}
-    )
-    nmb_sim_dim: np.ndarray = field(
-        default=None, metadata={"help": "Array of ensemble member indices"}
-    )
-    change_chem_mech: bool = field(
-        default=None,
-        metadata={"help": "Whether to change the chemistry mechanism file"},
-    )
+    param_ranges:       configparser.ConfigParser = field(default_factory=lambda: configparser.ConfigParser(), metadata={"help": "Parsed parameter ranges file"})
+    nparams:            int = field(default=0, metadata={"help": "Number of parameters to be sampled"})
+    scramble:           bool = field(default=True, metadata={"help": "Whether to scramble the samples"})
+    nmb_sim_dim:        np.ndarray = field(default_factory=lambda: np.array([]), metadata={"help": "Array of ensemble member indices"})
+    change_chem_mech:   bool = field(default=False, metadata={"help": "Whether to change the chemistry mechanism file"})
 
     def __post_init__(self):
         # run the parent __post_init__ method
@@ -334,6 +333,5 @@ class CheckedParameterFileConfig(ParameterFileConfig):
         check_type(self.change_chem_mech, bool)
 
     def get_checked_and_derived_config(self):
-        logging.info(
-            f"{self.__class__.__name__} is a datacall with all derived fields, no further checks are needed."
-        )
+        logging.info(f"{self.__class__.__name__} is a dataclass with all derived fields, no further checks are needed.")
+        return self

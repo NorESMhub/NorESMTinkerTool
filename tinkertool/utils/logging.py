@@ -15,8 +15,7 @@ def patch_info_detailed():
         def info_detailed(self, message, *args, **kwargs):
             if self.isEnabledFor(INFO_DETAILED):
                 self._log(INFO_DETAILED, message, args, **kwargs)
-
-        logging.Logger.info_detailed = info_detailed
+        setattr(logging.Logger, 'info_detailed', info_detailed)
 
 
 def setup_logging(
@@ -158,7 +157,8 @@ def custom_logging(
     # Create new handlers
     handlers = [logging.StreamHandler()]
     if log_file is not None:
-        validate_file(log_file, ".log", "log file", new_file=True)
+        log_file = Path(log_file).resolve()
+        validate_file(log_file, '.log', "log file", new_file=True)
         if not log_file.exists():
             log_file.parent.mkdir(parents=True, exist_ok=True)
             log_file.touch()

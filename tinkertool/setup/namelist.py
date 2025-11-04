@@ -40,10 +40,11 @@ def format_value(value: str) -> str:
 
 
 def setup_usr_nlstring(
-    user_nl_config: configparser.ConfigParser, component_name: str
-) -> None:
-    """
-    Takes inn configparser objects of default namelist settings for setting dianoistics and control namelist settings.
+  user_nl_config: configparser.ConfigParser,
+  component_name: str
+) -> str:
+  """
+  Takes inn configparser objects of default namelist settings for setting dianoistics and control namelist settings.
 
     Parameters:
     -----------
