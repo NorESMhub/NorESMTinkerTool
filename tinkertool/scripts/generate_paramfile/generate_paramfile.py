@@ -5,7 +5,7 @@ import scipy.stats as stats
 from pathlib import Path
 from datetime import datetime
 
-from tinkertool.utils.logging import setup_logging
+from tinkertool.utils.custom_logging import setup_logging, log_info_detailed
 from tinkertool.utils.sampling import scale_values
 from tinkertool.utils.make_chem_in import generate_chem_in_ppe
 from tinkertool.scripts.generate_paramfile.config import (

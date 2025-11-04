@@ -7,8 +7,8 @@ from pathlib import Path
 from dataclasses import dataclass, fields, field, MISSING
 
 from importlib import resources
-from tinkertool.utils.logging import setup_logging
-from tinkertool.utils.read_files import read_config
+from tinkertool.utils.custom_logging import setup_logging
+from tinkertool.utils.read_files import read_config, safe_get_param_value
 from tinkertool.utils.check_arguments import validate_file, validate_directory, check_type
 from tinkertool.utils.make_chem_in import generate_chem_in_ppe, check_if_chem_mech_is_perterbed
 
