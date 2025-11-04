@@ -148,20 +148,22 @@ def generate_paramfile(config: ParameterFileConfig):
         sample_points[param] = (["nmb_sim"], out_array)
 
     # Generate chemistry mech files
-    if config.change_chem_mech:
+    # TODO: move the chem_mech_in routine into the same system
+    # as ctsm/fates_param_file.
+    chem_mech_in = []  # Initialize outside the conditional
+    if checked_config.change_chem_mech and checked_config.chem_mech_file is not None:
         logging.debug("Generating chemistry mechanism files")
 
-        chem_mech_in = []
         if sample_points.get("SOA_y_scale_chem_mech_in", None):
             SOA_y_scale_chem_mech_in = sample_points["SOA_y_scale_chem_mech_in"]
 
             for scale_factor in SOA_y_scale_chem_mech_in[1]:
                 outfile = generate_chem_in_ppe(
                     scale_factor=scale_factor,
-                    input_file=config.chem_mech_file,
-                    outfolder_base=config.tinkertool_output_dir,
+                    input_file=checked_config.chem_mech_file,
+                    outfolder_base=checked_config.tinkertool_output_dir,
                     outfolder_name='chem_mech_files',
-                    verbose=True if config.verbose > 2 else False,
+                    verbose=True if checked_config.verbose > 2 else False,
                 )
                 chem_mech_in.append(outfile)
 
