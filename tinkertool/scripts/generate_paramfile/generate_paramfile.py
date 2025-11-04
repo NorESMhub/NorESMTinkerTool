@@ -56,13 +56,12 @@ def _test_ranges(
 def generate_paramfile(config: ParameterFileConfig):
 
     # Set up logging
-    setup_logging(config.verbose, config.log_file, config.log_mode)
     logging.info("> Starting parameter file generation")
 
     # check if ParameterFileConfig is valid
-    logging.debug(f"Checking config: {config.describe(return_string=True)}")
-    config: CheckedParameterFileConfig = config.get_checked_and_derived_config()
-    logging.getLogger('tinkertool_log').info_detailed(f">> Generating with config: {config.describe(return_string=True)}")
+    logging.debug(f"Checking config: {config.describe(return_string=True)}") # type: ignore
+    checked_config: CheckedParameterFileConfig = config.get_checked_and_derived_config()
+    log_info_detailed('tinkertool_log', f">> Generating with config: {checked_config.describe(return_string=True)}") # type: ignore
 
     # Generate Latin Hypercube sample
     logging.debug("Generating Latin Hypercube sample")
@@ -130,8 +129,7 @@ def generate_paramfile(config: ParameterFileConfig):
                 )
                 chem_mech_in.append(outfile)
 
-                logging.getLogger('tinkertool_log').info_detailed(f"{outfile} generated with SOA_y_scale_chem_mech_in = {scale_factor}")
-
+                log_info_detailed('tinkertool_log', f"{outfile} generated with SOA_y_scale_chem_mech_in = {scale_factor}")
             del sample_points["SOA_y_scale_chem_mech_in"]
 
     logging.debug("Creating xarray dataset")
