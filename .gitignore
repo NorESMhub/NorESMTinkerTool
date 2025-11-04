@@ -167,3 +167,6 @@ chem_mech_files
 
 # history files
 .history
+
+# github
+.github
