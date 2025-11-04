@@ -13,6 +13,46 @@ from tinkertool.scripts.generate_paramfile.config import (
     CheckedParameterFileConfig
 )
 
+def _test_ranges(
+    minv: float,
+    maxv: float,
+    param: str,
+    out_array: np.ndarray
+) -> bool:
+    """Test if the generated parameter samples are within the specified ranges.
+    Intended for extra checking after rounding and interconnections.
+
+    Parameters
+    ----------
+    minv : float
+        The minimum value for the parameter.
+    maxv : float
+        The maximum value for the parameter.
+    param : str
+        The name of the parameter.
+    out_array : np.ndarray
+        The array of generated parameter samples.
+
+    Returns
+    -------
+    bool
+        True if all samples are within ranges, False otherwise.
+    """
+
+    all_within_ranges = True
+
+    for val in out_array:
+        if not (minv <= val <= maxv):
+            logging.error(f"Parameter '{param}' has value {val} outside of range [{minv}, {maxv}].")
+            all_within_ranges = False
+
+    if all_within_ranges:
+        logging.debug(f"All values for parameter '{param}' are within the range [{minv}, {maxv}].")
+    else:
+        logging.warning(f"Some values for parameter '{param}' are outside of the range [{minv}, {maxv}].")
+
+    return all_within_ranges
+
 def generate_paramfile(config: ParameterFileConfig):
 
     # Set up logging
@@ -59,9 +99,17 @@ def generate_paramfile(config: ParameterFileConfig):
             else:
                 out_array[0] = float(pdata["default"])
                 out_array[1:] = long_vals
+        else:
+            err_msg = f"Unknown sampling method '{sampling_method}' for parameter '{param}'. Supported methods are 'log' and 'linear'."
+            logging.error(err_msg)
+            raise ValueError(err_msg)
 
-        if pdata.get("ndigits", None):
-            out_array = np.around(out_array, int(pdata["ndigits"]))
+        ndigits = safe_get_param_value(pdata, "ndigits")
+        if ndigits is not None:
+            # Convert to float first, then int to handle strings like '5.0'
+            out_array = np.around(out_array, int(float(ndigits)))
+
+        _test_ranges(minv, maxv, param, out_array)
         sample_points[param] = (["nmb_sim"], out_array)
 
     # Generate chemistry mech files
