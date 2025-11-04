@@ -126,10 +126,10 @@ def generate_paramfile(config: ParameterFileConfig):
                 out_array[0] = float(pdata["default"])
                 out_array[1:] = 10**long_vals
 
-        else:
-            out_array = np.zeros(len(config.nmb_sim_dim))
-            long_vals = scale_values(hyp_cube_parmas[:,i], minv, maxv)
-            if config.exclude_default:
+        elif sampling_method == 'linear':
+            out_array = np.zeros(len(checked_config.nmb_sim_dim))
+            long_vals = scale_values(hyp_cube_params[:,i_use], minv, maxv)
+            if checked_config.exclude_default:
                 out_array = long_vals
             else:
                 out_array[0] = float(pdata["default"])
