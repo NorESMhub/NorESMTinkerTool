@@ -65,26 +65,62 @@ def generate_paramfile(config: ParameterFileConfig):
 
     # Generate Latin Hypercube sample
     logging.debug("Generating Latin Hypercube sample")
-    hypc = stats.qmc.LatinHypercube(config.nparams, scramble=config.scramble, optimization=config.optimization)
-    hyp_cube_parmas = hypc.random(config.nmb_sim)
+    opt_literal = cast("Literal['random-cd','lloyd'] | None", checked_config.optimization)
+    interdependent_params = [param for param in checked_config.params if safe_get_param_value(checked_config.param_ranges[param], "interdependent_with") is not None]
+    hypc_params = [param for param in checked_config.params if param not in interdependent_params]
+    hypc_param_paramindx_map = {param: indx for indx, param in enumerate(hypc_params)}
+
+    hypc = stats.qmc.LatinHypercube(
+        len(hypc_param_paramindx_map),
+        scramble=checked_config.scramble,
+        optimization=opt_literal
+    )
+    hyp_cube_params = hypc.random(checked_config.nmb_sim)
+
+    logging.debug(f"Hypersample shape ({checked_config.nmb_sim_dim}, n_params - n_interdependent_params): {hyp_cube_params.shape}")
 
     logging.debug("Scaling the values to the parameter ranges")
     sample_points = {}
     # Scale the values to the parameter ranges
     # and add component information
-    for i, param in enumerate(config.params):
-        pdata = config.param_ranges[param]
-        if pdata.get("scale_fact", None):
-            minv = float(pdata["default"]) - float(pdata["default"])*float(pdata["scale_fact"])
-            maxv = float(pdata["default"]) + float(pdata["default"])*float(pdata["scale_fact"])
-        else:
-            minv = float(pdata["min"])
-            maxv = float(pdata["max"])
+    for param in checked_config.params:
+        pdata = checked_config.param_ranges[param]
 
-        if pdata.get("sampling") == 'log':
-            out_array = np.zeros(len(config.nmb_sim_dim))
-            long_vals = scale_values(hyp_cube_parmas[:,i], np.log10(minv), np.log10(maxv))
-            if config.exclude_default:
+        defaultv = safe_get_param_value(pdata, "default")
+        assert defaultv is not None, f"Default value for parameter '{param}' cannot be None."
+
+        # Use safe parameter access to handle nan values properly
+        scale_fact: float | None = safe_get_param_value(pdata, "scale_fact")
+        if scale_fact is not None:
+            minv = float(defaultv) - float(defaultv)*float(scale_fact)
+            maxv = float(defaultv) + float(defaultv)*float(scale_fact)
+        else:
+            minv_raw = safe_get_param_value(pdata, "min")
+            maxv_raw = safe_get_param_value(pdata, "max")
+            assert minv_raw is not None, f"Min value for parameter '{param}' cannot be None when scale_fact is not provided."
+            assert maxv_raw is not None, f"Max value for parameter '{param}' cannot be None when scale_fact is not provided."
+            minv = float(minv_raw)
+            maxv = float(maxv_raw)
+
+        logging.debug(f"Parameter '{param}': min={minv}, max={maxv}, default={defaultv}, scale_fact={scale_fact}")
+
+        # check what index in hyp_cube_params to use
+        # if the param is not interdependent, use hypc_param_paramindx_map[param]
+        # if it is interdependent use the index of the param
+        # that it is interdependent with
+        param_to_index_with = param
+        if param not in hypc_param_paramindx_map:
+            assert param in interdependent_params, f"Parameter '{param}' not found in hypc_param_paramindx_map or interdependent_params."
+            param_to_index_with = safe_get_param_value(pdata, "interdependent_with")
+            assert param_to_index_with is not None, f"Parameter '{param}' is interdependent but 'interdependent_with' is None."
+        i_use = hypc_param_paramindx_map[param_to_index_with]
+        logging.debug(f"Parameter '{param}' uses index {i_use} from hyp_cube_params.")
+
+        sampling_method = safe_get_param_value(pdata, "sampling")
+        if sampling_method == 'log':
+            out_array = np.zeros(len(checked_config.nmb_sim_dim))
+            long_vals = scale_values(hyp_cube_params[:,i_use], np.log10(minv), np.log10(maxv))
+            if checked_config.exclude_default:
                 out_array = 10**long_vals
             else:
                 out_array[0] = float(pdata["default"])
