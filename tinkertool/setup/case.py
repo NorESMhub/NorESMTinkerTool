@@ -269,6 +269,7 @@ def build_base_case(
         case.set_value("RUN_TYPE", env_run_settings.pop("RUN_TYPE"))
         case.set_value('JOB_WALLCLOCK_TIME', env_run_settings.pop('JOB_WALLCLOCK_TIME_RUN'), subgroup='case.run')
         case.set_value('JOB_WALLCLOCK_TIME', env_run_settings.pop('JOB_WALLCLOCK_TIME_ARCHIVE'), subgroup='case.st_archive')
+        case.set_value('JOB_WALLCLOCK_TIME', env_run_settings.pop('JOB_WALLCLOCK_TIME_COMPRESS'), subgroup='case.compress')
         if env_run_settings.get("GET_REFCASE") is not None:
             case.set_value("GET_REFCASE", env_run_settings.pop("GET_REFCASE"))
         if env_run_settings.get("RUN_REFCASE") is not None:
