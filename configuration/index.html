@@ -423,7 +423,7 @@ CALENDAR  = GREGORIAN
 <p>It is possible to use additional key-value pairs in this section as well. As key-value pairs are given to <code>Case.set_value()</code> (where <code>Case</code> is an object defined from <code>NorESM/cime/CIME/case/case.py</code>) available/unused are available by running <code>./xmlquery --listall</code> in a case directory. To see information for a key run <code>./xmlquery &lt;key&gt; --full</code>. <strong>NOTE</strong>: Additional key-value pairs to those already discussed are attempted set using a loop over remaining pairs, a warning is raised if it is not successfull but program will not exit. This is done <em>after</em> the handling of the other keys.</p>
 <p><strong>ppe_settings</strong> - This section holds key-value paris used for pointing to the parameter file previously discussed and ensuring correct case paths for PPE members. <em>Required</em> keys are <code>paramfile</code>, <code>pdim</code>, <code>baseroot</code>, <code>basecasename</code>, <code>basecase_id</code> and <code>assumed_esm_component</code>. A valid section is therefore:</p>
 <pre><code class="language-ini">paramfile             = &lt;absolute path to .nc parameter samples&gt;
-pdim                  = &lt;ensamlbe number dimension name in paramfile&gt;
+pdim                  = &lt;ensemble number dimension name in paramfile&gt;
 baseroot              = &lt;absolute path to where you want ppe cases&gt;
 basecasename          = &lt;name of basecase&gt;
 basecase_id           = &lt;number used id-ing the basecase, e.g. 000 if we include default or 001 if we exclude it&gt;
