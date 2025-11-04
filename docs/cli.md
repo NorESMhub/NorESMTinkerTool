@@ -56,8 +56,9 @@ There are two options for creating the parameterfile, (1) using the CLI tool:
 ### Command Line Interface (CLI)
 A description of the fuctionalities of the CLI tool is found by running `generate-paramfile --help`:
 ```bash
-usage: generate-paramfile [-h] [--chem-mech-file CHEM_MECH_FILE] [--tinkertool-output-dir TINKERTOOL_OUTPUT_DIR] [--nmb-sim NMB_SIM] [--optimization OPTIMIZATION] [--avoid-scramble]
-                          [--params PARAMS [PARAMS ...]] [--assumed-esm-component ASSUMED_ESM_COMPONENT] [--exclude-default] [--verbose] [--log-file LOG_FILE] [--log-mode LOG_MODE]
+generate-paramfile --help
+usage: generate-paramfile [-h] [--chem-mech-file CHEM_MECH_FILE] [--tinkertool-output-dir TINKERTOOL_OUTPUT_DIR] [--nmb-sim NMB_SIM] [--optimization OPTIMIZATION] [--avoid-scramble] [--params PARAMS [PARAMS ...]]
+                          [--assumed-esm-component ASSUMED_ESM_COMPONENT] [--exclude-default] [--verbose] [--log-file LOG_FILE] [--log-mode LOG_MODE]
                           param_ranges_inpath param_sample_outpath
 
 Generates a Latin Hyper Cube parameter file for PPE experiment
@@ -77,8 +78,7 @@ options:
   --optimization, -opt OPTIMIZATION
                         Whether to enable optimazation after sampling, valid random-cd or lloyd. Default None.
   --avoid-scramble, -asc
-                        Overwrite the default scramble of hypercube, i.e. scramble=False to center samples within cells of a multi-dimensional grid. If it is not called, samples are
-                        randomly placed within cells of the grid.
+                        Overwrite the default scramble of hypercube, i.e. scramble=False to center samples within cells of a multi-dimensional grid. If it is not called, samples are randomly placed within cells of the grid.
   --params, -p PARAMS [PARAMS ...]
                         List of parameters to be sampled, have to be defined in param_ranges_inpath. If unspecified all parameters in param_ranges_inpath will be used
   --assumed-esm-component, -ac ASSUMED_ESM_COMPONENT
@@ -90,6 +90,5 @@ options:
                         Path to the log file where logs will be written. If None, logs will not be saved to a file.
   --log-mode, -lm LOG_MODE
                         Mode for opening the log file. 'w' for write (overwrite), 'a' for append. Default is 'w'.
-
 ```
 

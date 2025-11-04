@@ -47,7 +47,7 @@ It is possible to use additional key-value pairs in this section as well. As key
 
 ```ini
 paramfile             = <absolute path to .nc parameter samples>
-pdim                  = <ensamlbe number dimension name in paramfile>
+pdim                  = <ensemble number dimension name in paramfile>
 baseroot              = <absolute path to where you want ppe cases>
 basecasename          = <name of basecase>
 basecase_id           = <number used id-ing the basecase, e.g. 000 if we include default or 001 if we exclude it>
