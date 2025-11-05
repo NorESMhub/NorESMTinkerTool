@@ -33,7 +33,10 @@ def format_value(value: str) -> str:
     # Otherwise, treat as string
     return f"'{value}'"
 
-
+# TODO: Since the usage syntax of user_nl is different between model components
+# we should make the user_nlstring writing based on a component class instances
+# instead of if tests. Will become more important when we perturb more
+# user nl's
 def setup_usr_nlstring(
   user_nl_config: configparser.ConfigParser,
   component_name: str
