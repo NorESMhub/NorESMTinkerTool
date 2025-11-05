@@ -11,7 +11,8 @@ def validate_file(
     new_file:           bool
 ):
     file_path = Path(file_path).resolve()
-    if not file_path.suffix == expected_suffix:
+    # Handle compound suffixes like .raw.nc by checking if the filename ends with the expected suffix
+    if not str(file_path).endswith(expected_suffix):
         raise SystemExit(f"ERROR: {file_path} is not a valid {description}")
     else:
         if new_file and file_path.exists():

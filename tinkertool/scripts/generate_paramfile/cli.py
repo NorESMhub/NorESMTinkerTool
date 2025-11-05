@@ -22,14 +22,12 @@ def parse_cli_args() -> ParameterFileConfig:
         help="Overwrite the default scramble of hypercube, i.e. scramble=False to center samples within cells of a multi-dimensional grid. If it is not called, samples are randomly placed within cells of the grid.")
     parser.add_argument("--params", "-p", nargs="+", type=str,
         help="List of parameters to be sampled, have to be defined in param_ranges_inpath. If unspecified all parameters in param_ranges_inpath will be used")
-    parser.add_argument("--assumed-esm-component", "-ac", type=str, default='cam',
-        help="Assume component for parameter. This is used if component is not specified for an entry in the parameter ranges file. Default is 'cam'.")
     parser.add_argument("--exclude-default", "-exd", action="store_true",
         help="Whether to exclude the default parameter value in the output file in nmb_sim=0. Using this flag will skip nmb_sim=0. Default is to include default value.")
     parser.add_argument("--verbose", "-v", default=0, action="count",
         help="Increase verbosity level by number of v's (0: WARNING, 1: INFO, 2: INFO_DETAILED, 3: DEBUG)")
-    parser.add_argument("--log-file", "-l", type=str, default=None,
-        help="Path to the log file where logs will be written. If None, logs will not be saved to a file.")
+    parser.add_argument("--log-dir", "-ld", type=str, default=None,
+        help="Path to the log directory where logs will be written. If None, logs will be written to current work directory.")
     parser.add_argument("--log-mode", "-lm", type=str, default="w",
         help="Mode for opening the log file. 'w' for write (overwrite), 'a' for append. Default is 'w'.")
 
@@ -45,9 +43,8 @@ def parse_cli_args() -> ParameterFileConfig:
         optimization=args.optimization,
         avoid_scramble=args.avoid_scramble,
         params=args.params,
-        assumed_esm_component=args.assumed_esm_component,
         exclude_default=args.exclude_default,
         verbose=args.verbose,
-        log_file=Path(args.log_file).resolve() if args.log_file else None,
+        log_dir=Path(args.log_dir).resolve() if args.log_dir else None,
         log_mode=args.log_mode
     )
