@@ -285,8 +285,8 @@ def generate_paramfile(config: ParameterFileConfig):
             ds[param].attrs['input_type'] = input_type
             ds[param].attrs['interdependent_with'] = safe_get_param_value(pdata, "interdependent_with", "")
 
-            component = safe_get_param_value(pdata, 'component', checked_config.assumed_esm_component)
-            ds[param].attrs['esm_component'] = component.lower() if component else checked_config.assumed_esm_component.lower()
+            component = pdata.get('component')
+            ds[param].attrs['esm_component'] = component.lower()
 
     # Add variables with irregular names
     if checked_config.change_chem_mech:

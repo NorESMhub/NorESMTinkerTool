@@ -63,7 +63,6 @@ class CreatePPEConfig(BaseConfig):
         # - ppe_settings
         baseroot = Path(simulation_setup['ppe_settings']['baseroot']).resolve()
         basecasename = simulation_setup['ppe_settings']['basecasename']
-        assumed_esm_component: str = simulation_setup['ppe_settings']['assumed_esm_component']
         ## - paramfile
         pdim: str = simulation_setup['ppe_settings']['pdim']
         paramfile_path: Path = Path(simulation_setup['ppe_settings']['paramfile']).resolve()
@@ -72,7 +71,14 @@ class CreatePPEConfig(BaseConfig):
         if pdim not in list(paramfile.dimensions.keys()):
             raise SystemExit(f"ERROR: {pdim} is not a valid dimension in {paramfile_path}. \nParamfile dimensions are: {list(paramfile.dimensions.keys())}")
         paramdict: dict = {k: v[:] for k, v in paramfile.variables.items() if k != pdim}
-        componentdict: dict = {k: get_ncattr_or_default(v, 'esm_component', assumed_esm_component) for k, v in paramdict.items()}
+        componentdict: dict = {}
+        for param, paramvalue in paramdict.items():
+            esm_component = get_ncattr_or_default(paramvalue, 'esm_component', None)
+            if esm_component is None:
+                err_msg = f"Parameter {param} in paramfile {paramfile_path} does not have an 'esm_component' attribute."
+                logging.error(err_msg)
+                raise SystemExit(err_msg)
+            componentdict[param] = esm_component
         num_sims = paramfile.dimensions[pdim].size
         num_vars = len(paramfile.variables.keys())-1
         ensemble_num = paramfile[pdim][:]
@@ -101,7 +107,6 @@ class CreatePPEConfig(BaseConfig):
             simulation_setup=simulation_setup,
             baseroot=baseroot,
             basecasename=basecasename,
-            assumed_esm_component=assumed_esm_component,
             paramfile_path=paramfile_path,
             pdim=pdim,
             paramdict=paramdict,
@@ -127,7 +132,6 @@ class CheckedCreatePPEConfig(CheckedBaseConfig):
     # - ppe_settings
     baseroot:               Path = field(metadata={"help": "Path to the base case root directory"})
     basecasename:           str = field(metadata={"help": "Name of the base case"})
-    assumed_esm_component:  str = field(metadata={"help": "Assumed ESM component for entries that does not have a specified component attribute in paramfile"})
     # - paramfile
     paramfile_path:         Path = field(metadata={"help": "Path to the paramfile"})
     pdim:                   str = field(metadata={"help": "Dimension of ensemble member count in paramfile"})
@@ -148,7 +152,6 @@ class CheckedCreatePPEConfig(CheckedBaseConfig):
         validate_directory(self.baseroot, "base case root directory")
         check_type(self.baseroot, Path)
         check_type(self.basecasename, str)
-        check_type(self.assumed_esm_component, str)
         # - paramfile
         validate_file(self.paramfile_path, ".nc", "paramfile", new_file=False)
         check_type(self.pdim, str)
