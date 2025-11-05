@@ -35,7 +35,7 @@ def safe_get_param_value(
     config_section,
     option: str,
     fallback=None
-) -> Any | None:
+) -> Any:
     """Get a parameter value from config,
     converting 'nan', 'none', 'null', '' strings to None or fallback.
 
@@ -50,7 +50,7 @@ def safe_get_param_value(
 
     Returns
     -------
-    Any or None
+    Any
         The parameter value, or None if it was a nan/none/null/empty string
     """
     try:

@@ -31,7 +31,7 @@ class ParameterFileConfig(BaseConfig):
     ctsm_default_param_file:    Path | None = field(default=None, metadata={"help": "Path to the default CTSM parameter file in netCDF format, default None will not modify CTSM parameters"})
     fates_default_param_file:   Path | None = field(default=None, metadata={"help": "Path to the default FATES parameter file in netCDF format, default None will not modify FATES parameters"})
     tinkertool_output_dir:      Path = field(default=Path(default_output_dir).resolve(), metadata={"help": "Path to the output directory for files produced by TinkerTool, default will use NorESMTinkerTool/output"})
-    optimization:               str | None = field(default=None, metadata={"help": "Whether to enable optimazation after sampling, valid random-cd or lloyd. Default None."})
+    optimization:               str | None = field(default=None, metadata={"help": "Whether to enable optimization after sampling, valid random-cd or lloyd. Default None."})
     avoid_scramble:             bool = field(default=False, metadata={"help": "Overwrite the default scramble of hypercube, i.e. scramble=False to center samples within cells of a multi-dimensional grid. If it is not called, samples are randomly placed within cells of the grid."})
     params:                     list = field(default_factory=list, metadata={"help": "List of parameters to be sampled, have to be defined in param_ranges_inpath. If unspecified all parameters in param_ranges_inpath will be used"})
     assumed_esm_component:      str = field(default='cam', metadata={"help": "Assume component for parameter. This is used if component is not specified for an entry in the parameter ranges file. Default is 'cam'."})

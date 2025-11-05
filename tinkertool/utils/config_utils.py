@@ -3,8 +3,8 @@ import logging
 import argparse
 
 from pathlib import Path
+from typing import TypeVar, Type
 from dataclasses import dataclass, fields, field, MISSING
-from typing import TypeVar, Type, Optional
 
 from tinkertool import NorESMTinkerTool_abspath
 from tinkertool.utils.custom_logging import setup_logging
@@ -65,7 +65,7 @@ def _from_cli(cls: Type[TypeVarT]) -> TypeVarT:
         if fld.type == Path:
             parser.add_argument(
                 arg_name,
-                type=lambda x: Path(x),
+                type=Path,
                 help=help_text + (" (default: None)" if not required else ""),
                 required=required,
                 default=default
@@ -97,8 +97,8 @@ def _from_cli(cls: Type[TypeVarT]) -> TypeVarT:
 def _describe(
     self,
     return_string: bool = False
-) -> Optional[str]:
-    """Prints or returns string describing the a dataclass object.
+) -> str | None:
+    """Prints or returns string describing the dataclass object.
 
     Parameters
     ----------
@@ -108,7 +108,7 @@ def _describe(
 
     Returns
     -------
-    Optional[str]
+    str | None
         The description of the dataclass instance, or None if
         not returning as string
     """

@@ -12,13 +12,14 @@ from tinkertool.utils.make_land_parameterfiles import (
     make_new_ctsm_pamfile,
     make_new_fates_pamfile
 )
-from tinkertool.utils.check_arguments import validate_file
 from tinkertool.utils.read_files import safe_get_param_value
 from tinkertool.scripts.generate_paramfile import PARAMFILE_INPUT_TYPES
 from tinkertool.scripts.generate_paramfile.config import (
     ParameterFileConfig,
     CheckedParameterFileConfig
 )
+
+VALID_SAMPLING_METHODS = ['linear', 'log']
 
 def _test_ranges(
     minv: float,
@@ -142,7 +143,7 @@ def generate_paramfile(config: ParameterFileConfig):
                 out_array[0] = float(pdata["default"])
                 out_array[1:] = long_vals
         else:
-            err_msg = f"Unknown sampling method '{sampling_method}' for parameter '{param}'. Supported methods are 'log' and 'linear'."
+            err_msg = f"Unknown sampling method '{sampling_method}' for parameter '{param}'. Supported methods are {', '.join(VALID_SAMPLING_METHODS)}."
             logging.error(err_msg)
             raise ValueError(err_msg)
 
@@ -211,8 +212,7 @@ def generate_paramfile(config: ParameterFileConfig):
             for sim_indx in checked_config.nmb_sim_dim:
                 pam_change_dict = {}
                 for param in param_group:
-                    pdata = checked_config.param_ranges[param]
-                    pam_change_dict[param] = sample_points[param][1][sim_indx]  # Fixed: access tuple correctly
+                    pam_change_dict[param] = sample_points[param][1][sim_indx]  # Access values array from (dims, values) tuple
                 if pam_change_dict:
                     if param_type == 'CTSM_param_file':
                         orig_pamfile = checked_config.ctsm_default_param_file
@@ -244,7 +244,7 @@ def generate_paramfile(config: ParameterFileConfig):
                 for param in param_group:
                     pdata = checked_config.param_ranges[param]
                     pg_defaults[param] = pdata['default']
-                    pg_newvals[param] = sample_points[param][1].copy()  # Fixed: access tuple correctly
+                    pg_newvals[param] = sample_points[param][1].copy()  # Access values array from (dims, values) tuple
                     pg_sampling[param] = safe_get_param_value(pdata, 'sampling', 'No sampling method available')
                     pg_input_type[param] = safe_get_param_value(pdata, 'input_type', '')
                     pg_interdependent_with[param] = safe_get_param_value(pdata, 'interdependent_with', '')
