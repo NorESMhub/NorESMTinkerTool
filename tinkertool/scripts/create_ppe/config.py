@@ -248,8 +248,18 @@ class SubmitPPEConfig(BaseConfig):
 
 @dataclass(kw_only=True)
 class CheckedSubmitPPEConfig(CheckedBaseConfig):
-    # Include fields from SubmitPPEConfig
-    cases: Union[str, Path, list[str], list[Path]] = field(metadata={"help": "List of case directories to submit to the queue"})
+    # Include fields from SubmitPPEConfig (cases is always list[Path] after processing)
+    cases: list[Path] = field(default_factory=list, metadata={"help": "List of case directories to submit to the queue"})
+
+    def __post_init__(self):
+        # run the parent __post_init__ method
+        super().__post_init__()
+        # check that cases is a list of Paths (should always be true in CheckedSubmitPPEConfig)
+        check_type(self.cases, list)
+        if not self.cases:
+            raise ValueError("cases list cannot be empty in CheckedSubmitPPEConfig")
+        for case in self.cases:
+            check_type(case, Path)
 
     def get_checked_and_derived_config(self) -> 'CheckedSubmitPPEConfig':
         logging.info(f"{self.__class__.__name__} is a dataclass with all derived fields, no further checks are needed.")
