@@ -34,7 +34,6 @@ class ParameterFileConfig(BaseConfig):
     optimization:               str | None = field(default=None, metadata={"help": "Whether to enable optimization after sampling, valid random-cd or lloyd. Default None."})
     avoid_scramble:             bool = field(default=False, metadata={"help": "Overwrite the default scramble of hypercube, i.e. scramble=False to center samples within cells of a multi-dimensional grid. If it is not called, samples are randomly placed within cells of the grid."})
     params:                     list = field(default_factory=list, metadata={"help": "List of parameters to be sampled, have to be defined in param_ranges_inpath. If unspecified all parameters in param_ranges_inpath will be used"})
-    assumed_esm_component:      str = field(default='cam', metadata={"help": "Assume component for parameter. This is used if component is not specified for an entry in the parameter ranges file. Default is 'cam'."})
     exclude_default:            bool = field(default=False, metadata={"help": "Whether to exclude the default parameter value in the output file in nmb_sim=0. Using this flag will skip nmb_sim=0. Default is to include default value."})
 
     def __post_init__(self):
@@ -63,9 +62,6 @@ class ParameterFileConfig(BaseConfig):
         check_type(self.params, list)
         for param in self.params:
             check_type(param, str)
-        # assume_component
-        if self.assumed_esm_component not in VALID_COMPONENTS:
-            raise ValueError(f"Invalid component: {self.assumed_esm_component}. Must be one of {VALID_COMPONENTS}.")
         # exclude_default
         check_type(self.exclude_default, bool)
 
@@ -180,7 +176,6 @@ class CheckedParameterFileConfig(CheckedBaseConfig):
     optimization:               str | None = field(default=None, metadata={"help": "Whether to enable optimazation after sampling"})
     avoid_scramble:             bool = field(default=False, metadata={"help": "Overwrite the default scramble of hypercube"})
     params:                     list = field(default_factory=list, metadata={"help": "List of parameters to be sampled"})
-    assumed_esm_component:      str = field(default='cam', metadata={"help": "Assume component for parameter"})
     exclude_default:            bool = field(default=False, metadata={"help": "Whether to exclude the default parameter value in the output file"})
 
     # Derived/checked configuration fields
