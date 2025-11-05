@@ -117,10 +117,21 @@ def generate_paramfile(config: ParameterFileConfig):
         # if the param is not interdependent, use hypc_param_paramindx_map[param]
         # if it is interdependent use the index of the param
         # that it is interdependent with
+        inverse_scaling = False
         param_to_index_with = param
-        if param not in hypc_param_paramindx_map:
+        if param not in hypc_param_paramindx_map: # then it is interdependent
             assert param in interdependent_params, f"Parameter '{param}' not found in hypc_param_paramindx_map or interdependent_params."
             param_to_index_with = safe_get_param_value(pdata, "interdependent_with")
+            # check if we are to use inverse scaling by checking for
+            # "-" prefix/first character
+            if param_to_index_with.startswith("-"):
+                param_to_index_with = param_to_index_with[1:]  # remove the "-" character
+                logging.debug(f"Parameter '{param}' is interdependent with '{param_to_index_with}' using inverse scaling.")
+                # Inverse scaling: we will later do maxv - scaled_value + minv
+                # to flip the scaling
+                # This is handled in scale_values function by passing minv and maxv swapped
+                minv, maxv = maxv, minv
+                inverse_scaling = True
             assert param_to_index_with is not None, f"Parameter '{param}' is interdependent but 'interdependent_with' is None."
         i_use = hypc_param_paramindx_map[param_to_index_with]
         logging.debug(f"Parameter '{param}' uses index {i_use} from hyp_cube_params.")
@@ -153,7 +164,10 @@ def generate_paramfile(config: ParameterFileConfig):
             # Convert to float first, then int to handle strings like '5.0'
             out_array = np.around(out_array, int(float(ndigits)))
 
-        _test_ranges(minv, maxv, param, out_array)
+        if inverse_scaling:
+            _test_ranges(maxv, minv, param, out_array)
+        else:
+            _test_ranges(minv, maxv, param, out_array)
         sample_points[param] = (["nmb_sim"], out_array)
 
     # Generate chemistry mech files
