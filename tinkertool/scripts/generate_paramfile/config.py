@@ -173,7 +173,7 @@ class CheckedParameterFileConfig(CheckedBaseConfig):
     ctsm_default_param_file:    Path | None = field(default=None, metadata={"help": "Path to the default CTSM parameter file in netCDF format"})
     fates_default_param_file:   Path | None = field(default=None, metadata={"help": "Path to the default FATES parameter file in netCDF format"})
     tinkertool_output_dir:      Path = field(default=Path(default_output_dir).resolve(), metadata={"help": "Path to the output directory for files produced by TinkerTool"})
-    optimization:               str | None = field(default=None, metadata={"help": "Whether to enable optimazation after sampling"})
+    optimization:               str | None = field(default=None, metadata={"help": "Whether to enable optimization after sampling"})
     avoid_scramble:             bool = field(default=False, metadata={"help": "Overwrite the default scramble of hypercube"})
     params:                     list = field(default_factory=list, metadata={"help": "List of parameters to be sampled"})
     exclude_default:            bool = field(default=False, metadata={"help": "Whether to exclude the default parameter value in the output file"})
