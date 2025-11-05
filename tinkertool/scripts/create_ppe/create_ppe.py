@@ -331,4 +331,4 @@ def submit_ppe(config: SubmitPPEConfig):
     logger.info(f">> {len(config.cases)} cases submitted successfully.")
     logger.info(">> Check the queue with 'squeue -u <USER>' command")
     logger.info(">> Check the log files in each case directory for more information")
-    logger.info(">> Finished SCAM PPE case submission")
+    logger.info(">> Finished PPE case submission")
