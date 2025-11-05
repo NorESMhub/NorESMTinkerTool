@@ -1,10 +1,9 @@
 import sys
-import time
 import logging
 import configparser
 import numpy as np
 from pathlib import Path
-from dataclasses import dataclass, fields, field, MISSING
+from dataclasses import dataclass, field
 
 from tinkertool import NorESMTinkerTool_abspath
 from tinkertool.utils.config_utils import BaseConfig, CheckedBaseConfig
@@ -33,7 +32,7 @@ class ParameterFileConfig(BaseConfig):
     tinkertool_output_dir:      Path = field(default=Path(default_output_dir).resolve(), metadata={"help": "Path to the output directory for files produced by TinkerTool, default will use NorESMTinkerTool/output"})
     optimization:               str | None = field(default=None, metadata={"help": "Whether to enable optimization after sampling, valid random-cd or lloyd. Default None."})
     avoid_scramble:             bool = field(default=False, metadata={"help": "Overwrite the default scramble of hypercube, i.e. scramble=False to center samples within cells of a multi-dimensional grid. If it is not called, samples are randomly placed within cells of the grid."})
-    params:                     list = field(default_factory=list, metadata={"help": "List of parameters to be sampled, have to be defined in param_ranges_inpath. If unspecified all parameters in param_ranges_inpath will be used"})
+    params:                     list | None = field(default=None, metadata={"help": "List of parameters to be sampled, have to be defined in param_ranges_inpath. If unspecified all parameters in param_ranges_inpath will be used"})
     exclude_default:            bool = field(default=False, metadata={"help": "Whether to exclude the default parameter value in the output file in nmb_sim=0. Using this flag will skip nmb_sim=0. Default is to include default value."})
 
     def __post_init__(self):
@@ -59,9 +58,10 @@ class ParameterFileConfig(BaseConfig):
         # avoid_scramble
         check_type(self.avoid_scramble, bool)
         # params
-        check_type(self.params, list)
-        for param in self.params:
-            check_type(param, str)
+        if self.params is not None:
+            check_type(self.params, list)
+            for param in self.params:
+                check_type(param, str)
         # exclude_default
         check_type(self.exclude_default, bool)
 
@@ -81,12 +81,13 @@ class ParameterFileConfig(BaseConfig):
         assert self.param_ranges_inpath is not None  # Help type checker
         param_ranges: configparser.ConfigParser = read_config(self.param_ranges_inpath)
         # params
-        if self.params:  # Check if list is not empty
+        if self.params is not None and len(self.params) > 0:  # Check if list is provided and not empty
             self.params = [param.strip() for param in self.params]
             for param in self.params:
                 if param not in param_ranges:
                     raise ValueError(f"Parameter '{param}' not found in parameter ranges file {self.param_ranges_inpath}.")
         else:
+            # If no params specified, use all sections from param_ranges_inpath
             self.params = list(param_ranges.sections())
         nparams = len(self.params)
         # param_sample_outpath
@@ -191,6 +192,10 @@ class CheckedParameterFileConfig(CheckedBaseConfig):
         # run the parent __post_init__ method
         super().__post_init__()
         # check the arguments
+        # params (should always be a list in CheckedParameterFileConfig)
+        check_type(self.params, list)
+        if not self.params:
+            raise ValueError("params list cannot be empty in CheckedParameterFileConfig")
         # param_ranges
         check_type(self.param_ranges, configparser.ConfigParser)
         if not self.param_ranges.sections():

@@ -5,7 +5,7 @@ import scipy.stats as stats
 from datetime import datetime
 from typing import cast, Literal
 
-from tinkertool.utils.custom_logging import setup_logging, log_info_detailed
+from tinkertool.utils.custom_logging import log_info_detailed
 from tinkertool.utils.sampling import scale_values
 from tinkertool.utils.make_chem_in import generate_chem_in_ppe
 from tinkertool.utils.make_land_parameterfiles import (
@@ -13,6 +13,7 @@ from tinkertool.utils.make_land_parameterfiles import (
     make_new_fates_pamfile
 )
 from tinkertool.utils.read_files import safe_get_param_value
+from tinkertool import VALID_COMPONENTS
 from tinkertool.scripts.generate_paramfile import PARAMFILE_INPUT_TYPES
 from tinkertool.scripts.generate_paramfile.config import (
     ParameterFileConfig,
@@ -248,7 +249,7 @@ def generate_paramfile(config: ParameterFileConfig):
                     pg_sampling[param] = safe_get_param_value(pdata, 'sampling', 'No sampling method available')
                     pg_input_type[param] = safe_get_param_value(pdata, 'input_type', '')
                     pg_interdependent_with[param] = safe_get_param_value(pdata, 'interdependent_with', '')
-                    pg_esm_component[param] = safe_get_param_value(pdata, 'component', '')
+                    pg_esm_component[param] = safe_get_param_value(pdata, 'esm_component', '')
                     del sample_points_with_files[param]
                 pg_param_ranges['default'] = ",\n".join([f"{param}: {pg_defaults[param]}" for param in param_group])
                 pg_param_ranges['sampling'] = ",\n".join([f"{param}: {pg_sampling[param]}" for param in param_group])
@@ -258,7 +259,10 @@ def generate_paramfile(config: ParameterFileConfig):
                     raise ValueError(f"Parameters in group {param_group} have differing input_types: {input_type}")
                 pg_param_ranges['input_type'] = input_type[0]
                 pg_param_ranges['interdependent_with'] = ",\n".join([f"{param}: {pg_interdependent_with[param]}" for param in param_group])
-                pg_param_ranges['esm_component'] = ",\n".join([f"{param}: {pg_esm_component[param]}" for param in param_group])
+                esm_component = [pg_esm_component[param] for param in param_group]
+                if not all(it == esm_component[0] for it in esm_component):
+                    raise ValueError(f"Parameters in group {param_group} have differing esm_component: {esm_component}")
+                pg_param_ranges['esm_component'] = esm_component[0]
                 pg_param_ranges['description'] = f"{param_type} file perturbing parameters:\n" + \
                     ",\n".join([f"{param}, default -> new value: {pg_defaults[param]} -> {pg_newvals[param]}" for param in param_group])
 
@@ -285,7 +289,15 @@ def generate_paramfile(config: ParameterFileConfig):
             ds[param].attrs['input_type'] = input_type
             ds[param].attrs['interdependent_with'] = safe_get_param_value(pdata, "interdependent_with", "")
 
-            component = pdata.get('component')
+            component = pdata.get('esm_component')
+            if not isinstance(component, str):
+                err_msg = f"The component passed to param {param} is of type {type(component)}, expected type str"
+                logging.error(err_msg)
+                raise TypeError(err_msg)
+            if component.lower() not in VALID_COMPONENTS:
+                err_msg = f"Invalid component '{component}' for parameter '{param}'. Supported components are: {VALID_COMPONENTS}."
+                logging.error(err_msg)
+                raise ValueError(err_msg)
             ds[param].attrs['esm_component'] = component.lower()
 
     # Add variables with irregular names
