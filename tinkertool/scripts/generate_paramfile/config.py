@@ -6,7 +6,7 @@ import numpy as np
 from pathlib import Path
 from dataclasses import dataclass, fields, field, MISSING
 
-from tinkertool import VALID_COMPONENTS, NorESMTinkerTool_abspath
+from tinkertool import NorESMTinkerTool_abspath
 from tinkertool.utils.config_utils import BaseConfig, CheckedBaseConfig
 from tinkertool.utils.read_files import read_config
 from tinkertool.utils.check_arguments import validate_file, check_type
