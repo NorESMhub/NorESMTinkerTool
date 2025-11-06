@@ -70,10 +70,14 @@ class CreatePPEConfig(BaseConfig):
         paramfile: Dataset = Dataset(paramfile_path, 'r')
         if pdim not in list(paramfile.dimensions.keys()):
             raise SystemExit(f"ERROR: {pdim} is not a valid dimension in {paramfile_path}. \nParamfile dimensions are: {list(paramfile.dimensions.keys())}")
-        paramdict: dict = {k: v[:] for k, v in paramfile.variables.items() if k != pdim}
+        paramdict: dict = {}
         componentdict: dict = {}
-        for param, paramvalue in paramdict.items():
-            esm_component = get_ncattr_or_default(paramvalue, 'esm_component', None)
+        logging.debug(f"Processing paramfile {paramfile_path} with parameters: {list(paramdict.keys())}")
+        for param in [ param for param in paramfile.variables.keys() if param != pdim ]:
+            # get the values of the parameter for paramdict
+            paramdict[param] = paramfile[param][:]
+            # get the esm_component attribute for componentdict
+            esm_component = get_ncattr_or_default(paramfile.variables[param], 'esm_component', None)
             if esm_component is None:
                 err_msg = f"Parameter {param} in paramfile {paramfile_path} does not have an 'esm_component' attribute."
                 logging.error(err_msg)
