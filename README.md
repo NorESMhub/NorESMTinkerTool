@@ -30,11 +30,14 @@ pip install -e  ./
 ```
 Or, to include optionals:
 ```
-pip install -e  .[optional1, ..., optionalx]
+pip install -e  .[optional1,...,optionalx]
 ```
 Available optionals:
 
 * sampling
+* plotting
 
-Note that the `-e` puts the package in editable mode, if it is not included changes to configuration files etc will not be available before you re install the package.
+Note that:
+* the `-e` puts the package in editable mode, if it is not included changes to configuration files etc will not be available before you re install the package.
+* There is no spaces between optional's and ',' character.
 
