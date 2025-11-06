@@ -373,7 +373,7 @@ def clone_base_case(
     if not os.path.isdir(cloneroot):
         with Case(basecaseroot, read_only=False) as clone:
             clone.create_clone(cloneroot, keepexe=keepexe)
-    with Case(cloneroot, read_only=False) as case:
+    with Case(str(cloneroot), read_only=False) as case:
         _per_run_case_updates(
             case=case,
             paramdict=paramdict,
