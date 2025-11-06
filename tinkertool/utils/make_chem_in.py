@@ -5,9 +5,9 @@ from tinkertool.utils.read_files import read_config
 
 
 def generate_chem_in_ppe(
-    scale_factor: float,
-    input_file: str,
-    outfolder_base: str,
+    scale_factor:   float,
+    input_file:     str | Path,
+    outfolder_base: str | Path,
     outfolder_name: str,
     verbose: bool = False,
 ) -> str:
@@ -17,9 +17,9 @@ def generate_chem_in_ppe(
     -----------
     scale_factor : float
         The scale factor to use for the chemistry file.
-    input_file : str
+    input_file : str | Path
         The input file to use for the chemistry file.
-    outfolder_base : str
+    outfolder_base : str | Path
         The base folder to use for the output files.
     outfolder_name : str
         The name of the folder to use for the output files.
@@ -73,15 +73,16 @@ def generate_chem_in_ppe(
 
     return str(outputfile)
 
-
-def check_if_chem_mech_is_perterbed(param_ranges_inpath: str) -> bool:
+def check_if_chem_mech_is_perterbed(
+    param_ranges_inpath: str | Path
+) -> bool:
     """Check if the chemistry mechanism is perturbed. The check is
     performed by looking for specific section headers defined in
     chem_mech_variable_flags in the parameter ranges file.
 
     Parameters
     ----------
-    param_ranges_inpath : str
+    param_ranges_inpath : str | Path
         The path to the parameter ranges file.
 
     Returns

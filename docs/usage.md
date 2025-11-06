@@ -31,7 +31,7 @@ Requirements:
 - scipy and xarray should be installed, ensure optional 'sampling' is included in installation command `pip install -e .[sampling]`.
 - Update input files:
 - Update parameter ranges by either adding/editing entries in `default_config/default_param_ranges.ini` or by feeding an updated custom path to --param-ranges-file (see more information bellow).
-- `default_config/chem_mech_default.in` should be renewed if you are perterbing values from `NorESM/components/cam/src/chemistry/pp_trop_mam_oslo/`.
+- `default_config/chem_mech_default.in` should be renewed if you are perturbing values from `NorESM/components/cam/src/chemistry/pp_trop_mam_oslo/`.
 
 To generate the parameter file for the PPE we use Latin Hypercube sampling 
 to most efficiently span the whole parameter space. 

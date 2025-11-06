@@ -12,8 +12,11 @@ from tinkertool.setup.namelist import setup_usr_nlstring, write_user_nl_file
 from tinkertool.setup.setup_cime_connection import add_CIME_paths
 
 try:
-    add_CIME_paths(cesmroot=os.environ.get("CESMROOT"))
-except TypeError:
+    environ_CESMROOT = os.environ.get('CESMROOT')
+    if environ_CESMROOT is None:
+        raise ImportError("CESMROOT environment variable not set")
+    add_CIME_paths(cesmroot=environ_CESMROOT)
+except ImportError:
     print("ERROR: add_CIME_paths failed, update CESMROOT environment variable")
     raise SystemExit
 
@@ -109,9 +112,8 @@ def _per_run_case_updates(
     logger.info(">> Building clone case {}...".format(ens_idx))
 
     caseroot = case.get_value("CASEROOT")
-    basecasename = os.path.basename(caseroot)
-    unlock_file("env_case.xml", caseroot=caseroot)
-    casename = f"{basecasename}{ens_idx}"
+    casename = os.path.basename(caseroot)
+    unlock_file("env_case.xml",caseroot=caseroot)
     case.set_value("CASE", casename)
     rundir = case.get_value("RUNDIR")
     rundir = os.path.dirname(rundir)
@@ -199,24 +201,21 @@ def _per_run_case_updates(
 
 
 def build_base_case(
-    baseroot: str,
-    basecasename: str,
-    overwrite: bool,
-    case_settings: dict,
-    env_pe_settings: dict,
-    env_run_settings: dict,
-    env_build_settings: dict,
-    namelist_collection_dict: dict,
-) -> str:
+    basecaseroot:               Path,
+    overwrite:                  bool,
+    case_settings:              dict,
+    env_pe_settings:            dict,
+    env_run_settings:           dict,
+    env_build_settings:         dict,
+    namelist_collection_dict:   dict
+) -> Path:
     """
     Create and build the base case that all PPE cases are cloned from
 
     Parameters
     ----------
-    baseroot : str
-        The base directory for the cases
-    basecasename : str
-        The base case name
+    basecaseroot : Path
+        The base case root directory
     overwrite : bool
         Overwrite existing cases
     case_settings : dict
@@ -232,24 +231,22 @@ def build_base_case(
 
     Returns
     -------
-    str
+    Path
         The root directory of the base case
     """
     logger.info(">>> BUILDING BASE CASE...")
-    caseroot = os.path.join(baseroot, basecasename)
-    if overwrite and os.path.isdir(caseroot):
-        shutil.rmtree(caseroot)
-    with Case(caseroot, read_only=False) as case:
-        if not os.path.isdir(caseroot):
-            logger.info("Creating base case directory: {}".format(caseroot))
+    if overwrite and basecaseroot.is_dir():
+        shutil.rmtree(basecaseroot)
+    with Case(str(basecaseroot), read_only=False) as case:
+        if not basecaseroot.is_dir():
+            logger.info('Creating base case directory: {}'.format(basecaseroot))
             # create the case using the case_settings
             case.create(
-                casename=os.path.basename(caseroot),
+                casename=basecaseroot.name,
                 srcroot=case_settings.pop("cesmroot"),
                 compset_name=case_settings.pop("compset"),
                 grid_name=case_settings.pop("res"),
                 machine_name=case_settings.pop("mach"),
-                walltime=case_settings.pop("walltime"),
                 project=case_settings.pop("project"),
                 driver="nuopc",
                 run_unsupported=True,
@@ -259,11 +256,10 @@ def build_base_case(
             case.record_cmd(init=True)
         else:
             if not case.read_only:
-                logger.info("Reusing existing case directory: {}".format(caseroot))
+                logger.info('Reusing existing case directory: {}'.format(str(basecaseroot)))
             else:
-                logger.warning(
-                    "Base case directory exists but is read-only: {}".format(caseroot)
-                )
+                logger.warning('Base case directory exists but is read-only: {}'.format(str(basecaseroot)))
+
 
         # set the case environment variables
         # first using the case's own values
@@ -289,6 +285,9 @@ def build_base_case(
         logger.info(">>> Setting environment run settings...")
         # set the run settings
         case.set_value("RUN_TYPE", env_run_settings.pop("RUN_TYPE"))
+        case.set_value('JOB_WALLCLOCK_TIME', env_run_settings.pop('JOB_WALLCLOCK_TIME_RUN'), subgroup='case.run')
+        case.set_value('JOB_WALLCLOCK_TIME', env_run_settings.pop('JOB_WALLCLOCK_TIME_ARCHIVE'), subgroup='case.st_archive')
+        case.set_value('JOB_WALLCLOCK_TIME', env_run_settings.pop('JOB_WALLCLOCK_TIME_COMPRESS'), subgroup='case.compress')
         if env_run_settings.get("GET_REFCASE") is not None:
             case.set_value("GET_REFCASE", env_run_settings.pop("GET_REFCASE"))
         if env_run_settings.get("RUN_REFCASE") is not None:
@@ -310,9 +309,9 @@ def build_base_case(
             case.set_value("REST_OPTION", env_run_settings.pop("REST_OPTION"))
             case.set_value("REST_N", env_run_settings.pop("REST_N"))
 
-        if env_run_settings.get("CAM_CONFIG_OPTS") is not None:
-            if env_run_settings.get("cam_onopts"):
-                Warning.warning(
+        if env_run_settings.get('CAM_CONFIG_OPTS') is not None:
+            if env_run_settings.get('cam_onopts'):
+                logging.warning(
                     "Both 'CAM_CONFIG_OPTS' and 'cam_onopts' were provided. "
                     "'CAM_CONFIG_OPTS' will overwrite all previous options including 'cam_onopts'."
                 )
@@ -350,40 +349,35 @@ def build_base_case(
         # write user_nl files
         for nl_control_filename in namelist_collection_dict.keys():
             # get the component name from the file name assuming control_<component>.ini
-            component_name = nl_control_filename.split("_")[1].split(".")[0]
-            user_nl_str = setup_usr_nlstring(
-                namelist_collection_dict[nl_control_filename],
-                component_name=component_name,
-            )
-            write_user_nl_file(caseroot, f"user_nl_{component_name}", user_nl_str)
+            component_name = nl_control_filename.split('_')[1].split('.')[0]
+            user_nl_str = setup_usr_nlstring(namelist_collection_dict[nl_control_filename], component_name=component_name)
+            write_user_nl_file(str(basecaseroot), f"user_nl_{component_name}", user_nl_str)
 
-    logger.info(">> base case_build...")
-    os.chdir(caseroot)
-    subprocess.run(["./case.build"], check=True)
-    logger.info(">>> base case build completed successfully.")
+        logger.info(">> base case_build...")
+        build.case_build(basecaseroot, case=case)
 
-    return caseroot
+    return basecaseroot
 
 
 def clone_base_case(
-    baseroot: str,
-    basecaseroot: str,
-    overwrite: bool,
-    paramdict: dict,
-    componentdict: dict,
-    ensemble_idx: str,
-    path_base_input: str = "",
-    keepexe: bool = False,
-    **kwargs,
+    baseroot:           Path,
+    basecaseroot:       Path,
+    overwrite:          bool,
+    paramdict:          dict,
+    componentdict:      dict,
+    ensemble_idx:       str,
+    path_base_input:    Path=Path(''),
+    keepexe:            bool=False,
+    **kwargs
 ):
     """
     Clone the base case and update the namelist parameters
 
     Parameters
     ----------
-    baseroot : str
+    baseroot : Path
         The base directory for the cases
-    basecaseroot : str
+    basecaseroot : Path
         The base case root directory
     overwrite : bool
         Overwrite existing cases
@@ -403,7 +397,7 @@ def clone_base_case(
     """
 
     logger.info(">>> CLONING BASE CASE for member {}...".format(ensemble_idx))
-    cloneroot = os.path.join(baseroot, f"ensamble_member.{ensemble_idx}")
+    cloneroot = os.path.join(baseroot, f'ensemble_member.{ensemble_idx}')
 
     if overwrite and os.path.isdir(cloneroot):
         shutil.rmtree(cloneroot)
@@ -416,7 +410,7 @@ def clone_base_case(
             paramdict=paramdict,
             componentdict=componentdict,
             ens_idx=ensemble_idx,
-            path_base_input=path_base_input,
+            path_base_input=str(path_base_input),
             keepexe=keepexe,
             **kwargs,
         )

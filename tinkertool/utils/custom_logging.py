@@ -15,9 +15,15 @@ def patch_info_detailed():
         def info_detailed(self, message, *args, **kwargs):
             if self.isEnabledFor(INFO_DETAILED):
                 self._log(INFO_DETAILED, message, args, **kwargs)
+        setattr(logging.Logger, 'info_detailed', info_detailed)
 
-        logging.Logger.info_detailed = info_detailed
-
+def log_info_detailed(logger_name: str, message: str):
+    """Helper function to log info_detailed messages with proper type handling."""
+    logger = logging.getLogger(logger_name)
+    if hasattr(logger, 'info_detailed'):
+        logger.info_detailed(message)  # type: ignore[attr-defined]
+    else:
+        logger.info(f"[DETAILED] {message}")
 
 def setup_logging(
     verbosity: int,
@@ -158,7 +164,8 @@ def custom_logging(
     # Create new handlers
     handlers = [logging.StreamHandler()]
     if log_file is not None:
-        validate_file(log_file, ".log", "log file", new_file=True)
+        log_file = Path(log_file).resolve()
+        validate_file(log_file, '.log', "log file", new_file=True)
         if not log_file.exists():
             log_file.parent.mkdir(parents=True, exist_ok=True)
             log_file.touch()

@@ -164,3 +164,9 @@ cython_debug/
 # --- output files ---
 chem_mech_files
 *.nc
+
+# history files
+.history
+
+# github
+.github

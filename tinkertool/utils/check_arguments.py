@@ -7,9 +7,14 @@ from tinkertool.utils.type_check_decorator import type_check_decorator
 
 @type_check_decorator
 def validate_file(
-    file_path: Path, expected_suffix: str, description: str, new_file: bool
+    file_path:          Path | str,
+    expected_suffix:    str,
+    description:        str,
+    new_file:           bool
 ):
-    if not file_path.suffix == expected_suffix:
+    file_path = Path(file_path).resolve()
+    # Handle compound suffixes like .raw.nc by checking if the filename ends with the expected suffix
+    if not str(file_path).endswith(expected_suffix):
         raise SystemExit(f"ERROR: {file_path} is not a valid {description}")
     else:
         if new_file and file_path.exists():
@@ -22,7 +27,11 @@ def validate_file(
 
 
 @type_check_decorator
-def validate_directory(directory_path: Path, description: str):
+def validate_directory(
+    directory_path: Path | str,
+    description: str
+):
+    directory_path = Path(directory_path).resolve()
     if not directory_path.is_dir():
         traceback.print_stack()
         raise SystemExit(f"ERROR: {directory_path} is not a valid {description}")
