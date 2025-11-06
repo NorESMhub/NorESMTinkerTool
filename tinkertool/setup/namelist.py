@@ -1,3 +1,5 @@
+# TODO: when writing string for user_nl's check if the keyword already exists
+# in the file, if so remove that line
 import os
 import re
 import logging
@@ -19,19 +21,21 @@ def format_value(value: str) -> str:
     value = value.strip()
     # Handle Fortran logicals
     if value.lower() in ['.true.', '.false.']:
-        return value.lower()
+        return_value = value.lower()
     # Handle single numeric value (int, float, E or D notation)
     if re.match(r'^-?\d+(\.\d*)?([eEdD][+-]?\d+)?$', value):
-        return value
+        return_value = value
     # Handle comma-separated list of numbers or booleans
     if "," in value:
         vals = [v.strip() for v in value.split(",")]
         if all(re.match(r'^-?\d+(\.\d*)?([eEdD][+-]?\d+)?$', v) or v.lower() in ['.true.', '.false.'] for v in vals):
-            return ", ".join(vals)
+            return_value = ", ".join(vals)
         # Otherwise, treat as strings
-        return ", ".join(f"'{v}'" for v in vals)
+        return_value = ", ".join(f"'{v}'" for v in vals)
     # Otherwise, treat as string
-    return f"'{value}'"
+    return_value = f"'{value}'"
+    logging.debug(f"'format_value': in - {value}, out {return_value}")
+    return return_value
 
 # TODO: Since the usage syntax of user_nl is different between model components
 # we should make the user_nlstring writing based on a component class instances
@@ -61,22 +65,24 @@ def setup_usr_nlstring(
     if component_name.lower() != 'blom':
       user_nlstring += f"&{section}\n"
     for key in user_nl_config[section]:
-      if key.startswith("fincl"):
-        diag_list = user_nl_config[section][key].split("\n")
+      value = user_nl_config[section][key]
+      print(value)
+      if any(substring in key for substring in ["fincl", "fexcl"]):
+        diag_list = value.split("\n")
         user_nlstring += key + f" = '{diag_list[0]}',\n"
         for diag in diag_list[1:-1]:
           user_nlstring += f"         '{diag}',\n"
         user_nlstring +=  f"         '{diag_list[-1]}'\n"
 
       elif key.endswith("_specifier"):
-        emis_specfier = user_nl_config[section][key].split("\n")
+        emis_specfier = value.split("\n")
         user_nlstring += key + f" = '{emis_specfier[0]}',\n"
         for emis in emis_specfier[1:-1]:
           user_nlstring += f"                  '{emis}',\n"
         user_nlstring += f"                  '{emis_specfier[-1]}'\n"
 
       else:
-        user_nlstring += key + " = " + format_value(user_nl_config[section][key]) + "\n"
+        user_nlstring += key + " = " + format_value(value) + "\n"
     if component_name.lower() != 'blom':
       user_nlstring += "/\n"
     user_nlstring += "\n"

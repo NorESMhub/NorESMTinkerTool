@@ -8,7 +8,7 @@ import subprocess
 from pathlib import Path
 from itertools import islice
 
-from tinkertool.setup.namelist import setup_usr_nlstring, write_user_nl_file
+from tinkertool.setup.namelist import setup_usr_nlstring, write_user_nl_file, format_value
 from tinkertool.setup.setup_cime_connection import add_CIME_paths
 
 try:
@@ -153,7 +153,10 @@ def _per_run_case_updates(
             lifeCylceList[lifeCycleNumber] = "{:.1E}".format(paramdict[var]).replace('E', 'D').replace('+', '')
             paramLines.append("oslo_aero_lifecyclesigma = "+','.join(lifeCylceList)+"\n")
         else:
-            paramLines.append("{} = {}\n".format(var,paramdict[var]))
+            value = paramdict[var]
+            if isinstance(value, str):
+                value = format_value(value)
+            paramLines.append("{} = {}\n".format(var, value))
 
     for component in components:
         paramLines = paramLinesDict[component]
@@ -338,7 +341,7 @@ def clone_base_case(
     path_base_input:    Path=Path(''),
     keepexe:            bool=False,
     **kwargs
-):
+) -> Path:
     """
     Clone the base case and update the namelist parameters
 
@@ -356,23 +359,29 @@ def clone_base_case(
         Dictionary of component names for the parameters
     ensemble_idx : str
         The ensemble index for the new case
-    path_base_input : str
+    path_base_input : Path
         The path to the base input files
     keepexe : bool
         Keep the executable files
     **kwargs : dict
         Additional keyword arguments to be passed to the case updates
 
+    Returns
+    -------
+    Path
+        The root directory of the cloned case
     """
 
     logger.info(">>> CLONING BASE CASE for member {}...".format(ensemble_idx))
-    cloneroot = os.path.join(baseroot, f'ensemble_member.{ensemble_idx}')
+    cloneroot = baseroot.joinpath(f'ensemble_member.{ensemble_idx}')
 
-    if overwrite and os.path.isdir(cloneroot):
+    if overwrite and cloneroot.exists():
         shutil.rmtree(cloneroot)
-    if not os.path.isdir(cloneroot):
-        with Case(basecaseroot, read_only=False) as clone:
-            clone.create_clone(cloneroot, keepexe=keepexe)
+    if not cloneroot.exists():
+        logger.debug(f"Creating clone directory: {cloneroot}")
+        logger.debug(f"cloneroot type: {type(cloneroot)}")
+        with Case(str(basecaseroot), read_only=False) as clone:
+            clone.create_clone(str(cloneroot), keepexe=keepexe)
     with Case(str(cloneroot), read_only=False) as case:
         _per_run_case_updates(
             case=case,
@@ -384,7 +393,7 @@ def clone_base_case(
             **kwargs
         )
 
-    return cloneroot
+    return Path(cloneroot)
 
 def take(n, iterable):
     "Return first n items of the iterable as a list"
