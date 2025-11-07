@@ -19,21 +19,26 @@ def format_value(value: str) -> str:
         The string to format.
     """
     value = value.strip()
+
     # Handle Fortran logicals
     if value.lower() in ['.true.', '.false.']:
         return_value = value.lower()
-    # Handle single numeric value (int, float, E or D notation)
-    if re.match(r'^-?\d+(\.\d*)?([eEdD][+-]?\d+)?$', value):
-        return_value = value
     # Handle comma-separated list of numbers or booleans
-    if "," in value:
+    elif "," in value:
         vals = [v.strip() for v in value.split(",")]
         if all(re.match(r'^-?\d+(\.\d*)?([eEdD][+-]?\d+)?$', v) or v.lower() in ['.true.', '.false.'] for v in vals):
-            return_value = ", ".join(vals)
-        # Otherwise, treat as strings
-        return_value = ", ".join(f"'{v}'" for v in vals)
-    # Otherwise, treat as string
-    return_value = f"'{value}'"
+            # For numeric lists, join without spaces (Fortran convention)
+            return_value = ",".join(vals)
+        else:
+            # For string lists, quote each item and join with commas (no spaces)
+            return_value = ",".join(f"'{v}'" for v in vals)
+    # Handle single numeric value (int, float, E or D notation)
+    elif re.match(r'^-?\d+(\.\d*)?([eEdD][+-]?\d+)?$', value):
+        return_value = value
+    else:
+        # Otherwise, treat as string
+        return_value = f"'{value}'"
+
     logging.debug(f"'format_value': in - {value}, out {return_value}")
     return return_value
 
@@ -68,11 +73,17 @@ def setup_usr_nlstring(
       value = user_nl_config[section][key]
       print(value)
       if any(substring in key for substring in ["fincl", "fexcl"]):
-        diag_list = value.split("\n")
-        user_nlstring += key + f" = '{diag_list[0]}',\n"
-        for diag in diag_list[1:-1]:
-          user_nlstring += f"         '{diag}',\n"
-        user_nlstring +=  f"         '{diag_list[-1]}'\n"
+        # Handle multi-line diagnostic lists
+        if "\n" in value:
+          diag_list = value.split("\n")
+          # For string lists, quote each item
+          user_nlstring += key + f" = '{diag_list[0]}',\n"
+          for diag in diag_list[1:-1]:
+            user_nlstring += f"         '{diag}',\n"
+          user_nlstring +=  f"         '{diag_list[-1]}'\n"
+        else:
+          # Single line - use format_value for proper formatting
+          user_nlstring += key + " = " + format_value(value) + "\n"
 
       elif key.endswith("_specifier"):
         emis_specfier = value.split("\n")
@@ -94,7 +105,9 @@ def write_user_nl_file(
     usernlfile:     str,
     user_nl_str:    str
 ) -> None:
-    """write user_nl string to file
+    """write user_nl string to file. Here we OVERWRITE the
+    full file content, i.e. creating a new file. This implies that
+    that the contral files should hold all key-value pairs.
 
     Parameters
     ----------
@@ -109,5 +122,5 @@ def write_user_nl_file(
     """
     user_nl_file = os.path.join(caseroot, usernlfile)
     logger.info(f"...Writing to user_nl file: {usernlfile}")
-    with open(user_nl_file, "a") as funl:
+    with open(user_nl_file, "w") as funl:
         funl.write(user_nl_str)
