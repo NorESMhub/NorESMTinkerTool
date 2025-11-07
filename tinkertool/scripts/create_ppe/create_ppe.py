@@ -257,6 +257,9 @@ def prestage_ensemble(config: PrestageEnsembleConfig) -> bool:
 
     logging.info(">> Starting PPE prestaging")
 
+    rsync_time_cap_restart_files = 600 # sec
+    rsync_time_cap_rpointer_files = 120 # sec
+
     all_prestage_success = True
     for caseroot in checked_config.cases:
         with Case(caseroot, read_only=False) as case:
@@ -276,23 +279,38 @@ def prestage_ensemble(config: PrestageEnsembleConfig) -> bool:
                 # copy the netcdf files from the 'RUN_REFDIR' to the 'RUNDIR'
                 # and set 'RUN_REFDIR'='RUNDIR'. This is needed to ensure that the
                 # cases can run independently and do not interfere with each other.
-                ref_netcdf_files = [str(file) for file in run_refdir.glob('*.nc')]
+                ref_netcdf_files = list(run_refdir.glob('*.nc'))
                 if ref_netcdf_files:
+                    # Use rsync with shell expansion for glob pattern and progress display
+                    cmd_str = f"rsync --archive --progress '{run_refdir}'/*.nc '{rundir}'/."
+                    log_info_detailed('tinkertool_log', f"Copying {len(ref_netcdf_files)} netCDF files with rsync from {run_refdir} to {rundir}")
+                    logging.debug(f"Command: {cmd_str}")
+
                     try:
-                        subprocess.run(
-                            [
-                                'rsync', '--archive',
-                                *ref_netcdf_files,
-                                rundir
-                            ],
+                        result = subprocess.run(
+                            cmd_str,
                             cwd=caseroot,
-                            executable='/bin/bash',
                             check=True,
-                            shell=True
+                            shell=True,
+                            capture_output=True,
+                            text=True,
+                            timeout=rsync_time_cap_restart_files
                         )
+                        log_info_detailed('tinkertool_log', f"rsync completed successfully")
+                        if result.stdout:
+                            log_info_detailed('tinkertool_log', f"rsync stdout: {result.stdout}")
+                    except subprocess.TimeoutExpired:
+                        error_msg = f"rsync timeout after {rsync_time_cap_restart_files/60} minutes for case {caseroot}."
+                        logging.error(error_msg)
+                        all_prestage_success = False
+                        continue
                     except subprocess.CalledProcessError as e:
                         error_msg = f"Failed to prestage ref_netcdf_files files for case {caseroot}."
                         logging.error(error_msg)
+                        if e.stderr:
+                            logging.error(f"rsync stderr: {e.stderr}")
+                        all_prestage_success = False
+                        continue
                     case.set_value('RUN_REFDIR', rundir)
                 else:
                     logging.warning(f"No netcdf files found in {run_refdir}. Skipping prestaging for case {caseroot}.")
@@ -302,23 +320,36 @@ def prestage_ensemble(config: PrestageEnsembleConfig) -> bool:
                     # in a branch run, we need to prestage the rpointer files as well
                     # copy the rpointer files from the original run_refdir to the rundir
                     # and set 'DRV_RESTART_POINTER' to the rpointer file name with the correct date and time
-                    rpointer_files = [str(file) for file in run_refdir.glob('rpointer*')]
+                    rpointer_files = list(run_refdir.glob('rpointer*'))
                     if rpointer_files:
+                        cmd_str = f"rsync --archive '{run_refdir}'/rpointer* '{rundir}'/."
+                        log_info_detailed('tinkertool_log', f"Copying {len(rpointer_files)} rpointer files with rsync from {run_refdir} to {rundir}")
+                        logging.debug(f"Command: {cmd_str}")
                         try:
-                            subprocess.run(
-                                [
-                                    'rsync', '--archive',
-                                    *rpointer_files,
-                                    rundir
-                                ],
+                            result = subprocess.run(
+                                cmd_str,
                                 cwd=caseroot,
-                                executable='/bin/bash',
                                 check=True,
-                                shell=True
+                                shell=True,
+                                capture_output=True,
+                                text=True,
+                                timeout=rsync_time_cap_rpointer_files
                             )
+                            log_info_detailed('tinkertool_log', f"rpointer rsync completed successfully")
+                            if result.stdout:
+                                log_info_detailed('tinkertool_log', f"rsync stdout: {result.stdout}")
+                        except subprocess.TimeoutExpired:
+                            error_msg = f"rpointer rsync timeout after {rsync_time_cap_rpointer_files/60} minute for case {caseroot}."
+                            logging.error(error_msg)
+                            all_prestage_success = False
+                            continue
                         except subprocess.CalledProcessError as e:
                             error_msg = f"Failed to prestage rpointer files for case {caseroot}."
                             logging.error(error_msg)
+                            if e.stderr:
+                                logging.error(f"rsync stderr: {e.stderr}")
+                            all_prestage_success = False
+                            continue
 
                         case.set_value('DRV_RESTART_POINTER', f"rpointer.cpl.{case.get_value('RUN_REFDATE')}-{case.get_value('RUN_REFTOD')}")
                     else:
