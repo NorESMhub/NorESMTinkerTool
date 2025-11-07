@@ -387,3 +387,35 @@ def submit_ppe(config: SubmitPPEConfig):
     logging.info(">> Check the queue with 'squeue -u <USER>' command")
     logging.info(">> Check the log files in each case directory for more information")
     logging.info(">> Finished PPE case submission")
+
+
+# TODO: rather wrap xmlchange so that changes are registered in CaseStatus?
+def bulk_xmlchange(
+    cases: list[Path] | list[str],
+    xml_changes: dict[str, str] | list[dict[str, str]]
+) -> None:
+    """Apply bulk xml changes to a list of cases.
+
+    Parameters
+    ----------
+    cases : list[Path]
+        List of case directories to apply the xml changes to.
+    xml_changes : dict[str, str] | list[dict[str, str]]
+        Dictionary of xml changes to apply, where keys are xml variable names and values are the new values.
+    """
+
+    logging.info(">> Starting bulk xml changes for PPE cases")
+
+    if isinstance(xml_changes, dict):
+        xml_changes = [xml_changes]
+
+    for caseroot in cases:
+        with Case(str(caseroot), read_only=False) as case:
+            log_info_detailed('tinkertool_log', f"Applying xml changes to case {caseroot.name}")
+            for change in xml_changes:
+                for var, value in change.items():
+                    old_value = case.get_value(var)
+                case.set_value(var, value)
+                logging.debug(f"Case {caseroot.name}: Changed xml variable '{var}' from '{old_value}' to '{value}'")
+
+    logging.info(">> Finished bulk xml changes for PPE cases")
