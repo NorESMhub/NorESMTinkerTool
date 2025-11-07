@@ -268,3 +268,57 @@ class CheckedSubmitPPEConfig(CheckedBaseConfig):
     def get_checked_and_derived_config(self) -> 'CheckedSubmitPPEConfig':
         logging.info(f"{self.__class__.__name__} is a dataclass with all derived fields, no further checks are needed.")
         return self
+
+# wrapper config objects for check_build and prestage. They can
+# use SubmitPPEConfig, we just wrap them to avoid confusion.
+
+class CheckBuildConfig(SubmitPPEConfig):
+    """Configuration for checking build status of PPE cases.
+
+    Functionally identical to SubmitPPEConfig but with a name that clearly
+    indicates its purpose: checking if ensemble member cases have been built successfully.
+    """
+
+    def get_checked_and_derived_config(self) -> 'CheckedCheckBuildConfig':
+        """Check and handle arguments for the build check configuration."""
+        # Get the parent checked config
+        parent_config = super().get_checked_and_derived_config()
+        # Return as CheckedCheckBuildConfig
+        return CheckedCheckBuildConfig(**parent_config.__dict__)
+
+class CheckedCheckBuildConfig(CheckedSubmitPPEConfig):
+    """Checked configuration for checking build status of PPE cases.
+
+    The validated and processed version of CheckBuildConfig with all fields
+    verified and cases converted to Path objects.
+    """
+
+    def get_checked_and_derived_config(self) -> 'CheckedCheckBuildConfig':
+        logging.info(f"{self.__class__.__name__} is a dataclass with all derived fields, no further checks are needed.")
+        return self
+
+class PrestageEnsembleConfig(SubmitPPEConfig):
+    """Configuration for prestaging PPE ensemble cases.
+
+    Functionally identical to SubmitPPEConfig but with a name that clearly
+    indicates its purpose: preparing ensemble member cases by copying restart
+    files and setting up the run environment before job submission.
+    """
+
+    def get_checked_and_derived_config(self) -> 'CheckedPrestageEnsembleConfig':
+        """Check and handle arguments for the prestage configuration."""
+        # Get the parent checked config
+        parent_config = super().get_checked_and_derived_config()
+        # Return as CheckedPrestageEnsembleConfig
+        return CheckedPrestageEnsembleConfig(**parent_config.__dict__)
+
+class CheckedPrestageEnsembleConfig(CheckedSubmitPPEConfig):
+    """Checked configuration for prestaging PPE ensemble cases.
+
+    The validated and processed version of PrestageEnsembleConfig with all fields
+    verified and cases converted to Path objects.
+    """
+
+    def get_checked_and_derived_config(self) -> 'CheckedPrestageEnsembleConfig':
+        logging.info(f"{self.__class__.__name__} is a dataclass with all derived fields, no further checks are needed.")
+        return self

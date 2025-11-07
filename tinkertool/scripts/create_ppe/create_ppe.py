@@ -10,7 +10,11 @@ from tinkertool.scripts.create_ppe.config import (
     BuildPPEConfig,
     CheckedBuildPPEConfig,
     SubmitPPEConfig,
-    CheckedSubmitPPEConfig
+    CheckedSubmitPPEConfig,
+    CheckBuildConfig,
+    CheckedCheckBuildConfig,
+    PrestageEnsembleConfig,
+    CheckedPrestageEnsembleConfig
 )
 from tinkertool.setup.setup_cime_connection import add_CIME_paths
 
@@ -89,7 +93,7 @@ def create_ppe(config: CreatePPEConfig):
 
     cases_for_check_build.extend(cases)
 
-    check_build_config = SubmitPPEConfig(
+    check_build_config = CheckBuildConfig(
         cases=cases_for_check_build,
         verbose=config.verbose,
         log_dir=config.log_dir,
@@ -103,15 +107,22 @@ def create_ppe(config: CreatePPEConfig):
         return
 
     if not config.build_only:
-        prestage_and_submit_ensemble_config = SubmitPPEConfig(
+        prestage_ensemble_config = PrestageEnsembleConfig(
             cases=cases,
             verbose=config.verbose,
             log_dir=config.log_dir,
             log_mode=config.log_mode
         )
-        prestage_ensemble(prestage_and_submit_ensemble_config)
+        prestage_ensemble(prestage_ensemble_config)
+
         # create SubmitPPEConfig object from config and cases
-        submit_ppe(prestage_and_submit_ensemble_config)
+        submit_ensemble_config = SubmitPPEConfig(
+            cases=cases,
+            verbose=config.verbose,
+            log_dir=config.log_dir,
+            log_mode=config.log_mode
+        )
+        submit_ppe(submit_ensemble_config)
 
     logging.info("> Finished PPE creation")
 
@@ -182,7 +193,7 @@ def build_ppe(config: BuildPPEConfig) -> tuple[Path, list[Path] | None]:
 
     return basecaseroot, cases
 
-def check_build(config: SubmitPPEConfig) -> bool:
+def check_build(config: CheckBuildConfig) -> bool:
     """Check if the build was successful by checking for case.build success in each case directories CaseStatus
 
     Parameters
@@ -195,8 +206,8 @@ def check_build(config: SubmitPPEConfig) -> bool:
         True if all cases have a successful build, False otherwise.
     """
 
-    # check if SumitPPEConfig is valid
-    checked_config: CheckedSubmitPPEConfig = config.get_checked_and_derived_config()
+    # check if CheckBuildConfig is valid
+    checked_config: CheckedCheckBuildConfig = config.get_checked_and_derived_config()
 
     # set up logging if not already set
     if not logging.getLogger('tinkertool_log').handlers:
@@ -227,7 +238,7 @@ def check_build(config: SubmitPPEConfig) -> bool:
 
     return all_build_success
 
-def prestage_ensemble(config: SubmitPPEConfig) -> bool:
+def prestage_ensemble(config: PrestageEnsembleConfig) -> bool:
     """Prestage the ensemble members by copying the base case input files to each member's input directory.
 
     Parameters
@@ -237,7 +248,7 @@ def prestage_ensemble(config: SubmitPPEConfig) -> bool:
     """
 
     # check if PrestageEnsembleConfig is valid
-    checked_config: CheckedSubmitPPEConfig = config.get_checked_and_derived_config()
+    checked_config: CheckedPrestageEnsembleConfig = config.get_checked_and_derived_config()
 
     # set up logging if not already set
     if not logging.getLogger('tinkertool_log').handlers:
