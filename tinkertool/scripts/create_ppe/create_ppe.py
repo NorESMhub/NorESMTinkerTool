@@ -311,7 +311,7 @@ def prestage_ensemble(config: PrestageEnsembleConfig) -> bool:
                             logging.error(f"rsync stderr: {e.stderr}")
                         all_prestage_success = False
                         continue
-                    case.set_value('RUN_REFDIR', rundir)
+                    case.set_value('RUN_REFDIR', str(rundir))
                 else:
                     logging.warning(f"No netcdf files found in {run_refdir}. Skipping prestaging for case {caseroot}.")
                     all_prestage_success = False
@@ -322,7 +322,7 @@ def prestage_ensemble(config: PrestageEnsembleConfig) -> bool:
                     # and set 'DRV_RESTART_POINTER' to the rpointer file name with the correct date and time
                     rpointer_files = list(run_refdir.glob('rpointer*'))
                     if rpointer_files:
-                        cmd_str = f"rsync --archive '{run_refdir}'/rpointer* '{rundir}'/."
+                        cmd_str = f"rsync --archive '{run_refdir}'/rpointer* '{str(rundir)}'/."
                         log_info_detailed('tinkertool_log', f"Copying {len(rpointer_files)} rpointer files with rsync from {run_refdir} to {rundir}")
                         logging.debug(f"Command: {cmd_str}")
                         try:
