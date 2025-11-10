@@ -11,6 +11,7 @@ from itertools import islice
 from tinkertool.setup.namelist import setup_usr_nlstring, write_user_nl_file, format_value
 from tinkertool.setup.setup_cime_connection import add_CIME_paths
 
+# TODO: get rid of the need to export CESMROOT env variable, use the one in the config file instead?
 try:
     environ_CESMROOT = os.environ.get('CESMROOT')
     if environ_CESMROOT is None:

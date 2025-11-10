@@ -18,6 +18,7 @@ from tinkertool.scripts.create_ppe.config import (
 )
 from tinkertool.setup.setup_cime_connection import add_CIME_paths
 
+# TODO: get rid of the need to export CESMROOT env variable, use the one in the config file instead?
 try:
     env_cesmroot = os.environ.get('CESMROOT')
     if env_cesmroot is None:
