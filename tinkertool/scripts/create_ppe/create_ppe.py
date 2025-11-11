@@ -3,7 +3,9 @@ import logging
 import subprocess
 from pathlib import Path
 
-from tinkertool.utils.custom_logging import log_info_detailed, setup_logging
+from tinkertool.utils.custom_logging import (
+    log_info_detailed, setup_logging, input_with_timer
+)
 from tinkertool.setup.case import build_base_case, clone_base_case
 from tinkertool.scripts.create_ppe.config import (
     CreatePPEConfig,
@@ -194,6 +196,8 @@ def build_ppe(config: BuildPPEConfig) -> tuple[Path, list[Path] | None]:
 
     return basecaseroot, cases
 
+# TODO: make robust by constraining the search to lines after the last
+# build start line in CaseStatus
 def check_build(config: CheckBuildConfig) -> bool:
     """Check if the build was successful by checking for case.build success in each case directories CaseStatus
 
@@ -277,11 +281,32 @@ def prestage_ensemble(config: PrestageEnsembleConfig) -> bool:
                     "Note that this might cause a crash if cases are submitted simultaneously."
                 )
             else:
+                if not run_refdir.exists():
+                    logging.error(f"Reference directory {run_refdir} does not exist for case {caseroot}. Skipping prestaging.")
+                    all_prestage_success = False
+                    continue
+                logging.debug(f"Prestaging case {caseroot} from reference directory {run_refdir} to run directory {rundir}")
+                # check if 'rest' is in RUN_REFDIR path
+                # if not throw a warning and ask user to confirm prestaging
+                rest_dir = True
+                if 'rest' not in str(run_refdir).lower():
+                    logging.warning(
+                        f"RUN_REFDIR {run_refdir} for case {caseroot} does not contain 'rest' in its path. \n"
+                        "This might indicate that the reference directory is not a restart directory. \n"
+                        "You will be prompted to confirm prestaging. \n"
+                    )
+                    rest_dir = False
                 # copy the netcdf files from the 'RUN_REFDIR' to the 'RUNDIR'
                 # and set 'RUN_REFDIR'='RUNDIR'. This is needed to ensure that the
                 # cases can run independently and do not interfere with each other.
                 ref_netcdf_files = list(run_refdir.glob('*.nc'))
                 if ref_netcdf_files:
+                    if not rest_dir:
+                        input_with_timer(
+                            prompt=f"Press Enter to confirm prestaging of {len(ref_netcdf_files)} netCDF files from {run_refdir} to {rundir} for case {caseroot}, or Ctrl+C to abort. (Auto-continue in 30 seconds)\n",
+                            timeout=30,
+                            default=''
+                        )
                     # Use rsync with shell expansion for glob pattern and progress display
                     cmd_str = f"rsync --archive --progress '{run_refdir}'/*.nc '{rundir}'/."
                     log_info_detailed('tinkertool_log', f"Copying {len(ref_netcdf_files)} netCDF files with rsync from {run_refdir} to {rundir}")
@@ -323,6 +348,12 @@ def prestage_ensemble(config: PrestageEnsembleConfig) -> bool:
                     # and set 'DRV_RESTART_POINTER' to the rpointer file name with the correct date and time
                     rpointer_files = list(run_refdir.glob('rpointer*'))
                     if rpointer_files:
+                        if not rest_dir:
+                            input_with_timer(
+                                prompt=f"Press Enter to confirm prestaging of {len(rpointer_files)} rpointer files from {run_refdir} to {rundir} for case {caseroot}, or Ctrl+C to abort. (Auto-continue in 30 seconds)\n",
+                                timeout=30,
+                                default=''
+                            )
                         cmd_str = f"rsync --archive '{run_refdir}'/rpointer* '{str(rundir)}'/."
                         log_info_detailed('tinkertool_log', f"Copying {len(rpointer_files)} rpointer files with rsync from {run_refdir} to {rundir}")
                         logging.debug(f"Command: {cmd_str}")

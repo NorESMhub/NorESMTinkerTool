@@ -160,3 +160,39 @@ def custom_logging(
         logger.addHandler(handler)
 
     return logger
+
+def input_with_timer(
+    prompt: str,
+    timeout: int,
+    default: Optional[str] = None
+) -> Optional[str]:
+    """Get user input with a timeout.
+
+    Parameters
+    ----------
+    prompt : str
+        The prompt message to display to the user.
+    timeout : int
+        The time in seconds to wait for user input before timing out.
+    default : str, optional
+        The default value to return if the timeout is reached. Default is None.
+
+    Returns
+    -------
+    str or None
+        The user input if provided within the timeout, otherwise the default value.
+    """
+    import signal
+
+    def timeout_handler(signum, frame):
+        raise TimeoutError
+
+    signal.signal(signal.SIGALRM, timeout_handler)
+    signal.alarm(timeout)
+    try:
+        user_input = input(prompt)
+        signal.alarm(0)  # Disable the alarm
+        return user_input
+    except TimeoutError:
+        print(f"\nInput timed out after {timeout} seconds.")
+        return default
