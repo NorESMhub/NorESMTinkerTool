@@ -19,6 +19,7 @@ from tinkertool.scripts.create_ppe.config import (
     CheckedPrestageEnsembleConfig
 )
 from tinkertool.setup.setup_cime_connection import add_CIME_paths
+from tinkertool.utils.CIME_interaction_utils import set_value_with_status_update
 
 # TODO: get rid of the need to export CESMROOT env variable, use the one in the config file instead?
 try:
@@ -337,7 +338,7 @@ def prestage_ensemble(config: PrestageEnsembleConfig) -> bool:
                             logging.error(f"rsync stderr: {e.stderr}")
                         all_prestage_success = False
                         continue
-                    case.set_value('RUN_REFDIR', str(rundir))
+                    set_value_with_status_update(case, 'RUN_REFDIR', str(rundir), kill_on_error=False)
                 else:
                     logging.warning(f"No netcdf files found in {run_refdir}. Skipping prestaging for case {caseroot}.")
                     all_prestage_success = False
@@ -383,7 +384,7 @@ def prestage_ensemble(config: PrestageEnsembleConfig) -> bool:
                             all_prestage_success = False
                             continue
 
-                        case.set_value('DRV_RESTART_POINTER', f"rpointer.cpl.{case.get_value('RUN_REFDATE')}-{case.get_value('RUN_REFTOD')}")
+                        set_value_with_status_update(case, 'DRV_RESTART_POINTER', f"rpointer.cpl.{case.get_value('RUN_REFDATE')}-{case.get_value('RUN_REFTOD')}", kill_on_error=False)
                     else:
                         logging.warning(f"No rpointer files found in {run_refdir}. Skipping prestaging for case {caseroot}.")
                         all_prestage_success = False
@@ -443,11 +444,9 @@ def bulk_xmlchange(
 
     for caseroot in cases:
         with Case(str(caseroot), read_only=False) as case:
-            log_info_detailed('tinkertool_log', f"Applying xml changes to case {caseroot.name}")
+            log_info_detailed('tinkertool_log', f"Setting case values for case {caseroot.name}")
             for change in xml_changes:
                 for var, value in change.items():
-                    old_value = case.get_value(var)
-                case.set_value(var, value)
-                logging.debug(f"Case {caseroot.name}: Changed xml variable '{var}' from '{old_value}' to '{value}'")
+                    set_value_with_status_update(case, var, value, kill_on_error=False)
 
     logging.info(">> Finished bulk xml changes for PPE cases")
