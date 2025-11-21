@@ -420,7 +420,6 @@ def submit_ppe(config: SubmitPPEConfig):
     logging.info(">> Check the log files in each case directory for more information")
     logging.info(">> Finished PPE case submission")
 
-# TODO: rather wrap xmlchange so that changes are registered in CaseStatus?
 def bulk_xmlchange(
     cases: list[Path] | list[str],
     xml_changes: dict[str, str | dict[str, str]] | list[dict[str, str | dict[str, str]]]
@@ -449,7 +448,7 @@ def bulk_xmlchange(
                     if isinstance(value, dict):  # If value is a dictionary, it means subgroup-specific changes
                         for subgroup, sub_value in value.items():
                             old_value = case.get_value(var, subgroup=subgroup)
-                            case.set_value(var, sub_value, subgroup=subgroup)
+                            set_value_with_status_update(case, var, sub_value, subgroup=subgroup, kill_on_error=False)
                             logging.debug(
                                 f"Case {caseroot.name}: Changed XML variable '{var}' in subgroup '{subgroup}' "
                                 f"from '{old_value}' to '{sub_value}'"
