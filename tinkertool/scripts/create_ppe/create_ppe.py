@@ -18,7 +18,6 @@ from tinkertool.scripts.create_ppe.config import (
 )
 from tinkertool.setup.setup_cime_connection import add_CIME_paths
 
-# TODO: get rid of the need to export CESMROOT env variable, use the one in the config file instead?
 try:
     env_cesmroot = os.environ.get('CESMROOT')
     if env_cesmroot is None:
@@ -389,34 +388,45 @@ def submit_ppe(config: SubmitPPEConfig):
     logging.info(">> Check the log files in each case directory for more information")
     logging.info(">> Finished PPE case submission")
 
-
 # TODO: rather wrap xmlchange so that changes are registered in CaseStatus?
 def bulk_xmlchange(
     cases: list[Path] | list[str],
-    xml_changes: dict[str, str] | list[dict[str, str]]
+    xml_changes: dict[str, str | dict[str, str]] | list[dict[str, str | dict[str, str]]]
 ) -> None:
-    """Apply bulk xml changes to a list of cases.
+    """Apply bulk XML changes to a list of cases.
 
     Parameters
     ----------
     cases : list[Path]
-        List of case directories to apply the xml changes to.
-    xml_changes : dict[str, str] | list[dict[str, str]]
-        Dictionary of xml changes to apply, where keys are xml variable names and values are the new values.
+        List of case directories to apply the XML changes to.
+    xml_changes : dict[str, str | dict[str, str]] | list[dict[str, str | dict[str, str]]]
+        Dictionary (or list of dictionaries) of XML changes to apply. Keys are XML variable names.
+        Values can either be a string (for global changes) or a dictionary with subgroups as keys and values to apply.
     """
+    logging.info(">> Starting bulk XML changes for PPE cases")
 
-    logging.info(">> Starting bulk xml changes for PPE cases")
-
+    # Handle single dictionary input
     if isinstance(xml_changes, dict):
         xml_changes = [xml_changes]
 
     for caseroot in cases:
         with Case(str(caseroot), read_only=False) as case:
-            log_info_detailed('tinkertool_log', f"Applying xml changes to case {caseroot.name}")
+            log_info_detailed('tinkertool_log', f"Applying XML changes to case {caseroot.name}")
             for change in xml_changes:
                 for var, value in change.items():
-                    old_value = case.get_value(var)
-                case.set_value(var, value)
-                logging.debug(f"Case {caseroot.name}: Changed xml variable '{var}' from '{old_value}' to '{value}'")
+                    if isinstance(value, dict):  # If value is a dictionary, it means subgroup-specific changes
+                        for subgroup, sub_value in value.items():
+                            old_value = case.get_value(var, subgroup=subgroup)
+                            case.set_value(var, sub_value, subgroup=subgroup)
+                            logging.debug(
+                                f"Case {caseroot.name}: Changed XML variable '{var}' in subgroup '{subgroup}' "
+                                f"from '{old_value}' to '{sub_value}'"
+                            )
+                    else:  # If value is a simple string, apply to the default
+                        old_value = case.get_value(var)
+                        case.set_value(var, value)
+                        logging.debug(
+                            f"Case {caseroot.name}: Changed XML variable '{var}' from '{old_value}' to '{value}'"
+                        )
 
-    logging.info(">> Finished bulk xml changes for PPE cases")
+    logging.info(">> Finished bulk XML changes for PPE cases")
