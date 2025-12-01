@@ -297,7 +297,7 @@ def generate_paramfile(config: ParameterFileConfig):
             ds[param].attrs['default'] = safe_get_param_value(pdata, 'default', 'No default value available')
             ds[param].attrs['sampling'] = safe_get_param_value(pdata, 'sampling', 'No sampling method available')
 
-            input_type = safe_get_param_value(pdata, 'input_type', "")
+            input_type = safe_get_param_value(pdata, 'input_type', "user_nl")
             assert not isinstance(input_type, str) or input_type.lower() in [it.lower() for it in PARAMFILE_INPUT_TYPES], \
                 f"Invalid input type '{input_type}, type({type(input_type)})' for parameter '{param}'. Supported types are: {PARAMFILE_INPUT_TYPES}."
             ds[param].attrs['input_type'] = input_type

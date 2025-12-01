@@ -10,6 +10,9 @@ from tinkertool import NorESMTinkerTool_abspath
 from tinkertool.utils.custom_logging import setup_logging
 from tinkertool.utils.check_arguments import validate_directory
 
+from importlib import metadata
+__version__ = metadata.version("tinkertool")
+
 # --- Decorator to add config/CLI helper methods to dataclass ---
 TypeVarT = TypeVar("TypeVarT")
 
@@ -54,6 +57,7 @@ def _from_cli(cls: Type[TypeVarT]) -> TypeVarT:
         default = None if required else fld.default
 
         # Handle bools with argparse actions
+        print(fld.type)
         if fld.type == bool:
             parser.add_argument(
                 arg_name,
@@ -69,6 +73,15 @@ def _from_cli(cls: Type[TypeVarT]) -> TypeVarT:
                 help=help_text + (" (default: None)" if not required else ""),
                 required=required,
                 default=default
+            )
+            continue
+        if fld.name == "params":
+            parser.add_argument(
+                arg_name,
+                nargs='+',
+                help=help_text,
+                required=required,
+                default=[None]
             )
             continue
 
@@ -90,7 +103,7 @@ def _from_cli(cls: Type[TypeVarT]) -> TypeVarT:
                 required=required,
                 default=default
             )
-
+    parser.add_argument("--version", "-v", action="version", version=f"tinkertool version {__version__}")
     args = parser.parse_args()
     return cls(**vars(args))
 
