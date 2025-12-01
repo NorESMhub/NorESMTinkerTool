@@ -12,6 +12,8 @@ from tinkertool.utils.check_arguments import validate_file, check_type
 from tinkertool.utils.make_chem_in import check_if_chem_mech_is_perterbed
 from tinkertool.utils.make_land_parameterfiles import check_if_ctsm_param_is_perturbed, check_if_fates_param_is_perturbed
 
+
+import io
 # ------------------------ #
 # --- Global variables --- #
 # ------------------------ #
@@ -32,7 +34,7 @@ class ParameterFileConfig(BaseConfig):
     tinkertool_output_dir:      Path = field(default=Path(default_output_dir).resolve(), metadata={"help": "Path to the output directory for files produced by TinkerTool, default will use NorESMTinkerTool/output"})
     optimization:               str | None = field(default=None, metadata={"help": "Whether to enable optimization after sampling, valid random-cd or lloyd. Default None."})
     avoid_scramble:             bool = field(default=False, metadata={"help": "Overwrite the default scramble of hypercube, i.e. scramble=False to center samples within cells of a multi-dimensional grid. If it is not called, samples are randomly placed within cells of the grid."})
-    params:                     list | None = field(default=None, metadata={"help": "List of parameters to be sampled, have to be defined in param_ranges_inpath. If unspecified all parameters in param_ranges_inpath will be used"})
+    params:                     list = field(default=None, metadata={"help": "List of parameters to be sampled, have to be defined in param_ranges_inpath. If unspecified all parameters in param_ranges_inpath will be used"})
     exclude_default:            bool = field(default=False, metadata={"help": "Whether to exclude the default parameter value in the output file in nmb_sim=0. Using this flag will skip nmb_sim=0. Default is to include default value."})
 
     def __post_init__(self):
@@ -58,6 +60,10 @@ class ParameterFileConfig(BaseConfig):
         # avoid_scramble
         check_type(self.avoid_scramble, bool)
         # params
+        if isinstance(self.params, list):
+            p0 = self.params[0]
+        else:
+            p0 = self.params
         if self.params is not None:
             check_type(self.params, list)
             for param in self.params:
@@ -86,6 +92,10 @@ class ParameterFileConfig(BaseConfig):
             for param in self.params:
                 if param not in param_ranges:
                     raise ValueError(f"Parameter '{param}' not found in parameter ranges file {self.param_ranges_inpath}.")
+            # subset param_ranges to only include specified params keep as configparser object by poping unwanted sections
+            for section in param_ranges.sections():
+                if section not in self.params:
+                    param_ranges.remove_section(section) 
         else:
             # If no params specified, use all sections from param_ranges_inpath
             self.params = list(param_ranges.sections())
@@ -113,7 +123,10 @@ class ParameterFileConfig(BaseConfig):
         # check if CTSM or FATES parameters are perturbed
         # ctsm_default_param_file
         change_ctsm_params = False
-        if check_if_ctsm_param_is_perturbed(str(self.param_ranges_inpath)):
+        str_buffer = io.StringIO()
+        param_ranges.write(str_buffer)
+        cfg_str = str_buffer.getvalue()
+        if check_if_ctsm_param_is_perturbed(cfg_str):
             change_ctsm_params = True
             if self.ctsm_default_param_file is None:
                 err_msg = ("Parameter ranges file indicates CTSM parameter perturbations, "
