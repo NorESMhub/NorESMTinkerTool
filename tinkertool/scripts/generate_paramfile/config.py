@@ -73,6 +73,7 @@ class ParameterFileConfig(BaseConfig):
         This method should be called once at the start of the application.
         It now returns `self`.
         """
+        super().get_checked_and_derived_config()
         # If derived fields are already populated, we can assume this has been run.
         if self.param_ranges is not None:
             logging.debug("Configuration already checked. Skipping full validation.")

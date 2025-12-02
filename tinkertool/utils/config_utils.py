@@ -165,14 +165,20 @@ class BaseConfig:
         # log_mode
         if self.log_mode not in ["w", "a", "o"]:
             raise ValueError(f"Invalid log mode: {self.log_mode}. Must be 'w', 'a', or 'o'.")
+        self.log_file = None
 
-    def get_checked_and_derived_config(self):
+    def get_checked_and_derived_config(self) -> 'BaseConfig':
+        """Performs checks and populates derived fields, including setting up logging."""
+        if self.log_file is not None: # Already run
+            return self
+
         time_str = time.strftime("%Y%m%d-%H%M%S")
-        log_file = Path(self.log_dir).joinpath(f'tinkertool_{time_str}.log')
-        return CheckedBaseConfig(
-            **self.__dict__,
-            log_file=log_file
-        )
+        self.log_file = Path(self.log_dir).joinpath(f'tinkertool_{time_str}.log')
+
+        if self.log_mode != 'o' and not logging.getLogger('tinkertool_log').handlers:
+            setup_logging(self.verbose, self.log_file, self.log_mode, 'tinkertool_log')
+        
+        return self
 
 @dataclass(kw_only=True)
 class CheckedBaseConfig(BaseConfig):
