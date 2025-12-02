@@ -26,11 +26,7 @@ def test_version(command):
     assert metadata.version("tinkertool") in proc.stdout
 
 
-
-def test_generate_paramfile_lhc_no_fates_ctsm(tmp_path:pathlib.Path):
-    test_ini = tmp_path / "test_ppe.ini"
-    test_paramfile = tmp_path / "test_paramfile.nc"
-
+def _create_test_ini_file(tmp_path: pathlib.Path):
     ini_content = """
     [test_parameter1]
     esm_component = CAM
@@ -68,13 +64,23 @@ def test_generate_paramfile_lhc_no_fates_ctsm(tmp_path:pathlib.Path):
     ndigits = 4.0
     input_type = CTSM_param_file
     """
+    test_ini = tmp_path / "test_ppe.ini"
     test_ini.write_text(ini_content)
+    return test_ini
+
+
+def test_generate_paramfile_lhc_no_fates_ctsm(tmp_path:pathlib.Path):
+
+    test_paramfile = tmp_path / "test_paramfile.nc"
+
+    test_ini = _create_test_ini_file(tmp_path)
 
     proc = subprocess.run(
         [sys.executable, "-m", "tinkertool.scripts.generate_paramfile.main",
          '--param-ranges-inpath', str(test_ini),
          '--param-sample-outpath', str(test_paramfile),
          '--nmb-sim', "30",
+         '--log-mode', "o",
          '--params', "test_parameter1",  "test_parameter2", "test_parameter3"],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -97,3 +103,5 @@ def test_generate_paramfile_lhc_no_fates_ctsm(tmp_path:pathlib.Path):
         
     assert defaults_from_file == [0.006, 50.0, 5.0], f"Default values in output file do not match expected defaults: {defaults_from_file}"
     assert n_sims == 31, f"Number of simulations in output file is {n_sims}, expected 30 + 1 (default simulation)."
+
+

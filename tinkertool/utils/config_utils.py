@@ -50,7 +50,9 @@ def _help(cls: Type[TypeVarT]) -> None:
 def _from_cli(cls: Type[TypeVarT]) -> TypeVarT:
     """Parse CLI args and return a dataclass instance."""
     parser = argparse.ArgumentParser(description=cls.__doc__)
-    for fld in fields(cls):  # type: ignore
+    for fld in fields(cls): 
+        if not fld.init:
+            continue
         arg_name = f"--{fld.name.replace('_', '-')}"
         help_text = fld.metadata.get("help", "")
         required = fld.default is MISSING
@@ -144,7 +146,7 @@ class BaseConfig:
     """Base dataclass for parameter file generation configuration."""
     verbose:    int = field(default=0, metadata={"help": "Increase verbosity level (0: WARNING, 1: INFO, 2: INFO_DETAILED, 3: DEBUG)"})
     log_dir:    Path | str = field(default="", metadata={"help": "Path to the log directory where logs will be written. If not specified, logs will be printed in current work directory."})
-    log_mode:   str = field(default="w", metadata={"help": "Mode for opening the log file ('w' for write, 'a' for append)"})
+    log_mode:   str = field(default="w", metadata={"help": "Mode for opening the log file ('w' for write, 'a' for append, 'o' for no logging, default: 'w')"})
 
     def __post_init__(self):
 
@@ -161,8 +163,8 @@ class BaseConfig:
         else:
             self.log_dir = Path.cwd()
         # log_mode
-        if self.log_mode not in ["w", "a"]:
-            raise ValueError(f"Invalid log mode: {self.log_mode}. Must be 'w' or 'a'.")
+        if self.log_mode not in ["w", "a", "o"]:
+            raise ValueError(f"Invalid log mode: {self.log_mode}. Must be 'w', 'a', or 'o'.")
 
     def get_checked_and_derived_config(self):
         time_str = time.strftime("%Y%m%d-%H%M%S")
@@ -176,11 +178,12 @@ class BaseConfig:
 class CheckedBaseConfig(BaseConfig):
     """BaseConfig subclass that performs argument checking in __post_init__."""
 
-    log_file: Path = field(default_factory=lambda: NorESMTinkerTool_abspath.parent.joinpath('output', f"tinkertool.{time.strftime('%Y%m%d-%H%M%S')}.log"), metadata={"help": "Log file path (set automatically)"})
+    log_file: Path = field(default_factory=lambda: NorESMTinkerTool_abspath.parent.joinpath('output', f"tinkertool.{time.strftime('%Y%m%d-%H%M%S')}.log"), 
+                           metadata={"help": "Log file path (set automatically)"})
 
     def __post_init__(self):
         # set up logging
-        if not logging.getLogger('tinkertool_log').handlers:
+        if self.log_mode != 'o' and not logging.getLogger('tinkertool_log').handlers:
             setup_logging(self.verbose, self.log_file, self.log_mode, 'tinkertool_log')
         super().__post_init__()
         # Additional argument checks can be added here in subclasses

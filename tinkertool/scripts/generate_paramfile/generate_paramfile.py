@@ -16,8 +16,7 @@ from tinkertool.utils.read_files import safe_get_param_value
 from tinkertool import VALID_COMPONENTS
 from tinkertool.scripts.generate_paramfile import PARAMFILE_INPUT_TYPES
 from tinkertool.scripts.generate_paramfile.config import (
-    ParameterFileConfig,
-    CheckedParameterFileConfig
+    ParameterFileConfig
 )
 
 VALID_SAMPLING_METHODS = ['linear', 'log']
@@ -69,7 +68,7 @@ def generate_paramfile(config: ParameterFileConfig):
 
     # check if ParameterFileConfig is valid
     logging.debug(f"Checking config: {config.describe(return_string=True)}") # type: ignore
-    checked_config: CheckedParameterFileConfig = config.get_checked_and_derived_config()
+    checked_config: ParameterFileConfig = config.get_checked_and_derived_config()
     log_info_detailed('tinkertool_log', f">> Generating with config: {checked_config.describe(return_string=True)}") # type: ignore
 
     # Generate Latin Hypercube sample
