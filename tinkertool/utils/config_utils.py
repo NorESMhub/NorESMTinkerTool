@@ -58,8 +58,6 @@ def _from_cli(cls: Type[TypeVarT]) -> TypeVarT:
         required = fld.default is MISSING
         default = None if required else fld.default
 
-        # Handle bools with argparse actions
-        print(fld.type)
         if fld.type == bool:
             parser.add_argument(
                 arg_name,
