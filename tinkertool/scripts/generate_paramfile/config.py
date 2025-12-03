@@ -28,6 +28,7 @@ class ParameterFileConfig(BaseConfig):
     param_sample_outpath:       Path = field(metadata={"help": "Path to the output parameter file with .nc extension"})
     nmb_sim:                    int = field(metadata={"help": "Number of ensemble members."})
     # Optional parameter file specific fields
+    method:                     str = field(default='latin_hypercube', metadata={"help": "Sampling method, valid options: latin_hypercube (lh), one_at_a_time (oat). Default is latin_hypercube."})
     chem_mech_file:             Path | None = field(default=None, metadata={"help": "Path to the chemistry mechanism file, default None will will not modify chemistry mechanism."})
     ctsm_default_param_file:    Path | None = field(default=None, metadata={"help": "Path to the default CTSM parameter file in netCDF format, default None will not modify CTSM parameters"})
     fates_default_param_file:   Path | None = field(default=None, metadata={"help": "Path to the default FATES parameter file in netCDF format, default None will not modify FATES parameters"})
