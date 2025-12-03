@@ -94,9 +94,89 @@ def generate_land_model_param_files(
     sample_points: dict,
     sample_points_with_files: dict,
     checked_config: ParameterFileConfig
-) -> list:
+) -> None:
+    
+    ctsm_fates_paramfile_info = []
+    if checked_config.change_ctsm_params:
+        CTSM_param_file_params = [
+            param for param in checked_config.params
+            if safe_get_param_value(checked_config.param_ranges[param], "input_type") == "CTSM_param_file"
+        ]
+        ctsm_fates_paramfile_info.append(("CTSM_param_file", 'paramfile', CTSM_param_file_params, make_new_ctsm_pamfile))
+    if checked_config.change_fates_params:
+        FATES_param_file_params = [
+            param for param in checked_config.params
+            if safe_get_param_value(checked_config.param_ranges[param], "input_type") == "FATES_param_file"
+        ]
+        ctsm_fates_paramfile_info.append(("FATES_param_file", 'fates_paramfile', FATES_param_file_params, make_new_fates_pamfile))
+    if not ctsm_fates_paramfile_info:
+        return  # Nothing to do, so exit early.
+
+
     logging.debug("Generating land model parameter files")
-    raise NotImplementedError("Land model parameter file generation not implemented yet.")
+    for param_type, user_nl_kw, param_group, make_new_param_file in ctsm_fates_paramfile_info:
+        # create new section in the ConfigParser object (if it doesn't exist)
+        if not checked_config.param_ranges.has_section(user_nl_kw):
+            checked_config.param_ranges.add_section(user_nl_kw)
+        pg_param_ranges = checked_config.param_ranges[user_nl_kw]
+
+        pam_filepaths = []
+        for sim_indx in checked_config.nmb_sim_dim:
+            pam_change_dict = {}
+            for param in param_group:
+                pam_change_dict[param] = sample_points[param][1][sim_indx]  # Access values array from (dims, values) tuple
+            if pam_change_dict:
+                if param_type == 'CTSM_param_file':
+                    orig_pamfile = checked_config.ctsm_default_param_file
+
+                elif param_type == 'FATES_param_file':
+                    orig_pamfile = checked_config.fates_default_param_file
+                    if orig_pamfile is None:
+                        raise ValueError("FATES default parameter file path is not set in the configuration:\n"
+                                        "Please provide a valid path to the FATES default parameter file.")
+                else:
+                    raise ValueError(f"Unknown parameter file type '{param_type}'.")
+                save_path = checked_config.tinkertool_output_dir.joinpath(
+                    user_nl_kw,
+                    f"{user_nl_kw}_file_sim{sim_indx}.nc"
+                ).resolve()
+                # Ensure directory exists before creating the file
+                save_path.parent.mkdir(parents=True, exist_ok=True)
+                new_pamfile = make_new_param_file(
+                    pam_change_dict,
+                    orig_pamfile=orig_pamfile,
+                    file_dump=save_path
+                )
+                pam_filepaths.append(str(new_pamfile))
+                log_info_detailed('tinkertool_log', f"{new_pamfile} generated with changes: {pam_change_dict}")
+        if pam_filepaths:
+            sample_points_with_files[user_nl_kw] = (['nmb_sim'], pam_filepaths)
+            # add attribute info
+            pg_defaults, pg_newvals, pg_sampling, pg_input_type, pg_interdependent_with, pg_esm_component = {}, {}, {}, {}, {}, {}
+            for param in param_group:
+                pdata = checked_config.param_ranges[param]
+                pg_defaults[param] = pdata['default']
+                pg_newvals[param] = sample_points[param][1].copy()  # Access values array from (dims, values) tuple
+                pg_sampling[param] = safe_get_param_value(pdata, 'sampling', 'No sampling method available')
+                pg_input_type[param] = safe_get_param_value(pdata, 'input_type', '')
+                pg_interdependent_with[param] = safe_get_param_value(pdata, 'interdependent_with', '')
+                pg_esm_component[param] = safe_get_param_value(pdata, 'esm_component', '')
+                del sample_points_with_files[param]
+            pg_param_ranges['default'] = ",\n".join([f"{param}: {pg_defaults[param]}" for param in param_group])
+            pg_param_ranges['sampling'] = ",\n".join([f"{param}: {pg_sampling[param]}" for param in param_group])
+            # input_type should be same for all params in group
+            input_type = [pg_input_type[param] for param in param_group]
+            if not all(it == input_type[0] for it in input_type):
+                raise ValueError(f"Parameters in group {param_group} have differing input_types: {input_type}")
+            pg_param_ranges['input_type'] = input_type[0]
+            pg_param_ranges['interdependent_with'] = ",\n".join([f"{param}: {pg_interdependent_with[param]}" for param in param_group])
+            esm_component = [pg_esm_component[param] for param in param_group]
+            if not all(it == esm_component[0] for it in esm_component):
+                raise ValueError(f"Parameters in group {param_group} have differing esm_component: {esm_component}")
+            pg_param_ranges['esm_component'] = esm_component[0]
+            pg_param_ranges['description'] = f"{param_type} file perturbing parameters:\n" + \
+                ",\n".join([f"{param}, default -> new value: {pg_defaults[param]} -> {pg_newvals[param]}" for param in param_group])
+
 
 def generate_latin_hypercube_sample_points(checked_config: ParameterFileConfig) -> dict:
     """Generate sample_points using a Latin Hypercube and scale to ranges.
@@ -296,6 +376,9 @@ def generate_paramfile(config: ParameterFileConfig):
     if config.change_chem_mech:
         logging.debug("Generating chemistry mechanism files")
         chem_mech_in = generate_chem_mech_files(sample_points, config)
+
+    generate_land_model_param_files(sample_points, sample_points_with_files, checked_config)
+    
     logging.debug("Creating xarray dataset")
     raw_ds = xr.Dataset(
         data_vars = sample_points,
