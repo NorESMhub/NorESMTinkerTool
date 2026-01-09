@@ -26,55 +26,11 @@ def test_version(command):
     assert metadata.version("tinkertool") in proc.stdout
 
 
-def _create_test_ini_file(tmp_path: pathlib.Path):
-    ini_content = """
-    [test_parameter1]
-    esm_component = CAM
-    sampling = linear
-    ndigits = 4.0
-    max = 0.004
-    min = 0.5
-    default= 0.006
+def test_generate_paramfile_lhc_no_fates_ctsm(temp_dir:pathlib.Path, sample_parameter_file:pathlib.Path):
+    
+    test_paramfile = temp_dir / "test_paramfile.nc"
 
-
-    [test_parameter2]
-    esm_component = CAM
-    sampling = linear
-    ndigits = 2.0
-    max = 100
-    min = 10
-    default= 50
-
-
-    [test_parameter3]
-    esm_component = CAM
-    sampling = log
-    max = 30
-    min= 0.1
-    ndigits = 3.0
-    default= 5.0
-    interdependent_with = None
-
-
-    [test_parameter4]
-    esm_component = CLM
-    sampling = linear
-    default = 0.025
-    scale_fact = 0.5
-    ndigits = 4.0
-    input_type = CTSM_param_file
-    """
-    test_ini = tmp_path / "test_ppe.ini"
-    test_ini.write_text(ini_content)
-    return test_ini
-
-
-def test_generate_paramfile_lhc_no_fates_ctsm(tmp_path:pathlib.Path):
-
-    test_paramfile = tmp_path / "test_paramfile.nc"
-
-    test_ini = _create_test_ini_file(tmp_path)
-
+    test_ini = sample_parameter_file
     proc = subprocess.run(
         [sys.executable, "-m", "tinkertool.scripts.generate_paramfile.main",
          '--param-ranges-inpath', str(test_ini),
