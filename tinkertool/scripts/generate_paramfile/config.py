@@ -26,8 +26,9 @@ class ParameterFileConfig(BaseConfig):
     # Core required fields (validated in __post_init__)
     param_ranges_inpath:        Path = field(metadata={"help": "Path to the parameter ranges file in .ini format"})
     param_sample_outpath:       Path = field(metadata={"help": "Path to the output parameter file with .nc extension"})
-    nmb_sim:                    int = field(metadata={"help": "Number of ensemble members."})
     # Optional parameter file specific fields
+    
+    nmb_sim:                    int | None = field(default=None,metadata={"help": "Number of ensemble members. (required for latin_hypercube, should not be specified for one_at_a_time)"})
     method:                     str = field(default='latin_hypercube', metadata={"help": "Sampling method, valid options: latin_hypercube (lh), one_at_a_time (oat). Default is latin_hypercube."})
     chem_mech_file:             Path | None = field(default=None, metadata={"help": "Path to the chemistry mechanism file, default None will will not modify chemistry mechanism."})
     ctsm_default_param_file:    Path | None = field(default=None, metadata={"help": "Path to the default CTSM parameter file in netCDF format, default None will not modify CTSM parameters"})
@@ -54,9 +55,13 @@ class ParameterFileConfig(BaseConfig):
         # param_sample_outpath
         validate_file(self.param_sample_outpath, '.nc', "output parameter file with .nc extension", new_file=True)
         # nmb_sim
-        check_type(self.nmb_sim, int)
-        if self.nmb_sim <= 0:
-            raise ValueError(f"Number of ensemble members must be greater than 0. Given: {self.nmb_sim}.")
+        if self.method in ['latin_hypercube', 'lh']:
+            self.nmb_sim = int(self.nmb_sim) 
+            if self.nmb_sim <= 0:
+                raise ValueError(f"Number of ensemble members must be greater than 0. Given: {self.nmb_sim}.")
+        else:
+            if self.nmb_sim is not None:
+                raise ValueError(f"nmb_sim should not be specified for method '{self.method}'.")
         # optimization
         if self.optimization is not None and self.optimization not in ['random-cd', 'lloyd']:
             raise ValueError(f"Invalid optimization method: {self.optimization}. Must be 'random-cd' or 'lloyd'.")
@@ -133,7 +138,9 @@ class ParameterFileConfig(BaseConfig):
 
         # avoid_scramble
         self.scramble = not self.avoid_scramble
-
+        if self.method in ['one_at_a_time', 'oat']:
+            self.nmb_sim = len(self.params)*2
+            self.scramble = False
         # exclude_default
         if self.exclude_default:
             if self.nmb_sim == 0:

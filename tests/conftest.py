@@ -19,15 +19,15 @@ def sample_parameter_file(temp_dir: Path) -> Path:
     [test_parameter1]
     esm_component = CAM
     sampling = linear
-    ndigits = 4.0
-    max = 0.004
-    min = 0.5
-    default= 0.006
+    ndigits = 5
+    max = 0.005
+    min = 0.002
+    default= 0.0034
 
     [test_parameter2]
     esm_component = CAM
     sampling = linear
-    ndigits = 2.0
+    ndigits = 2
     max = 100
     min = 10
     default= 50
@@ -37,7 +37,7 @@ def sample_parameter_file(temp_dir: Path) -> Path:
     sampling = log
     max = 30
     min= 0.1
-    ndigits = 3.0
+    ndigits = 3
     default= 5.0
     interdependent_with = None
 
@@ -46,12 +46,12 @@ def sample_parameter_file(temp_dir: Path) -> Path:
     sampling = linear
     default = 0.025
     scale_fact = 0.5
-    ndigits = 4.0
+    ndigits = 4
 
     [d_max]
     esm_component = CLM
     sampling = linear
-    ndigits = 2.0
+    ndigits = 2
     max = 20.0
     min = 5.0
     default= 13.0
@@ -60,7 +60,7 @@ def sample_parameter_file(temp_dir: Path) -> Path:
     [frac_sat_soil_dsl_init]
     esm_component = CLM
     sampling = linear
-    ndigits = 3.0
+    ndigits = 3
     max = 1.0
     min = 0.0
     default= 0.5

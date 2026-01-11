@@ -328,11 +328,8 @@ def generate_one_at_a_time_sample_points(checked_config: ParameterFileConfig) ->
             maxv = float(pdata["max"])
 
         n_var = variations_per_param
-        if n_var <= 0:
-            continue
 
         var_vals = np.linspace(minv, maxv, n_var)
-        print(var_vals)
         for k in range(n_var):
             if idx >= n_total:
                 break

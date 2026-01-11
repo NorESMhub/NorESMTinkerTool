@@ -57,7 +57,7 @@ def test_generate_paramfile_lhc_no_fates_ctsm(temp_dir:pathlib.Path, sample_para
                                 float(check_defaults['test_parameter2'].values),
                                 float(check_defaults['test_parameter3'].values)]
         
-    assert defaults_from_file == [0.006, 50.0, 5.0], f"Default values in output file do not match expected defaults: {defaults_from_file}"
+    assert defaults_from_file == [0.0034, 50.0, 5.0], f"Default values in output file do not match expected defaults: {defaults_from_file}"
     assert n_sims == 31, f"Number of simulations in output file is {n_sims}, expected 30 + 1 (default simulation)."
 
 
