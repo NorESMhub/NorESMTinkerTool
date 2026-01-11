@@ -1,0 +1,11 @@
+site_name: NorESMTinkerTool
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Configuration: configuration.md
+  - CLI: cli.md
+  - API Usage: usage.md
+  - API: api.md
+  - Examples: examples.md

@@ -1,5 +1,6 @@
 import inspect
-from typing import get_type_hints, Union, get_origin, get_args
+from typing import Union, get_args, get_origin, get_type_hints
+
 
 def type_check_decorator(func):
     """
@@ -42,4 +43,5 @@ def type_check_decorator(func):
                             f"Argument '{name}' must be of type {expected_type}, but got {type(value)}"
                         )
         return func(*args, **kwargs)
+
     return wrapper

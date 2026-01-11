@@ -6,9 +6,10 @@ from pathlib import Path
 from tinkertool.utils.custom_logging import log_info_detailed, setup_logging
 from tinkertool.setup.case import build_base_case, clone_base_case
 from tinkertool.scripts.create_ppe.config import (
-    CreatePPEConfig,
     BuildPPEConfig,
     CheckedBuildPPEConfig,
+    CheckedSubmitPPEConfig,
+    CreatePPEConfig,
     SubmitPPEConfig,
     CheckedSubmitPPEConfig,
     CheckBuildConfig,
@@ -358,6 +359,7 @@ def prestage_ensemble(config: PrestageEnsembleConfig) -> bool:
 
     logging.info(f">> {len(checked_config.cases)} cases prestaged successfully.")
     return all_prestage_success
+
 
 def submit_ppe(config: SubmitPPEConfig):
 

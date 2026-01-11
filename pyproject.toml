@@ -24,6 +24,10 @@ pytest-cov = "^7.0.0"
 coverage = "^7.13.1"
 
 
+[tool.poetry.group.docs.dependencies]
+mkdocs = "^1.6.0"
+mkdocs-material = "^9.5.19"
+
 [tool.poetry.extras]
 sampling = ["scipy", "xarray"]
 plotting = ["matplotlib", "seaborn"]

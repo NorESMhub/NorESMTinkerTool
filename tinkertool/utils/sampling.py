@@ -1,10 +1,7 @@
 import numpy as np
 
-def scale_values(
-    values: np.ndarray,
-    a: float,
-    b: float
-) -> np.ndarray:
+
+def scale_values(values: np.ndarray, a: float, b: float) -> np.ndarray:
     """Scale values from [0, 1] to [a, b] range
 
     Parameters

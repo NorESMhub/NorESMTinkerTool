@@ -1,12 +1,13 @@
 # TODO: when writing string for user_nl's check if the keyword already exists
 # in the file, if so remove that line
+import configparser
+import logging
 import os
 import re
-import logging
-import configparser
 
 # get the logger - assuming this is run from create_ppe.build_ppe so that tinkertool_log is set up
-logger = logging.getLogger('tinkertool_log')
+logger = logging.getLogger("tinkertool_log")
+
 
 def format_value(value: str) -> str:
     """

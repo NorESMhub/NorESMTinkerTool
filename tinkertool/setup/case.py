@@ -1,12 +1,12 @@
 # ------------------------ #
 # --- Import libraries --- #
 # ------------------------ #
+import logging
 import os
 import shutil
-import logging
 import subprocess
-from pathlib import Path
 from itertools import islice
+from pathlib import Path
 
 from tinkertool.setup.namelist import setup_usr_nlstring, write_user_nl_file, format_value
 from tinkertool.setup.setup_cime_connection import add_CIME_paths
@@ -27,9 +27,12 @@ except ImportError:
     raise SystemExit
 try:
     from CIME.Tools.standard_script_setup import check_minimum_python_version
+
     check_minimum_python_version(3, 8)
 except ImportError:
-    print('ERROR: CIME.Tools.standard_script_setup not found, or unable to use check_minimum_python_version()')
+    print(
+        "ERROR: CIME.Tools.standard_script_setup not found, or unable to use check_minimum_python_version()"
+    )
 try:
     os.environ["PYTHONUNBUFFERED"] = "1"
 except ImportError:
@@ -48,22 +51,21 @@ except ImportError:
 try:
     from CIME.locked_files import lock_file, unlock_file
 except ImportError:
-    print("ERROR: CIME.locked_files not found, or unable to find lock_file() and unlock_file()")
+    print(
+        "ERROR: CIME.locked_files not found, or unable to find lock_file() and unlock_file()"
+    )
     raise SystemExit
 
 # get the logger - assuming this is run from create_ppe.build_ppe so that tinkertool_log is set up
-logger = logging.getLogger('tinkertool_log')
+logger = logging.getLogger("tinkertool_log")
 logger.debug("CIME imported successfully")
 
 # ------------------------ #
 # --- Helper functions --- #
 # ------------------------ #
 
-def iterate_dict_to_set_value(
-    case:           CIME.case,
-    settings_dict:  dict,
-    dict_name:      str
-):
+
+def iterate_dict_to_set_value(case: CIME.case, settings_dict: dict, dict_name: str):
     """
     Iterate through a dictionary and set the values in the case object
 
@@ -81,15 +83,16 @@ def iterate_dict_to_set_value(
             logger.warning(f"WARNING: {key} from {dict_name} not set in case: {error}")
             continue
 
+
 def _per_run_case_updates(
     case: CIME.case,
     paramdict: dict,
     componentdict: dict,
     ens_idx: str,
-    path_base_input:str ='',
-    keepexe: bool=False,
+    path_base_input: str = "",
+    keepexe: bool = False,
     lifeCycleMedianRadius=None,
-    lifeCycleSigma=None
+    lifeCycleSigma=None,
 ):
     """
     Update and submit the new cloned case, setting namelist parameters according to paramdict
@@ -115,15 +118,15 @@ def _per_run_case_updates(
     rundir = case.get_value("RUNDIR")
     rundir = os.path.dirname(rundir)
     rundir = f"{rundir}/run.{ens_idx.split('.')[-1]}"
-    case.set_value("RUNDIR",rundir)
+    case.set_value("RUNDIR", rundir)
     # smb++ extract the chem_mech_in_file
     chem_mech_file = None
-    if 'chem_mech_in' in paramdict.keys():
-        chem_mech_file = Path(path_base_input)/paramdict['chem_mech_in']
-        del paramdict['chem_mech_in']
-        del componentdict['chem_mech_in']
+    if "chem_mech_in" in paramdict.keys():
+        chem_mech_file = Path(path_base_input) / paramdict["chem_mech_in"]
+        del paramdict["chem_mech_in"]
+        del componentdict["chem_mech_in"]
     case.flush()
-    lock_file("env_case.xml",caseroot=caseroot)
+    lock_file("env_case.xml", caseroot=caseroot)
 
     logger.info("...Casename is {}".format(casename))
     logger.info("...Caseroot is {}".format(caseroot))
@@ -137,21 +140,35 @@ def _per_run_case_updates(
 
     for var in paramdict.keys():
         paramLines = paramLinesDict[componentdict[var]]
-        if var.startswith('lifeCycleNumberMedianRadius'):
-            lifeCycleNumber = int(var.split('_')[-1])
+        if var.startswith("lifeCycleNumberMedianRadius"):
+            lifeCycleNumber = int(var.split("_")[-1])
             if lifeCycleMedianRadius is None:
-                raise ValueError('A default lifeCylceList has to be specified in default_simulation_setup.ini')
-            lifeCylceList = lifeCycleMedianRadius.split(',')
-            lifeCylceList[lifeCycleNumber] = "{:.1E}".format(paramdict[var]).replace('E', 'D').replace('+', '')
+                raise ValueError(
+                    "A default lifeCylceList has to be specified in default_simulation_setup.ini"
+                )
+            lifeCylceList = lifeCycleMedianRadius.split(",")
+            lifeCylceList[lifeCycleNumber] = (
+                "{:.1E}".format(paramdict[var]).replace("E", "D").replace("+", "")
+            )
 
-            paramLines.append("oslo_aero_lifecyclenumbermedianradius = "+','.join(lifeCylceList)+"\n")
+            paramLines.append(
+                "oslo_aero_lifecyclenumbermedianradius = "
+                + ",".join(lifeCylceList)
+                + "\n"
+            )
         elif var.startswith("lifeCycleSigma"):
-            lifeCycleNumber = int(var.split('_')[-1])
+            lifeCycleNumber = int(var.split("_")[-1])
             if lifeCycleSigma is None:
-                raise ValueError('A default lifeCylceList has to be specified in default_simulation_setup.ini')
-            lifeCylceList = lifeCycleSigma.split(',')
-            lifeCylceList[lifeCycleNumber] = "{:.1E}".format(paramdict[var]).replace('E', 'D').replace('+', '')
-            paramLines.append("oslo_aero_lifecyclesigma = "+','.join(lifeCylceList)+"\n")
+                raise ValueError(
+                    "A default lifeCylceList has to be specified in default_simulation_setup.ini"
+                )
+            lifeCylceList = lifeCycleSigma.split(",")
+            lifeCylceList[lifeCycleNumber] = (
+                "{:.1E}".format(paramdict[var]).replace("E", "D").replace("+", "")
+            )
+            paramLines.append(
+                "oslo_aero_lifecyclesigma = " + ",".join(lifeCylceList) + "\n"
+            )
         else:
             value = paramdict[var]
             if isinstance(value, str):
@@ -166,14 +183,16 @@ def _per_run_case_updates(
                 file.writelines(paramLines)
 
     if chem_mech_file is not None:
-        comm = 'cp {} {}'.format(chem_mech_file, caseroot+'/')
+        comm = "cp {} {}".format(chem_mech_file, caseroot + "/")
         subprocess.run(comm, shell=True)
         unlock_file("env_build.xml", caseroot=caseroot)
         value = case.get_value("CAM_CONFIG_OPTS", resolved=False)
-        case.set_value("CAM_CONFIG_OPTS", f"{value} --usr_mech_infile {caseroot}/{chem_mech_file.name}")
+        case.set_value(
+            "CAM_CONFIG_OPTS",
+            f"{value} --usr_mech_infile {caseroot}/{chem_mech_file.name}",
+        )
         case.flush()
         lock_file("env_build.xml", caseroot=caseroot)
-
 
     logger.info(">> Clone {} case_setup".format(ens_idx))
     case.case_setup()
@@ -182,6 +201,7 @@ def _per_run_case_updates(
     if keepexe == False:
         logger.info(">> Clone {} build".format(ens_idx))
         build.case_build(caseroot, case=case)
+
 
 def build_base_case(
     basecaseroot:               Path,
@@ -234,7 +254,7 @@ def build_base_case(
                 driver="nuopc",
                 run_unsupported=True,
                 answer="r",
-                **case_settings
+                **case_settings,
             )
             case.record_cmd(init=True)
         else:
@@ -250,14 +270,16 @@ def build_base_case(
         case.set_value("RUNDIR", case.get_value("RUNDIR", resolved=True))
         # set the PE settings
         # check if the env_pe_settings are not empty dict, or all entries are None
-        if not env_pe_settings or all(value is None for value in env_pe_settings.values()):
-            logging.warning("No environment parallel execution settings provided, using default values.")
+        if not env_pe_settings or all(
+            value is None for value in env_pe_settings.values()
+        ):
+            logging.warning(
+                "No environment parallel execution settings provided, using default values."
+            )
         else:
             logger.info(">>> Setting environment parallel execution settings...")
             iterate_dict_to_set_value(
-                case=case,
-                settings_dict=env_pe_settings,
-                dict_name='env_pe_settings'
+                case=case, settings_dict=env_pe_settings, dict_name="env_pe_settings"
             )
 
         logger.info(">>> base case_setup...")
@@ -272,16 +294,21 @@ def build_base_case(
         if env_run_settings.get("GET_REFCASE") is not None:
             case.set_value("GET_REFCASE", env_run_settings.pop("GET_REFCASE"))
         if env_run_settings.get("RUN_REFCASE") is not None:
-            case.set_value("RUN_REFCASE", env_run_settings.pop('RUN_REFCASE'))
-        if any(env_run_settings.get(key) is not None for key in ['RUN_REFDIR', 'RUN_REFDATE']):
+            case.set_value("RUN_REFCASE", env_run_settings.pop("RUN_REFCASE"))
+        if any(
+            env_run_settings.get(key) is not None
+            for key in ["RUN_REFDIR", "RUN_REFDATE"]
+        ):
             case.set_value("RUN_REFDIR", env_run_settings.pop("RUN_REFDIR"))
             case.set_value("RUN_REFDATE", env_run_settings.pop("RUN_REFDATE"))
 
-        case.set_value("STOP_OPTION",env_run_settings.pop("STOP_OPTION"))
-        case.set_value("STOP_N",env_run_settings.pop("STOP_N"))
-        case.set_value("RUN_STARTDATE",env_run_settings.pop("RUN_STARTDATE"))
+        case.set_value("STOP_OPTION", env_run_settings.pop("STOP_OPTION"))
+        case.set_value("STOP_N", env_run_settings.pop("STOP_N"))
+        case.set_value("RUN_STARTDATE", env_run_settings.pop("RUN_STARTDATE"))
 
-        if any(env_run_settings.get(key) is not None for key in ['REST_N', 'REST_OPTION']):
+        if any(
+            env_run_settings.get(key) is not None for key in ["REST_N", "REST_OPTION"]
+        ):
             case.set_value("REST_OPTION", env_run_settings.pop("REST_OPTION"))
             case.set_value("REST_N", env_run_settings.pop("REST_N"))
 
@@ -291,30 +318,34 @@ def build_base_case(
                     "Both 'CAM_CONFIG_OPTS' and 'cam_onopts' were provided. "
                     "'CAM_CONFIG_OPTS' will overwrite all previous options including 'cam_onopts'."
                 )
-            case.set_value('CAM_CONFIG_OPTS', env_run_settings.pop('CAM_CONFIG_OPTS'))
-        elif env_run_settings.get('cam_onopts') is not None:
-            current_opts = case.get_value('CAM_CONFIG_OPTS', resolved=True)
+            case.set_value("CAM_CONFIG_OPTS", env_run_settings.pop("CAM_CONFIG_OPTS"))
+        elif env_run_settings.get("cam_onopts") is not None:
+            current_opts = case.get_value("CAM_CONFIG_OPTS", resolved=True)
             new_opts = f"{current_opts} {env_run_settings.pop('cam_onopts')}".strip()
-            case.set_value('CAM_CONFIG_OPTS', new_opts)
+            case.set_value("CAM_CONFIG_OPTS", new_opts)
 
         # check if there are any additional run settings
-        if env_run_settings or any(value is not None for value in env_run_settings.values()):
+        if env_run_settings or any(
+            value is not None for value in env_run_settings.values()
+        ):
             iterate_dict_to_set_value(
-                case=case,
-                settings_dict=env_run_settings,
-                dict_name='env_run_settings'
+                case=case, settings_dict=env_run_settings, dict_name="env_run_settings"
             )
 
         case.set_value("DEBUG", env_build_settings.pop("DEBUG", "FALSE"))
         # check if the env_build_settings are not empty dict, or all entries are None
-        if not env_build_settings or all(value is None for value in env_build_settings.values()):
-            logging.warning("No environment build settings provided, using default values.")
+        if not env_build_settings or all(
+            value is None for value in env_build_settings.values()
+        ):
+            logging.warning(
+                "No environment build settings provided, using default values."
+            )
         else:
             logger.info(">>> Setting environment build settings...")
             iterate_dict_to_set_value(
                 case=case,
                 settings_dict=env_build_settings,
-                dict_name='env_build_settings'
+                dict_name="env_build_settings",
             )
 
         logger.info(">>> base case write user_nl files...")
@@ -390,10 +421,11 @@ def clone_base_case(
             ens_idx=ensemble_idx,
             path_base_input=str(path_base_input),
             keepexe=keepexe,
-            **kwargs
+            **kwargs,
         )
 
     return Path(cloneroot)
+
 
 def take(n, iterable):
     "Return first n items of the iterable as a list"
