@@ -3493,10 +3493,11 @@ parallel = ["dask[complete]"]
 viz = ["matplotlib", "nc-time-axis", "seaborn"]
 
 [extras]
+aerosolppe = []
 plotting = ["matplotlib", "seaborn"]
 sampling = ["scipy", "xarray"]
 
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "3340e55c28cd343467b772ff328627292de9b474fce85bccc6679523cd57b6ac"
+content-hash = "14ff637e664bd64d9e22517151188229f3667eb20bf1b9eb874e444eefbedef7"

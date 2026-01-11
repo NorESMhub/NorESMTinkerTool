@@ -9,7 +9,7 @@ from tinkertool import NorESMTinkerTool_abspath
 from tinkertool.utils.config_utils import BaseConfig, CheckedBaseConfig
 from tinkertool.utils.read_files import read_config
 from tinkertool.utils.check_arguments import validate_file, check_type
-from tinkertool.utils.make_chem_in import check_if_chem_mech_is_perterbed
+from tinkertool.utils.make_chem_in import check_if_chem_mech_is_perturbed
 from tinkertool.utils.make_land_parameterfiles import check_if_ctsm_param_is_perturbed, check_if_fates_param_is_perturbed
 
 
@@ -30,7 +30,7 @@ class ParameterFileConfig(BaseConfig):
     
     nmb_sim:                    int | None = field(default=None,metadata={"help": "Number of ensemble members. (required for latin_hypercube, should not be specified for one_at_a_time)"})
     method:                     str = field(default='latin_hypercube', metadata={"help": "Sampling method, valid options: latin_hypercube (lh), one_at_a_time (oat). Default is latin_hypercube."})
-    chem_mech_file:             Path | None = field(default=None, metadata={"help": "Path to the chemistry mechanism file, default None will will not modify chemistry mechanism."})
+    chem_mech_file:             Path | None = field(default=None, metadata={"help": "Path to the chemistry mechanism file, default None will not modify chemistry mechanism."})
     ctsm_default_param_file:    Path | None = field(default=None, metadata={"help": "Path to the default CTSM parameter file in netCDF format, default None will not modify CTSM parameters"})
     fates_default_param_file:   Path | None = field(default=None, metadata={"help": "Path to the default FATES parameter file in netCDF format, default None will not modify FATES parameters"})
     tinkertool_output_dir:      Path = field(default=Path(default_output_dir).resolve(), metadata={"help": "Path to the output directory for files produced by TinkerTool, default will use NorESMTinkerTool/output"})
@@ -112,7 +112,7 @@ class ParameterFileConfig(BaseConfig):
             self.param_sample_outpath.parent.mkdir(parents=True, exist_ok=True)
 
         # Check for perturbations and validate corresponding files
-        self.change_chem_mech = check_if_chem_mech_is_perterbed(str(self.param_ranges_inpath))
+        self.change_chem_mech = check_if_chem_mech_is_perturbed(self.param_ranges)
         if self.change_chem_mech:
             if self.chem_mech_file is None:
                 raise ValueError("Chemistry perturbations detected, but 'chem_mech_file' was not provided.")

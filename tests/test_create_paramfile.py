@@ -22,7 +22,8 @@ def test_create_paramfile_with_ctsm_param_changes(
     avoid_scramble=False,
     exclude_default=False,
     log_dir=temp_dir / "logs",
-    verbose=2   
+    verbose=2,
+    params=['test_parameter1', 'test_parameter2', 'd_max','frac_sat_soil_dsl_init']   
     )
     parm_conf = parm_conf.get_checked_and_derived_config()
     assert parm_conf.change_ctsm_params == True
@@ -63,6 +64,28 @@ def test_create_paramfile_without_ctsm_param_changes(
     ds_raw = xr.open_dataset(parm_conf.param_sample_outpath.with_suffix('.raw.nc'))
     assert 'test_parameter1' in ds_raw.data_vars, "test_parameter1 not found in raw parameter file."
     assert ds_raw['nmb_sim'].size == 3, "Number of simulations in raw parameter file is incorrect."
+
+
+def test_create_paramfile_with_chem_mech_changes(sample_parameter_file: Path, sample_chem_mech_file: Path, temp_dir: Path):
+    output_paramfile = temp_dir / "chem_mech_paramfile.nc"
+    print("sample_chem_mech_file:", sample_chem_mech_file)
+    parm_conf = ParameterFileConfig(
+        param_ranges_inpath=sample_parameter_file,
+        param_sample_outpath=output_paramfile,
+        tinkertool_output_dir=temp_dir,
+        chem_mech_file=sample_chem_mech_file,
+        ctsm_default_param_file=None,
+        nmb_sim=5,
+        avoid_scramble=False,
+        exclude_default=False,
+        log_dir=temp_dir / "logs",
+        verbose=2,
+        params=['test_parameter1', 'test_parameter2','SOA_y_scale_chem_mech_in']
+    )
+    parm_conf = parm_conf.get_checked_and_derived_config()
+    assert parm_conf.change_chem_mech == True
+    generate_paramfile(parm_conf)
+    assert output_paramfile.exists(), "Parameter file with chemistry mechanism changes was not created."
 
 def test_creation_oat(sample_parameter_file: Path, temp_dir: Path):
     output_oat_file = temp_dir / "oat_paramfile.nc"

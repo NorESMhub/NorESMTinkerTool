@@ -67,8 +67,8 @@ def generate_chem_in_ppe(
 
     return str(outputfile)
 
-def check_if_chem_mech_is_perterbed(
-    param_ranges_inpath: str | Path
+def check_if_chem_mech_is_perturbed(
+    param_ranges: dict
 ) -> bool:
     """Check if the chemistry mechanism is perturbed. The check is
     performed by looking for specific section headers defined in
@@ -85,8 +85,6 @@ def check_if_chem_mech_is_perterbed(
         True if the chemistry mechanism is perturbed, False otherwise.
     """
     chem_mech_variable_flags = ["SOA_y_scale_chem_mech_in"]
-
-    param_ranges = read_config(Path(param_ranges_inpath).resolve())
 
     for param in param_ranges.sections():
         if param in chem_mech_variable_flags:
