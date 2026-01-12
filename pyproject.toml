@@ -1,19 +1,34 @@
-[tool.poetry]
+[project]
 name = "tinkertool"
 version = "0.2.1"
 description = "Toolchain for setup and post processing of Perturbed parameter Ensembles in NorESM"
-authors = ["Johannes <johannesfjeldsaa@gmail.com>" ,"Ove <ovehaugv@outlook.com>"]
-license = "MIT"
 readme = "README.md"
+requires-python = ">=3.10,<3.14"
+authors = [
+	{name = "Johannes", email = "johannesfjeldsaa@gmail.com"},
+	{name = "Ove", email = "ovehaugv@outlook.com"},
+]
+license = {text = "MIT"}
 
-[tool.poetry.dependencies]
-python          = ">=3.10,<3.14"
-netcdf4         = "^1.7.2"
-xarray          = "^2024.9.0"
-scipy           = {version = "^1.14.1", optional = true}
-matplotlib      = {version = "^3.10.1", optional =true}
-seaborn         = {version = "^0.13.2", optional = true}
-typer = "^0.20.0"
+
+dependencies = [
+	"netcdf4 >=1.7.2,<2.0",
+	"xarray >=2024.9.0,<2026.0",
+	"typer >=0.20.0,<1.0.0",
+]
+
+[project.optional-dependencies]
+sampling = ["scipy >=1.14.1,<2.0", "xarray >=2024.9.0,<2026.0"]
+plotting = ["matplotlib >=3.10.1,<4.0", "seaborn >=0.13.2,<1.0.0"]
+
+[project.scripts]
+create-ppe = "tinkertool.scripts.create_ppe.main:create_ppe_CLI"
+build-ppe = "tinkertool.scripts.create_ppe.main:build_ppe_CLI"
+check-build = "tinkertool.scripts.create_ppe.main:check_build_CLI"
+prestage-ensemble = "tinkertool.scripts.create_ppe.main:prestage_ensemble_CLI"
+submit-ppe = "tinkertool.scripts.create_ppe.main:submit_ppe_CLI"
+generate-paramfile = "tinkertool.scripts.generate_paramfile.main:main"
+aerosol-ppe-cam-nl = "usermods.aerosol_ppe.scripts.aerosol_ppe_cam_nl_updates:main"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.8.0"
@@ -28,20 +43,7 @@ coverage = "^7.13.1"
 mkdocs = "^1.6.0"
 mkdocs-material = "^9.5.19"
 
-[tool.poetry.extras]
-sampling = ["scipy", "xarray"]
-plotting = ["matplotlib", "seaborn"]
-aerosolppe = []
-
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=1.5.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.poetry.scripts]
-create-ppe = "tinkertool.scripts.create_ppe.main:create_ppe_CLI"
-build-ppe = "tinkertool.scripts.create_ppe.main:build_ppe_CLI"
-check-build = "tinkertool.scripts.create_ppe.main:check_build_CLI"
-prestage-ensemble = "tinkertool.scripts.create_ppe.main:prestage_ensemble_CLI"
-submit-ppe = "tinkertool.scripts.create_ppe.main:submit_ppe_CLI"
-generate-paramfile = "tinkertool.scripts.generate_paramfile.main:main"
-aerosol-ppe-cam-nl = {callable = "usermods.aerosol_ppe.scripts.aerosol_ppe_cam_nl_updates:main", extras = ["aerosolppe"]}
