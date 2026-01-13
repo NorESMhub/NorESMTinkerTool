@@ -306,11 +306,10 @@ def build_base_case(
         case.set_value("STOP_N", env_run_settings.pop("STOP_N"))
         case.set_value("RUN_STARTDATE", env_run_settings.pop("RUN_STARTDATE"))
 
-        if any(
-            env_run_settings.get(key) is not None for key in ["REST_N", "REST_OPTION"]
-        ):
-            case.set_value("REST_OPTION", env_run_settings.pop("REST_OPTION"))
+        if env_run_settings.get("REST_N") is not None:
             case.set_value("REST_N", env_run_settings.pop("REST_N"))
+        if env_run_settings.get("REST_OPTION") is not None:
+            case.set_value("REST_OPTION", env_run_settings.pop("REST_OPTION"))    
 
         if env_run_settings.get('CAM_CONFIG_OPTS') is not None:
             if env_run_settings.get('cam_onopts'):

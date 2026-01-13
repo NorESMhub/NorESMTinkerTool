@@ -72,7 +72,6 @@ def setup_usr_nlstring(
       user_nlstring += f"&{section}\n"
     for key in user_nl_config[section]:
       value = user_nl_config[section][key]
-      print(value)
       if any(substring in key for substring in ["fincl", "fexcl"]):
         # Handle multi-line diagnostic lists
         if "\n" in value:

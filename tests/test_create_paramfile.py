@@ -68,7 +68,6 @@ def test_create_paramfile_without_ctsm_param_changes(
 
 def test_create_paramfile_with_chem_mech_changes(sample_parameter_file: Path, sample_chem_mech_file: Path, temp_dir: Path):
     output_paramfile = temp_dir / "chem_mech_paramfile.nc"
-    print("sample_chem_mech_file:", sample_chem_mech_file)
     parm_conf = ParameterFileConfig(
         param_ranges_inpath=sample_parameter_file,
         param_sample_outpath=output_paramfile,
