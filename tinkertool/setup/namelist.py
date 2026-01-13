@@ -65,7 +65,21 @@ def setup_usr_nlstring(
   user_nlstring = ""
   if 'misc' in user_nl_config.sections():
     for key in user_nl_config['misc']:
-      user_nlstring += key + " = " + format_value(user_nl_config['misc'][key]) + "\n"
+      value = user_nl_config['misc'][key]
+      if any(substring in key for substring in ["fincl", "fexcl"]):
+        # Handle multi-line diagnostic lists
+        if "\n" in value:
+          diag_list = value.split("\n")
+          # For string lists, quote each item
+          user_nlstring += key + f" = '{diag_list[0]}',\n"
+          for diag in diag_list[1:-1]:
+            user_nlstring += f"         '{diag}',\n"
+          user_nlstring +=  f"         '{diag_list[-1]}'\n"
+        else:
+          # Single line - use format_value for proper formatting
+          user_nlstring += key + " = " + format_value(value) + "\n"
+      else:
+        user_nlstring += key + " = " + format_value(user_nl_config['misc'][key]) + "\n"
     user_nl_config.remove_section('misc')
   for section in user_nl_config.sections():
     if component_name.lower() != 'blom':
@@ -91,7 +105,6 @@ def setup_usr_nlstring(
         for emis in emis_specfier[1:-1]:
           user_nlstring += f"                  '{emis}',\n"
         user_nlstring += f"                  '{emis_specfier[-1]}'\n"
-
       else:
         user_nlstring += key + " = " + format_value(value) + "\n"
     if component_name.lower() != 'blom':
