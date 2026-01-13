@@ -61,3 +61,22 @@ def test_generate_paramfile_lhc_no_fates_ctsm(temp_dir:pathlib.Path, sample_para
     assert n_sims == 31, f"Number of simulations in output file is {n_sims}, expected 30 + 1 (default simulation)."
 
 
+def test_generate_paramfile_oat_no_fates_ctsm(temp_dir:pathlib.Path, sample_parameter_file:pathlib.Path):
+    
+    test_paramfile = temp_dir / "test_paramfile.nc"
+
+    test_ini = sample_parameter_file
+    proc = subprocess.run(
+        [sys.executable, "-m", "tinkertool.scripts.generate_paramfile.main",
+         '--param-ranges-inpath', str(test_ini),
+         '--param-sample-outpath', str(test_paramfile),
+         '--log-mode', "o",
+         '--params', "test_parameter1",  "test_parameter2", "test_parameter3",
+         '--method', "oat"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+    )
+    output_file = test_paramfile
+    assert proc.returncode == 0, f"Process failed with output: {proc.stdout}"
+    assert output_file.exists(), "Parameter file was not created."
