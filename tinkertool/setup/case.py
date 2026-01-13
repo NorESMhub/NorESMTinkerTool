@@ -349,9 +349,11 @@ def build_base_case(
 
         logger.info(">>> base case write user_nl files...")
         # write user_nl files
+        print(namelist_collection_dict.keys())
         for nl_control_filename in namelist_collection_dict.keys():
-            # get the component name from the file name assuming control_<component>.ini
-            component_name = nl_control_filename.split('_')[1].split('.')[0]
+            
+            # get the component name from the file name assuming control_<component> using the name in the .ini file
+            component_name = nl_control_filename.split('_')[-1]
             user_nl_str = setup_usr_nlstring(namelist_collection_dict[nl_control_filename], component_name=component_name)
             write_user_nl_file(str(basecaseroot), f"user_nl_{component_name}", user_nl_str)
 

@@ -94,7 +94,7 @@ class CreatePPEConfig(BaseConfig):
             if control_nl is not None:
                 control_nl = Path(control_nl).resolve()
                 validate_file(control_nl, ".ini", f"namelist control file {control_nl.name}.ini", new_file=False)
-                namelist_collection_dict[control_nl.name] = read_config(control_nl)
+                namelist_collection_dict[component_nl_name] = read_config(control_nl)
             else:
                 logging.warning(f"Control namelist is None for {control_nl.name}, using model default")
         # - create_case
