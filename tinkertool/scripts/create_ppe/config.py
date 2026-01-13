@@ -61,11 +61,11 @@ class CreatePPEConfig(BaseConfig):
         # derived fields - we unpack the simulation setup file
         simulation_setup: configparser.ConfigParser = read_config(self.simulation_setup_path)
         # - ppe_settings
-        baseroot = Path(simulation_setup['ppe_settings']['baseroot']).resolve()
+        baseroot = Path(simulation_setup['ppe_settings'].get('baseroot',vars=os.environ)).resolve()
         basecasename = simulation_setup['ppe_settings']['basecasename']
         ## - paramfile
         pdim: str = simulation_setup['ppe_settings']['pdim']
-        paramfile_path: Path = Path(simulation_setup['ppe_settings']['paramfile']).resolve()
+        paramfile_path: Path = Path(simulation_setup['ppe_settings'].get('paramfile',vars=os.environ)).resolve()
         validate_file(paramfile_path, ".nc", "paramfile", new_file=False)
         paramfile: Dataset = Dataset(paramfile_path, 'r')
         if pdim not in list(paramfile.dimensions.keys()):
@@ -87,9 +87,10 @@ class CreatePPEConfig(BaseConfig):
         num_vars = len(paramfile.variables.keys())-1
         ensemble_num = paramfile[pdim][:]
         paramfile.close()
-        # - namelist_control
+
         namelist_collection_dict = {}
-        for control_nl in simulation_setup['namelist_control'].values():
+        for component_nl_name in simulation_setup.options('namelist_control'):
+            control_nl = simulation_setup['namelist_control'].get(component_nl_name,vars=os.environ)
             if control_nl is not None:
                 control_nl = Path(control_nl).resolve()
                 validate_file(control_nl, ".ini", f"namelist control file {control_nl.name}.ini", new_file=False)
@@ -97,6 +98,7 @@ class CreatePPEConfig(BaseConfig):
             else:
                 logging.warning(f"Control namelist is None for {control_nl.name}, using model default")
         # - create_case
+        simulation_setup['create_case']['cesmroot'] = simulation_setup['create_case'].get('cesmroot',vars=os.environ)
         cesmroot = Path(simulation_setup['create_case']['cesmroot']).resolve()
         validate_directory(cesmroot, "CESM root directory")
         if os.environ.get('CESMROOT') != str(cesmroot):
@@ -104,7 +106,11 @@ class CreatePPEConfig(BaseConfig):
             logging.warning("This may cause issues with CIME paths. Consider choosing one cesmroot.")
 
         add_CIME_paths_and_import(cesmroot)
-
+        if self.__dict__.get('log_file', log_file) is not None:
+            log_file = self.__dict__.get('log_file', log_file)
+        # remove log_file from __dict__ to avoid duplication
+        if 'log_file' in self.__dict__:
+            del self.__dict__['log_file']
         return CheckedCreatePPEConfig(
             **self.__dict__,
             log_file=log_file,
@@ -154,6 +160,8 @@ class CheckedCreatePPEConfig(CheckedBaseConfig):
         check_type(self.simulation_setup, configparser.ConfigParser)
         # - ppe_settings
         validate_directory(self.baseroot, "base case root directory")
+        if isinstance(self.baseroot, str):
+            self.baseroot = Path(self.baseroot).resolve() 
         check_type(self.baseroot, Path)
         check_type(self.basecasename, str)
         # - paramfile
