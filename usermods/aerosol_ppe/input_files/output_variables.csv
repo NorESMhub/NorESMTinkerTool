@@ -204,12 +204,4 @@ D550_DUA2,rad,mon-global,A,k,,2d,Need some code modification
 D550_DUA3,rad,mon-global,A,k,,2d,Need some code modification
 A550_DU,rad,mon-global,A,k,,2d,
 DOD550,rad,mon-global,A,k,,2d,
-ABS550AL,rad,mon-global,A,k,,2d,
-DST_A2DDF,aerdep,mon-global,A,k,,,
-DST_A2_OCWDDF,aerdep,mon-global,A,k,,,
-DST_A3DDF,aerdep,mon-global,A,k,,,
-DST_A3_OCWDDF,aerdep,mon-global,A,k,,,
-DST_A2SFWET,aerdep,mon-global,A,k,,,
-DST_A3SFWET,aerdep,mon-global,A,k,,,
-DST_A2_OCWSFWET,aerdep,mon-global,A,k,,,
-DST_A3_OCWSFWET,aerdep,mon-global,A,k,,,
+ABS550AL,rad,mon-global,A,k,,2d

@@ -6,9 +6,10 @@ if __name__ == "__main__":
     build_ppe_config = BuildPPEConfig(
         simulation_setup_path='../aerosol_ppe_settings.ini',
         overwrite=True,
-        build_base_only=True,
+        build_base_only=False,
         log_dir                 = Path(__file__).parent.joinpath('../output_files', 'logs').resolve(),
-        log_mode                = 'w'
+        log_mode                = 'w',
+        build_only=True
     )
 
     build_ppe(build_ppe_config)
