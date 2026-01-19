@@ -398,7 +398,7 @@ def generate_paramfile(config: ParameterFileConfig):
                 f"Invalid input type '{input_type}, type({type(input_type)})' for parameter '{param}'. Supported types are: {PARAMFILE_INPUT_TYPES}."
             ds[param].attrs['input_type'] = input_type
             ds[param].attrs['interdependent_with'] = safe_get_param_value(pdata, "interdependent_with", "")
-
+            ds[param].attrs['format_to_file_method'] = safe_get_param_value(pdata, "format_to_file_method", "write-lines")
             component = pdata.get('esm_component')
             if not isinstance(component, str):
                 err_msg = f"The component passed to param {param} is of type {type(component)}, expected type str"

@@ -63,7 +63,7 @@ class CreatePPEConfig(BaseConfig):
         paramfile_path: Path = Path(simulation_setup['ppe_settings'].get('paramfile',vars=os.environ)).resolve()
         validate_file(paramfile_path, ".nc", "paramfile", new_file=False)
         paramfile: xr.Dataset = xr.open_dataset(paramfile_path)
-        if pdim not in list(paramfile.dims.keys()):
+        if pdim not in paramfile.dims:
             raise SystemExit(f"ERROR: {pdim} is not a valid dimension in {paramfile_path}. \nParamfile dimensions are: {list(paramfile.dims.keys())}")
         paramDataset: xr.Dataset = paramfile
         componentdict: dict = {}
@@ -77,7 +77,7 @@ class CreatePPEConfig(BaseConfig):
             componentdict[param] = esm_component
         num_sims = paramfile.sizes[pdim]
         num_vars = len(paramfile.variables.keys())-1
-        ensemble_num = paramfile[pdim][:]
+        ensemble_num = paramfile[pdim][:].values
 
         namelist_collection_dict = {}
         for component_nl_name in simulation_setup.options('namelist_control'):

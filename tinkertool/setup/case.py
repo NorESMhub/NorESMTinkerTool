@@ -90,6 +90,7 @@ def _per_run_case_updates(
     paramDataset: xr.Dataset,
     componentdict: dict,
     ens_idx: str,
+    namelist_collection_dict: dict|None = None,
     path_base_input: str = "",
     keepexe: bool = False,
     lifeCycleMedianRadius=None,
@@ -138,8 +139,8 @@ def _per_run_case_updates(
     components = list(set(componentdict.values()))
 
     paramLinesDict = {component: [] for component in components}
-
-    for var in paramDataset.variables.keys():
+    fStringParameters = {}
+    for var in paramDataset:
         paramLines = paramLinesDict[componentdict[var]]
         if var.startswith("lifeCycleNumberMedianRadius"):
             lifeCycleNumber = int(var.split("_")[-1])
@@ -170,8 +171,12 @@ def _per_run_case_updates(
             paramLines.append(
                 "oslo_aero_lifecyclesigma = " + ",".join(lifeCylceList) + "\n"
             )
-        elif var.startswith("specifier"):
-            pass
+
+        elif paramDataset[var].attrs.get("format_to_file_method", None) == "f-string":
+            esm_component = paramDataset[var].attrs["esm_component"]
+            if fStringParameters.get(esm_component, None) is None:
+                fStringParameters[esm_component] = {}
+            fStringParameters[esm_component][var] = paramDataset[var].values.item()
         else:
             value = paramDataset[var].values.item()
             if isinstance(value, str):
@@ -180,6 +185,14 @@ def _per_run_case_updates(
     # appending parameter changes to the user_nl file from the paramLinesDict
     for component in components:
         paramLines = paramLinesDict[component]
+        if namelist_collection_dict is not None:
+            if fStringParameters.get(component, None) is not None:
+                user_nl_str = setup_usr_nlstring(
+                    namelist_collection_dict[f"control_{component}"],
+                    component_name=component,
+                )
+                user_nl_str = user_nl_str.format(**fStringParameters[component])
+                paramLines = [line + "\n" for line in user_nl_str.splitlines() if line.strip() != '']
         if len(paramLines) > 0:
             usernlfile = os.path.join(caseroot, f"user_nl_{component}")
             with open(usernlfile, "a") as file:
@@ -213,7 +226,9 @@ def build_base_case(
     env_pe_settings:            dict,
     env_run_settings:           dict,
     env_build_settings:         dict,
-    namelist_collection_dict:   dict
+    namelist_collection_dict:   dict,
+    paramDataset:               xr.Dataset,
+    pdim: str
 ) -> Path:
     """
     Create and build the base case that all PPE cases are cloned from
@@ -352,12 +367,21 @@ def build_base_case(
 
         logger.info(">>> base case write user_nl files...")
         # write user_nl files
+        fStringParameters = {}
+        for var in paramDataset:
+            if paramDataset[var].attrs.get("format_to_file_method", None) == "f-string":
+                esm_component = paramDataset[var].attrs["esm_component"]
+                if fStringParameters.get(esm_component, None) is None:
+                    fStringParameters[esm_component] = {}
+                fStringParameters[esm_component][var] = paramDataset[var].isel({pdim:0}).values.item()
+
         for nl_control_name in namelist_collection_dict.keys():
             # get the component name from the file name assuming control_<component> using the name in the .ini file
             component_name = nl_control_name.split('_')[-1]
             user_nl_str = setup_usr_nlstring(namelist_collection_dict[nl_control_name], component_name=component_name)
-            if component_name == "cam":
-                pass
+            
+            if fStringParameters.get(component_name, None) is not None:
+                user_nl_str = user_nl_str.format(**fStringParameters[component_name])
             write_user_nl_file(str(basecaseroot), f"user_nl_{component_name}", user_nl_str)
 
         logger.info(">> base case_build...")
@@ -373,6 +397,7 @@ def clone_base_case(
     paramDataset:       xr.Dataset,
     componentdict:      dict,
     ensemble_idx:       str,
+    namelist_collection_dict: dict,
     path_base_input:    Path=Path(''),
     keepexe:            bool=False,
     **kwargs
@@ -417,6 +442,12 @@ def clone_base_case(
         logger.debug(f"cloneroot type: {type(cloneroot)}")
         with Case(str(basecaseroot), read_only=False) as clone:
             clone.create_clone(str(cloneroot), keepexe=keepexe)
+    fstings_params = [False if paramDataset[var].attrs.get("format_to_file_method", None) != "f-string" else True for var in paramDataset]
+    if all(fstings_params) == False:
+        namelist_dict = None
+    else:
+        namelist_dict = namelist_collection_dict
+    
     with Case(str(cloneroot), read_only=False) as case:
         _per_run_case_updates(
             case=case,
@@ -425,11 +456,11 @@ def clone_base_case(
             ens_idx=ensemble_idx,
             path_base_input=str(path_base_input),
             keepexe=keepexe,
+            namelist_collection_dict=namelist_dict,
             **kwargs,
         )
 
     return Path(cloneroot)
-
 
 def take(n, iterable):
     "Return first n items of the iterable as a list"

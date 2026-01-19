@@ -151,6 +151,8 @@ def build_ppe(config: BuildPPEConfig) -> tuple[Path, list[Path] | None]:
             env_run_settings=dict(checked_config.simulation_setup['env_run']),
             env_build_settings=dict(checked_config.simulation_setup['env_build']) if 'env_build' in checked_config.simulation_setup.sections() else {},
             namelist_collection_dict=checked_config.namelist_collection_dict,
+            paramDataset=checked_config.paramDataset,
+            pdim=checked_config.pdim
         )
         logging.info(f">> Base case created successfully at {basecaseroot}")
     else:
@@ -187,6 +189,7 @@ def build_ppe(config: BuildPPEConfig) -> tuple[Path, list[Path] | None]:
                 ensemble_idx=ensemble_idx,
                 path_base_input=checked_config.paramfile_path.parent,
                 keepexe=checked_config.keepexe,
+                    namelist_collection_dict=checked_config.namelist_collection_dict,
                 **clone_base_case_kwargs
             )
             cases.append(clonecaseroot)
