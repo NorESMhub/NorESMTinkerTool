@@ -4,7 +4,7 @@ import logging
 import configparser
 import numpy as np
 from pathlib import Path
-from netCDF4 import Dataset
+import xarray as xr
 from typing import Union, Optional
 from dataclasses import dataclass, fields, field
 
@@ -13,11 +13,6 @@ from tinkertool.utils.config_utils import BaseConfig, CheckedBaseConfig
 from tinkertool.setup.setup_cime_connection import add_CIME_paths_and_import
 from tinkertool.utils.check_arguments import validate_file, validate_directory, check_type
 
-def get_ncattr_or_default(var, attr, default=None):
-    try:
-        return var.getncattr(attr)
-    except AttributeError:
-        return default
 
 @dataclass(kw_only=True)
 class CreatePPEConfig(BaseConfig):
@@ -67,26 +62,22 @@ class CreatePPEConfig(BaseConfig):
         pdim: str = simulation_setup['ppe_settings']['pdim']
         paramfile_path: Path = Path(simulation_setup['ppe_settings'].get('paramfile',vars=os.environ)).resolve()
         validate_file(paramfile_path, ".nc", "paramfile", new_file=False)
-        paramfile: Dataset = Dataset(paramfile_path, 'r')
-        if pdim not in list(paramfile.dimensions.keys()):
-            raise SystemExit(f"ERROR: {pdim} is not a valid dimension in {paramfile_path}. \nParamfile dimensions are: {list(paramfile.dimensions.keys())}")
-        paramdict: dict = {}
+        paramfile: xr.Dataset = xr.open_dataset(paramfile_path)
+        if pdim not in list(paramfile.dims.keys()):
+            raise SystemExit(f"ERROR: {pdim} is not a valid dimension in {paramfile_path}. \nParamfile dimensions are: {list(paramfile.dims.keys())}")
+        paramDataset: xr.Dataset = paramfile
         componentdict: dict = {}
-        logging.debug(f"Processing paramfile {paramfile_path} with parameters: {list(paramdict.keys())}")
-        for param in [ param for param in paramfile.variables.keys() if param != pdim ]:
-            # get the values of the parameter for paramdict
-            paramdict[param] = paramfile[param][:]
-            # get the esm_component attribute for componentdict
-            esm_component = get_ncattr_or_default(paramfile.variables[param], 'esm_component', None)
+        logging.debug(f"Processing paramfile {paramfile_path} with parameters: {list(paramDataset.variables.keys())}")
+        for param in [ param for param in paramDataset.variables.keys() if param != pdim ]:
+            esm_component = paramDataset.variables[param].attrs.get('esm_component', None)
             if esm_component is None:
                 err_msg = f"Parameter {param} in paramfile {paramfile_path} does not have an 'esm_component' attribute."
                 logging.error(err_msg)
-                raise SystemExit(err_msg)
+                raise ValueError(err_msg)
             componentdict[param] = esm_component
-        num_sims = paramfile.dimensions[pdim].size
+        num_sims = paramfile.sizes[pdim]
         num_vars = len(paramfile.variables.keys())-1
         ensemble_num = paramfile[pdim][:]
-        paramfile.close()
 
         namelist_collection_dict = {}
         for component_nl_name in simulation_setup.options('namelist_control'):
@@ -119,7 +110,7 @@ class CreatePPEConfig(BaseConfig):
             basecasename=basecasename,
             paramfile_path=paramfile_path,
             pdim=pdim,
-            paramdict=paramdict,
+            paramDataset=paramDataset,
             componentdict=componentdict,
             num_sims=num_sims,
             num_vars=num_vars,
@@ -145,7 +136,7 @@ class CheckedCreatePPEConfig(CheckedBaseConfig):
     # - paramfile
     paramfile_path:         Path = field(metadata={"help": "Path to the paramfile"})
     pdim:                   str = field(metadata={"help": "Dimension of ensemble member count in paramfile"})
-    paramdict:              dict = field(metadata={"help": "Dictionary of parameters in the paramfile"})
+    paramDataset:           xr.Dataset = field(metadata={"help": "Dataset of parameters in the paramfile"})
     componentdict:          dict = field(metadata={"help": "Dictionary of ESM components in the paramfile"})
     num_sims:               int = field(metadata={"help": "Number of ensemble members"})
     num_vars:               int = field(metadata={"help": "Number of variables in the paramfile"})
@@ -167,7 +158,7 @@ class CheckedCreatePPEConfig(CheckedBaseConfig):
         # - paramfile
         validate_file(self.paramfile_path, ".nc", "paramfile", new_file=False)
         check_type(self.pdim, str)
-        check_type(self.paramdict, dict)
+        check_type(self.paramDataset, xr.Dataset)
         check_type(self.componentdict, dict)
         check_type(self.num_sims, int)
         check_type(self.num_vars, int)

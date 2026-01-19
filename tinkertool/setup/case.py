@@ -7,6 +7,7 @@ import shutil
 import subprocess
 from itertools import islice
 from pathlib import Path
+import xarray as xr
 
 from tinkertool.setup.namelist import setup_usr_nlstring, write_user_nl_file, format_value
 from tinkertool.setup.setup_cime_connection import add_CIME_paths
@@ -86,7 +87,7 @@ def iterate_dict_to_set_value(case: CIME.case, settings_dict: dict, dict_name: s
 
 def _per_run_case_updates(
     case: CIME.case,
-    paramdict: dict,
+    paramDataset: xr.Dataset,
     componentdict: dict,
     ens_idx: str,
     path_base_input: str = "",
@@ -95,14 +96,14 @@ def _per_run_case_updates(
     lifeCycleSigma=None,
 ):
     """
-    Update and submit the new cloned case, setting namelist parameters according to paramdict
+    Update and submit the new cloned case, setting namelist parameters according to the paramDataset
 
     Parameters
     ----------
     case : CIME.case
         The case object to be updated
-    paramdict : dict
-        Dictionary of namelist parameters to be updated
+    paramDataset : xr.Dataset 
+        Dataset of namelist parameters to be updated
     componentdict : dict
         Dictionary of component names for the parameters
     ens_idx : str
@@ -121,9 +122,9 @@ def _per_run_case_updates(
     case.set_value("RUNDIR", rundir)
     # smb++ extract the chem_mech_in_file
     chem_mech_file = None
-    if "chem_mech_in" in paramdict.keys():
-        chem_mech_file = Path(path_base_input) / paramdict["chem_mech_in"]
-        del paramdict["chem_mech_in"]
+    if "chem_mech_in" in paramDataset.variables.keys():
+        chem_mech_file = Path(path_base_input) / paramDataset["chem_mech_in"].values.item()
+        del paramDataset["chem_mech_in"]
         del componentdict["chem_mech_in"]
     case.flush()
     lock_file("env_case.xml", caseroot=caseroot)
@@ -138,7 +139,7 @@ def _per_run_case_updates(
 
     paramLinesDict = {component: [] for component in components}
 
-    for var in paramdict.keys():
+    for var in paramDataset.variables.keys():
         paramLines = paramLinesDict[componentdict[var]]
         if var.startswith("lifeCycleNumberMedianRadius"):
             lifeCycleNumber = int(var.split("_")[-1])
@@ -148,7 +149,7 @@ def _per_run_case_updates(
                 )
             lifeCylceList = lifeCycleMedianRadius.split(",")
             lifeCylceList[lifeCycleNumber] = (
-                "{:.1E}".format(paramdict[var]).replace("E", "D").replace("+", "")
+                "{:.1E}".format(paramDataset[var].values.item()).replace("E", "D").replace("+", "")
             )
 
             paramLines.append(
@@ -164,17 +165,19 @@ def _per_run_case_updates(
                 )
             lifeCylceList = lifeCycleSigma.split(",")
             lifeCylceList[lifeCycleNumber] = (
-                "{:.1E}".format(paramdict[var]).replace("E", "D").replace("+", "")
+                "{:.1E}".format(paramDataset[var].values.item()).replace("E", "D").replace("+", "")
             )
             paramLines.append(
                 "oslo_aero_lifecyclesigma = " + ",".join(lifeCylceList) + "\n"
             )
+        elif var.startswith("specifier"):
+            pass
         else:
-            value = paramdict[var]
+            value = paramDataset[var].values.item()
             if isinstance(value, str):
                 value = format_value(value)
             paramLines.append("{} = {}\n".format(var, value))
-
+    # appending parameter changes to the user_nl file from the paramLinesDict
     for component in components:
         paramLines = paramLinesDict[component]
         if len(paramLines) > 0:
@@ -349,12 +352,12 @@ def build_base_case(
 
         logger.info(">>> base case write user_nl files...")
         # write user_nl files
-        print(namelist_collection_dict.keys())
-        for nl_control_filename in namelist_collection_dict.keys():
-            
+        for nl_control_name in namelist_collection_dict.keys():
             # get the component name from the file name assuming control_<component> using the name in the .ini file
-            component_name = nl_control_filename.split('_')[-1]
-            user_nl_str = setup_usr_nlstring(namelist_collection_dict[nl_control_filename], component_name=component_name)
+            component_name = nl_control_name.split('_')[-1]
+            user_nl_str = setup_usr_nlstring(namelist_collection_dict[nl_control_name], component_name=component_name)
+            if component_name == "cam":
+                pass
             write_user_nl_file(str(basecaseroot), f"user_nl_{component_name}", user_nl_str)
 
         logger.info(">> base case_build...")
@@ -367,7 +370,7 @@ def clone_base_case(
     baseroot:           Path,
     basecaseroot:       Path,
     overwrite:          bool,
-    paramdict:          dict,
+    paramDataset:       xr.Dataset,
     componentdict:      dict,
     ensemble_idx:       str,
     path_base_input:    Path=Path(''),
@@ -385,8 +388,8 @@ def clone_base_case(
         The base case root directory
     overwrite : bool
         Overwrite existing cases
-    paramdict : dict
-        Dictionary of namelist parameters to be updated
+    paramDataset : xr.Dataset
+        Dataset of namelist parameters to be updated
     componentdict : dict
         Dictionary of component names for the parameters
     ensemble_idx : str
@@ -417,7 +420,7 @@ def clone_base_case(
     with Case(str(cloneroot), read_only=False) as case:
         _per_run_case_updates(
             case=case,
-            paramdict=paramdict,
+            paramDataset=paramDataset,
             componentdict=componentdict,
             ens_idx=ensemble_idx,
             path_base_input=str(path_base_input),

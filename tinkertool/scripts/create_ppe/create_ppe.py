@@ -164,15 +164,15 @@ def build_ppe(config: BuildPPEConfig) -> tuple[Path, list[Path] | None]:
         for i, idx in zip(checked_config.ensemble_num, range(len(checked_config.ensemble_num))):
             log_info_detailed('tinkertool_log', f"Building ensemble {i} of {checked_config.num_sims}")
             ensemble_idx = f"{i:03d}"
-            temp_param_dict = {k : v[idx] for k,v in checked_config.paramdict.items()}
+            tempParamDataset = checked_config.paramDataset.isel({checked_config.pdim: idx})
             # Special treatment for chem_mech.in changes:
-            if 'chem_mech_in' in temp_param_dict:
+            if 'chem_mech_in' in tempParamDataset:
                 # remove all chem_mech_in keys that are not chem_mech_in (there can anyway only be one chem_mech.in file)
-                keys_in_dic = list(temp_param_dict.keys())
+                keys_in_dic = list(tempParamDataset.keys())
                 for v in keys_in_dic:
                     if v[-12:]=='chem_mech_in' and len(v)>12:
                         log_info_detailed('tinkertool_log', f'Deleting {v} from parameter directory')
-                        del temp_param_dict[v]
+                        del tempParamDataset[v]
             # special treatment for non-mandatory parameters to clone_base_case
             clone_base_case_kwargs = {}
             if checked_config.simulation_setup.has_section('lifeCycleValues'):
@@ -182,7 +182,7 @@ def build_ppe(config: BuildPPEConfig) -> tuple[Path, list[Path] | None]:
                 baseroot=checked_config.baseroot,
                 basecaseroot=basecaseroot,
                 overwrite=checked_config.overwrite,
-                paramdict=temp_param_dict,
+                paramDataset=tempParamDataset,
                 componentdict=checked_config.componentdict,
                 ensemble_idx=ensemble_idx,
                 path_base_input=checked_config.paramfile_path.parent,
