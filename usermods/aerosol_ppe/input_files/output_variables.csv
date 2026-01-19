@@ -78,9 +78,7 @@ BC_NI_OCW',aer_mmr,"mon-global, 3-h-station","A,I",sr,r,3d,Why?
 BC_N_OCW',aer_mmr,"mon-global, 3-h-station","A,I",Sr,r,3d,Why?
 DMS',aer_mmr,"mon-global, 3-h-station","A,I",K,r,3d,
 DST_A2',aer_mmr,"mon-global, 3-h-station","A,I",K,r,3d,Why?
-DST_A2_OCW',aer_mmr,"mon-global, 3-h-station","A,I",K,r,3d,Why?
 DST_A3',aer_mmr,"mon-global, 3-h-station","A,I",K,r,3d,Why?
-DST_A3_OCW',aer_mmr,"mon-global, 3-h-station","A,I",K,r,3d,Why?
 cb_BC',aer_cb,mon-global,A,K,,2d,
 cb_BC_A',aer_cb,mon-global,A,k,,2d,
 cb_BC_AC',aer_cb,mon-global,A,k,,2d,
@@ -179,8 +177,6 @@ NMR12',szdst,"mon-global, 3-h-station","A,I",Sr,k,3d,Why?
 NMR14',szdst,"mon-global, 3-h-station","A,I",Sr,k,3d,
 SOLIN,rad,mon-global,A,k,,2d,
 FSDS,rad,mon-global,A,k,,2d,
-FSDS_DSTA2,rad,mon-global,A,k,,2d,Need some code modification
-FSDS_DSTA3,rad,mon-global,A,k,,2d,Need some code modification
 FSUTOA,rad,mon-global,A,k,,2d,
 FSNS,rad,mon-global,A,k,,2d,
 FSDSC,rad,mon-global,A,k,,2d,
@@ -190,18 +186,6 @@ FLDS,rad,mon-global,A,k,,2d,
 FLNT_DRF,rad,mon-global,A,k,,2d,
 FSNT_DRF,rad,mon-global,A,k,,2d,
 FSNTCDRF,rad,mon-global,A,k,,2d,
-FSNT_DSTA2,rad,mon-global,A,k,,2d,
-FSNT_DSTA3,rad,mon-global,A,k,,2d,
-FLNT_DSTA2,rad,mon-global,A,k,,2d,Need some code modification
-FLNT_DSTA3,rad,mon-global,A,k,,2d,Need some code modification
-FSNTCDRF_DSTA2,rad,mon-global,A,k,,2d,Need some code modification
-FSNTCDRF_DSTA3,rad,mon-global,A,k,,2d,Need some code modification
-DOD10UM,rad,mon-global,A,,,2d,Need some code modification
-DOD10UMA2,rad,mon-global,A,sr,,2d,Need some code modification
-DOD10UMA3,rad,mon-global,A,sr,,2d,Need some code modification
 D550_DU,rad,"mon-global, 3-h-station","A,I",k,,2d,Need some code modification
-D550_DUA2,rad,mon-global,A,k,,2d,Need some code modification
-D550_DUA3,rad,mon-global,A,k,,2d,Need some code modification
 A550_DU,rad,mon-global,A,k,,2d,
 DOD550,rad,mon-global,A,k,,2d,
-ABS550AL,rad,mon-global,A,k,,2d
