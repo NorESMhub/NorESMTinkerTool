@@ -66,7 +66,8 @@ def create_ppe(config: CreatePPEConfig):
         simulation_setup_path=config.simulation_setup_path,
         build_base_only=config.build_base_only,
         keepexe=config.keepexe,
-        overwrite=config.overwrite,
+        overwrite_base=config.overwrite_base,
+        overwrite_ppe=config.overwrite_ppe,
         verbose=config.verbose,
         log_dir=config.log_dir,
         log_mode=config.log_mode
@@ -142,10 +143,10 @@ def build_ppe(config: BuildPPEConfig) -> tuple[Path, list[Path] | None]:
     logging.info(">> Starting PPE case building")
     log_info_detailed('tinkertool_log', f"Building with config: {config.describe(return_string=True)}") # type: ignore
 
-    if not checked_config.clone_only_during_build:
+    if not checked_config.frozen_base_case:
         basecaseroot = build_base_case(
             basecaseroot=checked_config.baseroot.joinpath(checked_config.basecasename),
-            overwrite=checked_config.overwrite,
+            overwrite=checked_config.overwrite_base_case,
             case_settings=dict(checked_config.simulation_setup['create_case']),
             env_pe_settings=dict(checked_config.simulation_setup['env_pe']) if 'env_pe' in checked_config.simulation_setup.sections() else {},
             env_run_settings=dict(checked_config.simulation_setup['env_run']),
@@ -183,7 +184,7 @@ def build_ppe(config: BuildPPEConfig) -> tuple[Path, list[Path] | None]:
             clonecaseroot = clone_base_case(
                 baseroot=checked_config.baseroot,
                 basecaseroot=basecaseroot,
-                overwrite=checked_config.overwrite,
+                overwrite=checked_config.overwrite_ppe,
                 paramDataset=tempParamDataset,
                 componentdict=checked_config.componentdict,
                 ensemble_idx=ensemble_idx,

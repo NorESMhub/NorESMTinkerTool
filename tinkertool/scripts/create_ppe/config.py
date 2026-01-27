@@ -22,34 +22,26 @@ class CreatePPEConfig(BaseConfig):
     # Optional fields with defaults
     build_base_only:        bool = field(default=False, metadata={"help": "Only build the base case - not PPE members"})
     build_only:             bool = field(default=False, metadata={"help": "Only build the PPE and not submit them to the queue"})
-    clone_only_during_build:bool = field(default=False, metadata={"help": "Only clone the base case and not build the PPE members. This is useful if you have already built the base_case."})
+    frozen_base_case:       bool = field(default=False, metadata={"help": "Only clone the base case and not build the PPE members. This is useful if you have already built the base_case."})
     keepexe:                bool = field(default=False, metadata={"help": "Reuse the executable for the base case instead of building a new one for each member"})
-    overwrite:              bool = field(default=False, metadata={"help": "Overwrite existing cases if they exist"})
+    overwrite_base_case:    bool = field(default=False, metadata={"help": "Overwrite the exisiting base case it it exists, e.g. it will rebuild the entire case from scratch, required if code changes are made."})
+    overwrite_ppe:          bool = field(default=True, metadata={"help":  "Overwrite PPE ensemble cases if they exist"})
 
     def __post_init__(self):
-        # run parent checks for the variables that are inherited from BaseConfig
         super().__post_init__()
-        # check the arguments
         if self.simulation_setup_path is None:
             raise ValueError("simulation_setup_path is required. Please provide a valid path to the simulation setup file.")
         validate_file(self.simulation_setup_path, ".ini", "simulation setup file", new_file=False)
-        # build_base_only
         check_type(self.build_base_only, bool)
-        # build_only
-        # avoid checking if it is type BuildPPEConfig.
-        # BuildPPEConfig overrides build_only as a dummy field
         if type(self) is CreatePPEConfig or type(self) is CheckedCreatePPEConfig:
             check_type(self.build_only, bool)
-        # clone_only_during_build
-        check_type(self.clone_only_during_build, bool)
-        # keepexe
+        check_type(self.frozen_base_case, bool)
         check_type(self.keepexe, bool)
-        # overwrite
-        check_type(self.overwrite, bool)
+        check_type(self.overwrite_base_case, bool)
+        check_type(self.overwrite_ppe, bool)
 
     def get_checked_and_derived_config(self) -> 'CheckedCreatePPEConfig':
         """Check and handle arguments for the PPE configuration."""
-        # Create log file path (from parent class logic)
         time_str = time.strftime("%Y%m%d-%H%M%S")
         log_file = Path(self.log_dir).joinpath(f'tinkertool_{time_str}.log')
 
@@ -125,9 +117,10 @@ class CheckedCreatePPEConfig(CheckedBaseConfig):
     simulation_setup_path:  Path = field(metadata={"help": "Path to user defined configuration file for simulation setup."})
     build_base_only:        bool = field(default=False, metadata={"help": "Only build the base case - not PPE members"})
     build_only:             bool = field(default=False, metadata={"help": "Only build the PPE and not submit them to the queue"})
-    clone_only_during_build:bool = field(default=False, metadata={"help": "Only clone the base case and not build the PPE members"})
+    frozen_base_case:       bool = field(default=False, metadata={"help": "If true the BaseCase is frozen, and will not be touched during PPE build, useful if already built and not code changes made."})
     keepexe:                bool = field(default=False, metadata={"help": "Reuse the executable for the base case"})
-    overwrite:              bool = field(default=False, metadata={"help": "Overwrite existing cases if they exist"})
+    overwrite_base_case:    bool = field(default=False, metadata={"help": "Overwrite the existing base case if it exists, e.g. it will rebuild the entire case from scratch, required if code changes are made."})
+    overwrite_ppe:          bool = field(default=False, metadata={"help": "Overwrite PPE ensemble cases if they exist"})
     # Additional derived/checked fields:
     simulation_setup:       configparser.ConfigParser = field(metadata={"help": "Parsed simulation setup file"})
     # - ppe_settings
@@ -246,8 +239,9 @@ class SubmitPPEConfig(BaseConfig):
         # Create log file path (from parent class logic)
         time_str = time.strftime("%Y%m%d-%H%M%S")
         log_file = Path(self.log_dir).joinpath(f'tinkertool_{time_str}.log')
-
-        return CheckedSubmitPPEConfig(**self.__dict__, log_file=log_file)
+        if self.__dict__.get('log_file') is None:
+            self.__dict__['log_file'] = log_file
+        return CheckedSubmitPPEConfig(**self.__dict__)
 
 @dataclass(kw_only=True)
 class CheckedSubmitPPEConfig(CheckedBaseConfig):

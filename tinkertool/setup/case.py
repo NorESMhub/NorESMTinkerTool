@@ -183,18 +183,25 @@ def _per_run_case_updates(
                 value = format_value(value)
             paramLines.append("{} = {}\n".format(var, value))
     # appending parameter changes to the user_nl file from the paramLinesDict
+    logging.info(f"fStringParameters: {fStringParameters}")
+    logging.info(f"namelist_collection_dict: {namelist_collection_dict}") 
     for component in components:
         paramLines = paramLinesDict[component]
-        if namelist_collection_dict is not None:
-            if fStringParameters.get(component, None) is not None:
-                user_nl_str = setup_usr_nlstring(
-                    namelist_collection_dict[f"control_{component}"],
-                    component_name=component,
-                )
-                user_nl_str = user_nl_str.format(**fStringParameters[component])
-                paramLines = [line + "\n" for line in user_nl_str.splitlines() if line.strip() != '']
+        usernlfile = os.path.join(caseroot, f"user_nl_{component}")
         if len(paramLines) > 0:
-            usernlfile = os.path.join(caseroot, f"user_nl_{component}")
+            if namelist_collection_dict is not None:
+                logging.info(fStringParameters.get(component, None) is not None)
+                if fStringParameters.get(component, None) is not None:
+                    logging.info(f"Formatting user_nl_{component} with f-string parameters")
+                    user_nl_str = setup_usr_nlstring(
+                        namelist_collection_dict[f"control_{component}"],
+                        component_name=component,
+                    )
+                    logging.info(f"the following formatting is applied: {fStringParameters[component]}")
+                    user_nl_str = user_nl_str.format(**fStringParameters[component])
+                    with open(usernlfile, "w") as file:
+                        file.writelines(user_nl_str)
+                 
             with open(usernlfile, "a") as file:
                 file.writelines(paramLines)
 
@@ -255,11 +262,13 @@ def build_base_case(
     Path
         The root directory of the base case
     """
-    logger.info(">>> BUILDING BASE CASE...")
+
     if overwrite and basecaseroot.is_dir():
         shutil.rmtree(basecaseroot)
     with Case(str(basecaseroot), read_only=False) as case:
+        logging.debug(dir(case))
         if not basecaseroot.is_dir():
+            logger.info(">>> BUILDING BASE CASE...")
             logger.info('Creating base case directory: {}'.format(basecaseroot))
             # create the case using the case_settings
             case.create(
@@ -275,11 +284,9 @@ def build_base_case(
                 **case_settings,
             )
             case.record_cmd(init=True)
+        
         else:
-            if not case.read_only:
-                logger.info('Reusing existing case directory: {}'.format(str(basecaseroot)))
-            else:
-                logger.warning('Base case directory exists but is read-only: {}'.format(str(basecaseroot)))
+            logger.info('Reusing existing case directory: {}'.format(str(basecaseroot)))
 
 
         # set the case environment variables
@@ -434,7 +441,7 @@ def clone_base_case(
 
     logger.info(">>> CLONING BASE CASE for member {}...".format(ensemble_idx))
     cloneroot = baseroot.joinpath(f'ensemble_member.{ensemble_idx}')
-
+    # should be able to overwrite cloned cases independently of base case... 
     if overwrite and cloneroot.exists():
         shutil.rmtree(cloneroot)
     if not cloneroot.exists():
@@ -443,11 +450,12 @@ def clone_base_case(
         with Case(str(basecaseroot), read_only=False) as clone:
             clone.create_clone(str(cloneroot), keepexe=keepexe)
     fstings_params = [False if paramDataset[var].attrs.get("format_to_file_method", None) != "f-string" else True for var in paramDataset]
-    if all(fstings_params) == False:
-        namelist_dict = None
-    else:
+    logging.info(f"f-string parameters present: {fstings_params}")
+    if any(fstings_params) == True:
         namelist_dict = namelist_collection_dict
-    
+    else:
+        logging.info("No f-string parameters present, setting namelist_collection_dict to None")
+        namelist_dict = None    
     with Case(str(cloneroot), read_only=False) as case:
         _per_run_case_updates(
             case=case,

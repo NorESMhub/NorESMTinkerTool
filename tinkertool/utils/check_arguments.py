@@ -20,7 +20,6 @@ def validate_file(
         if new_file and file_path.exists():
             Warning(f"WARNING: {file_path} already exists. It will be overwritten.")
         if not new_file and not file_path.exists():
-            traceback.print_stack()
             raise ValueError(
                 f"ERROR: {file_path} does not exist. Please provide a valid file path."
             )
