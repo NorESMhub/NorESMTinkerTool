@@ -188,7 +188,7 @@ def _per_run_case_updates(
     for component in components:
         paramLines = paramLinesDict[component]
         usernlfile = os.path.join(caseroot, f"user_nl_{component}")
-        if len(paramLines) > 0:
+        if len(paramLines) > 0 or fStringParameters.get(component, None) is not None:
             if namelist_collection_dict is not None:
                 logging.info(fStringParameters.get(component, None) is not None)
                 if fStringParameters.get(component, None) is not None:
@@ -201,9 +201,11 @@ def _per_run_case_updates(
                     user_nl_str = user_nl_str.format(**fStringParameters[component])
                     with open(usernlfile, "w") as file:
                         file.writelines(user_nl_str)
-                 
-            with open(usernlfile, "a") as file:
-                file.writelines(paramLines)
+                else:
+                    if "misc" in namelist_collection_dict[f"control_{component}"].sections():
+                        namelist_collection_dict[f"control_{component}"].remove_section("misc")   
+                    with open(usernlfile, "a") as file:
+                        file.writelines(paramLines)
 
     if chem_mech_file is not None:
         comm = "cp {} {}".format(chem_mech_file, caseroot + "/")

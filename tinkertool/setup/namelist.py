@@ -63,7 +63,8 @@ def setup_usr_nlstring(
       Per now only 'blom' is the exception where the namelist section is not used.
   """
   user_nlstring = ""
-  if 'misc' in user_nl_config.sections():
+  section_list = user_nl_config.sections()
+  if 'misc' in section_list:
     for key in user_nl_config['misc']:
       value = user_nl_config['misc'][key]
       if any(substring in key for substring in ["fincl", "fexcl"]):
@@ -80,8 +81,8 @@ def setup_usr_nlstring(
           user_nlstring += key + " = " + format_value(value) + "\n"
       else:
         user_nlstring += key + " = " + format_value(user_nl_config['misc'][key]) + "\n"
-    user_nl_config.remove_section('misc')
-  for section in user_nl_config.sections():
+    section_list.remove('misc')
+  for section in section_list:
     if component_name.lower() != 'blom':
       user_nlstring += f"&{section}\n"
     for key in user_nl_config[section]:
