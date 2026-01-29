@@ -204,8 +204,8 @@ def _per_run_case_updates(
                 else:
                     if "misc" in namelist_collection_dict[f"control_{component}"].sections():
                         namelist_collection_dict[f"control_{component}"].remove_section("misc")   
-                    with open(usernlfile, "a") as file:
-                        file.writelines(paramLines)
+                with open(usernlfile, "a") as file:
+                    file.writelines(paramLines)
 
     if chem_mech_file is not None:
         comm = "cp {} {}".format(chem_mech_file, caseroot + "/")
