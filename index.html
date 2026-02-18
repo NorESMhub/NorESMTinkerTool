@@ -496,6 +496,20 @@
 </blockquote>
 <p>NorESMTinkerTool is a toolchain developed in Python for the development, building, production, and analysis of Perturbed Parameter Ensembles (PPEs) with the Norwegian Earth System Model (NorESM). The motivation for developing NorESMTinkerTool was to encourage more playful exploration of the model's parameter space by making tinkering with the model more accessible.</p>
 <p>The toolchain leverages the CIME infrastructure for building and creating the perturbed parameter ensembles. Latin hyper cube sampling is used to distribute the ensemble members such that they span the parameter space most efficiently.</p>
+<p>The NorESMTinkerTool have following functions, in parathesis indicates how far along the development have come and the robustness of that functions <br />
+1. Generate parameter file for PPE <strong><em>(beta)</em></strong>.
+    - latin hyper cube sampling or one at the time test
+2. Create PPE (<strong><em>(pre-beta</em></strong>)).
+    - build ensemble members <strong><em>(beta)</em></strong>
+    - check build <strong><em>(alpha)</em></strong>
+    - prestage data <strong><em>(alpha)</em></strong>
+    - submit ppe to queue <strong><em>(alpha)</em></strong>
+3. Catalogue PPE <strong><em>(In development pre-alpha)</em></strong>
+    - build intake_esm catalog to organize history files (<strong><em>(pre-alpha)</em></strong>)
+4. Emulate PPE <strong><em>(Not started, help wanted)</em></strong>
+    - Gaussian Process emulation fill the gaps in the parameter space
+5. Constrain PPE <strong><em>(Not started, help wanted)</em></strong> 
+    - Constrain the PPE against observational constrains </p>
 <p>If you have ideas' and suggestions please have look at <a href="contributing.md">contributing</a>,  feedback or pull requests are very much appreciated.  </p>
 <h2 id="contents">📚 Contents</h2>
 <ul>

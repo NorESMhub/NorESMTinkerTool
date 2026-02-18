@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#base-configuration-of-ppe-runs" class="md-skip">
+        <a href="#configuring-the-basecase-for-the-ppe" class="md-skip">
           Skip to content
         </a>
       
@@ -259,6 +259,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -275,6 +293,47 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#crate_case" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        crate_case
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#env_run-and-env_build" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        env_run and env_build
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -408,6 +467,36 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#crate_case" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        crate_case
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#env_run-and-env_build" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        env_run and env_build
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -423,21 +512,47 @@
 
 
 
-<h1 id="base-configuration-of-ppe-runs">Base Configuration of PPE runs</h1>
-<p>Before a PPE ensemble can be created, a base configuration of NorESM must specified. 
-The arguments to pass in to the <a href="../cli/">CLI</a> and <a href="../usage/">API</a> is generally self explanatory, except for the <code>simulation_setup.ini</code> file which you provide to 'simulation_setup_path' and which have to follow a specific template.</p>
-<p>This file contain extensive information on the base configuration of each of the PPE simulations. Each ensemble of the PPE will share the same configuration. Current setup uses the following sections; <code>create_case</code>, <code>env_run</code>, <code>env_build</code>, <code>ppe_settings</code>, <code>namelist_control</code> and <code>lifeCycleValues</code>.</p>
-<p><strong>create_case</strong> - This section holds key-value pairs used for creating a new case, i.e. what one does when running <code>./cime/scripts/create_newcase &lt;args&gt;</code>. <em>Required</em> keys are <code>cesm_root</code>, <code>res</code>, <code>compset_name</code>, <code>project</code>, <code>mach</code>, <code>walltime</code> and so a valid section will consist of:</p>
+<h1 id="configuring-the-basecase-for-the-ppe">Configuring the BaseCase for the PPE</h1>
+<p>The interface of the API and CLI is generally straightforward in terms of what the arguments mean, besides the <br />
+<code>simulation_setup.ini</code> file which is provided to 'simulation_setup_path' and which have to follow a specific 
+template. The purpose of this file is to describe the BaseCase which will serve as foundation for ensembles in 
+the PPE. 
+Each ensemble of the PPE will share the same configuration. Current setup uses the following sections; 
+<code>create_case</code>, <code>env_run</code>, <code>env_build</code>, <code>ppe_settings</code>, <code>namelist_control</code> and <code>lifeCycleValues</code>.</p>
+<h2 id="crate_case">crate_case</h2>
+<p>This section holds key-value pairs used for creating a new case, i.e. what one does when running <code>./cime/scripts/
+create_newcase &lt;args&gt;</code>. <em>Required</em> keys are <code>cesmroot</code>, <code>res</code>, <code>compset_name</code>, <code>project</code>, <code>mach</code>, <code>walltime</code> and 
+so a valid section will consist of:</p>
 <pre><code class="language-ini">[create_case]
-cesm_root   = &lt;absolute path to NorESM&gt;
+cesmroot   = &lt;absolute path to NorESM&gt;
 res         = &lt;long resolution name or alias&gt;
 compset     = &lt;long compeset name or alias&gt;
 project     = &lt;project name&gt;
 mach        = &lt;machine name&gt;
 walltime    = &lt;wall clock time per case&gt;
 </code></pre>
-<p>It is possible to use additional key-value pairs in this section as well. As key-value pairs are given to <code>Case.create()</code> (where <code>Case</code> is an object defined from <code>NorESM/cime/CIME/case/case.py</code>) available/unused key word arguments include <code>user_mods_dirs</code>, <code>pecount</code>, <code>compiler</code>, <code>mpilib</code>, <code>pesfile</code>, <code>gridfile</code>, <code>multi_driver</code>, <code>ninst</code>, <code>test</code>, <code>queue</code>, <code>output_root</code>, <code>input_dir</code>, <code>workflowid</code>, <code>non_local</code>, <code>extra_machines_dir</code> and <code>case_group</code>. <strong>Note</strong>: Arguments <code>run_unsupported=True</code>, <code>driver="mct"</code>, <code>answer="r"</code> are <em>"hard coded"</em> in <code>tinkertool.setup.case.build_base_case()</code> and is therefor not available. We referr to the CIME source code for proper usage of the available/unused key word arguments.</p>
-<p><strong>env_run</strong> and <strong>env_build</strong> - This section holds key-value pairs used for setting enviromental variables for the model, i.e. what ones does when using <code>./xmlchange</code> in a case directory. <em>Required</em> keys are <code>RUN_TYPE</code>, <code>STOP_OPTION</code>, <code>STOP_N</code> and <code>RUN__STARTDATE</code>. In addition this implementation has explicit handling off <code>GET_REFCASE</code>, <code>RUN_REFCASE</code>, <code>RUN_REFDIR</code>, <code>RUN_REFDATE</code>, <code>REST_OPTION</code>, <code>REST_N</code> for <em>env_run</em> and <code>CALENDAR</code>for <em>env_build</em>. To change <code>CAM_CONFIG_OPTS</code> there are two options; 1. provide a full and valid version of <code>CAM_CONFIG_OPTS</code>, this will overwrite the default in full, or 2. provide <code>cam_onopts</code>, this will add the options to the default. A valid/recomended <em>env_run</em> and <em>env_build</em> section is then:</p>
+<div class="admonition note">
+<p class="admonition-title">Additional key-value pairs</p>
+<p>Other common key-value pairs are given to <code>Case.create()</code> can be specified in addition to the required ones. 
+The available/unused key word arguments include <code>user_mods_dirs</code>, <code>pecount</code>, <code>compiler</code>, <code>mpilib</code>, 
+<code>pesfile</code>, <code>gridfile</code>, <code>multi_driver</code>, <code>ninst</code>, <code>test</code>, <code>queue</code>, <code>output_root</code>, <code>input_dir</code>, <code>workflowid</code>, 
+<code>non_local</code>, <code>extra_machines_dir</code> and <code>case_group</code>. <strong>Note</strong>: Arguments <code>run_unsupported=True</code>, 
+<code>driver="mct"</code>, <code>answer="r"</code> are <em>"hard coded"</em> in <code>tinkertool.setup.case.build_base_case()</code> and is therefor 
+not available. We refer to the CIME source code for proper usage of the available/unused key word arguments.</p>
+</div>
+<h2 id="env_run-and-env_build">env_run and env_build</h2>
+<p>This section holds key-value pairs used for setting environmental variables for the model, i.e. the equivalent 
+functionality to using <code>./xmlchange</code> in a case directory. 
+<em>Required</em> keys are <code>RUN_TYPE</code>, <code>STOP_OPTION</code>, <code>STOP_N</code> and <code>RUN__STARTDATE</code>. 
+In addition this implementation has explicit handling off <code>GET_REFCASE</code>, <code>RUN_REFCASE</code>, <code>RUN_REFDIR</code>, 
+<code>RUN_REFDATE</code>, <code>REST_OPTION</code>, <code>REST_N</code> for <em>env_run</em> and <code>CALENDAR</code>for <em>env_build</em>. </p>
+<div class="admonition note">
+<p class="admonition-title">Changing CAM config</p>
+<p>To change <code>CAM_CONFIG_OPTS</code> there are two options; 1. provide a full and valid version of <code>CAM_CONFIG_OPTS</code>, 
+this will overwrite the default in full, or 2. provide <code>cam_onopts</code>, this will add the options to the 
+default. </p>
+</div>
+<p>Below is an example of valid/recommended <em>env_run</em> and <em>env_build</em> section of <code>simulation_setup.ini</code>:</p>
 <pre><code class="language-ini">[env_run]
 RUN_TYPE        = &lt;type of run&gt;
 STOP_OPTION     = &lt;measure of time to use for STOP_N&gt;
