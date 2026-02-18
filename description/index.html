@@ -9,10 +9,6 @@
       
       
       
-        <link rel="prev" href="..">
-      
-      
-        <link rel="next" href="../configuration/">
       
       
         
@@ -23,7 +19,7 @@
     
     
       
-        <title>Installation - NorESMTinkerTool</title>
+        <title>Repository description - NorESMTinkerTool</title>
       
     
     
@@ -64,7 +60,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#installation" class="md-skip">
+        <a href="#repository-description" class="md-skip">
           Skip to content
         </a>
       
@@ -100,7 +96,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Installation
+              Repository description
             
           </span>
         </div>
@@ -220,19 +216,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
         
   
   
@@ -248,7 +235,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -408,6 +394,47 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#config_examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        config_examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usermods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        usermods
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-directories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other directories:
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -423,40 +450,31 @@
 
 
 
-<h1 id="installation">Installation</h1>
-<ol>
-<li>Setup virtual eviroment.</li>
-</ol>
-<pre><code>python3 -m venv tinkertool &amp;&amp; source tinkertool/bin/activate
-</code></pre>
-<p>Note that the package requires python &gt;=3.10,&lt;3.12 to be active in your enviroment.</p>
-<ol>
-<li>clone repository:</li>
-</ol>
-<pre><code>git clone https://github.com/Ovewh/NorESMTinkerTool.git &amp;&amp; cd NorESMTinkerTool
-</code></pre>
-<ol>
-<li>Install</li>
-</ol>
-<pre><code>pip install  ./
-</code></pre>
-<p>Or, to include optionals:</p>
-<pre><code>pip install  .[optional1, ..., optionalx]
-</code></pre>
-<p>Available optionals:</p>
+<h1 id="repository-description">Repository description</h1>
+<h2 id="config_examples">config_examples</h2>
+<p>The purpose of this directory is provide templates that are general purpose and can be further customized for different types PPE's within a model version. </p>
+<p>Current content:</p>
 <ul>
-<li>sampling</li>
-<li>plotting</li>
+<li>
+<p><code>config_examples/coupled_ppe_parameter_info.ini</code> - .ini files defining parameter ranges, describing their meaning, and the parameter default values. This is taken from one of the ongoing coupled PPE experiments and ranges here are subject to change as the model develops.</p>
+</li>
+<li>
+<p><code>config_examples/default_control_atm.ini</code> and <code>config_examples/default_control_atm.ini</code> - Examples on how the <code>user_nl_</code> files might be specified, made to as closely mimic how user_nl_ files are specified in the standard case directory.</p>
+</li>
+<li>
+<p><code>config_examples/default_simulation_setup.ini</code> - Example of a setup file containing information about compset and changes made via ./xmlchange, e.g., simulation time start date etc. </p>
+</li>
 </ul>
-<p>!!! warning "Optionals"
-    - If the <code>-e</code> flag is added, the package is installed in editable mode, if it is not included changes to configuration files etc will not be available before you re-install the package.
-    - There is no spaces between optional's and ',' character.</p>
-<p>!!! note "Development"
-    For development, <a href="https://python-poetry.org/">poetry</a> is needed to enable installing the docs and development dependencies. After poetry have been installed development dependencies can be installed by the following:</p>
-<pre><code>```
-poetry install --with-all-groups
-```
-</code></pre>
+<h2 id="usermods">usermods</h2>
+<p>The purpose of this directory is keep different "usermods" show casing the different ongoing PPE activities. </p>
+<p>Currently the following PPEs are described under <strong>usermods</strong>:
+- aerosol_ppe</p>
+<h2 id="other-directories">Other directories:</h2>
+<ul>
+<li><strong>docs</strong> Here is the documentation, any suggestions and improvements are very welcome. </li>
+<li><strong>tests</strong>  Testing of the code, testing is continuously being added to ensure that new functionality does not break existing parts of the toolkit.</li>
+<li><strong>tinkertool</strong> The main source code of the tinkertool toolkit.  </li>
+</ul>
 
 
 
