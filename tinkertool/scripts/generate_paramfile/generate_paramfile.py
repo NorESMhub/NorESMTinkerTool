@@ -368,8 +368,14 @@ def generate_one_at_a_time_sample_points(checked_config: ParameterFileConfig) ->
     return sample_points, n_total
 
 
-def generate_paramfile(config: ParameterFileConfig):
-    # Set up logging
+def generate_paramfile(config: ParameterFileConfig) -> None:
+    """
+    Top-level function to generate parameter files based on the provided configuration.
+
+    Arguments:
+    config : ParameterFileConfig
+        The configuration object containing all necessary information for parameter file generation.
+    """
     logging.info("> Starting parameter file generation")
 
     # check if ParameterFileConfig is valid

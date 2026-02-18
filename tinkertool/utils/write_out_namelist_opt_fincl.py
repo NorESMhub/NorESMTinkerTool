@@ -16,6 +16,9 @@ def get_namlist_string(look_for,
                        operation,
                        category_exclude=None,
                        category_include=None):
+    """
+    Create a namelist string for the specified frequency and operation based on the output variables defined in a CSV file.
+    """
     df_output = pd.read_csv(filename_output_vars, index_col=0, header=1)
     df_output = df_output.rename(columns={
         'category': 'category',

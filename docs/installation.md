@@ -1,27 +1,25 @@
 # Installation
+!!! note
+    Note that the package requires python >=3.10,<3.12.
 
-
-1. Setup virtual eviroment.
-
+## Setup the virtual environment.
 ```
-python3 -m venv tinkertool && source tinkertool/bin/activate
+python -m venv tinkertool && source tinkertool/bin/activate
 ```
 
-Note that the package requires python >=3.10,<3.12 to be active in your enviroment.
-
-2. clone repository:
+## clone repository:
 ```
 git clone https://github.com/Ovewh/NorESMTinkerTool.git && cd NorESMTinkerTool
 ```
 
-3. Install
+## Install
 
 ```
 pip install  ./
 ```
 Or, to include optionals:
 ```
-pip install  .[optional1, ..., optionalx]
+pip install  .[optional1, ..., optional]
 ```
 Available optionals:
 
