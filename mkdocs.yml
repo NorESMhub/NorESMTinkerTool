@@ -1,6 +1,8 @@
 site_name: NorESMTinkerTool
 theme:
   name: material
+markdown_extensions:
+  - admonition
 nav:
   - Home: index.md
   - Installation: installation.md
