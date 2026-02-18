@@ -290,18 +290,26 @@ def generate_one_at_a_time_sample_points(checked_config: ParameterFileConfig) ->
     - Subsequent simulations vary one parameter at a time. With its minimum and maximum 
       value for each parameter. Parameters that are not being varied retain their default value.
     """
-    n_total = len(checked_config.nmb_sim_dim)
-    nparams = len(checked_config.params)
     sample_points = {}
 
+    interdependent_params = [param for param in checked_config.params if safe_get_param_value(checked_config.param_ranges[param], "interdependent_with") is not None]
+    params = [param for param in checked_config.params if param not in interdependent_params]
+    param_paramindx_map = {param: indx for indx, param in enumerate(params)}
+    nparams = len(params)
+    n_total = nparams*2 
     # Determine how many variation sims per parameter
+    
     n_variations_base = (n_total - 1) // nparams
     remainder = (n_total - 1) % nparams
     variations_per_param = 2
 
     # Prepare matrix filled with defaults
-    values = np.zeros((n_total, nparams), dtype=float)
+    if checked_config.exclude_default:
+        values = np.zeros((n_total, len(checked_config.params)), dtype=float)
+    else: 
+        values = np.zeros((n_total+1, len(checked_config.params)), dtype=float)
 
+    # So here we set the 
     for j, param in enumerate(checked_config.params):
         pdata = checked_config.param_ranges[param]
         default_val = float(pdata.get("default", None))
@@ -330,11 +338,24 @@ def generate_one_at_a_time_sample_points(checked_config: ParameterFileConfig) ->
         n_var = variations_per_param
 
         var_vals = np.linspace(minv, maxv, n_var)
+        inverse_scaling = False
+        param_to_index_with = param
+        if param not in param_paramindx_map: # then it is interdependent
+            assert param in interdependent_params, f"Parameter '{param}' not found in aram_paramindx_map or interdependent_params."
+            param_to_index_with = safe_get_param_value(pdata, "interdependent_with")
+            if param_to_index_with.startswith("-"):
+                param_to_index_with = param_to_index_with[1:]  # remove the "-" character
+                logging.debug(f"Parameter '{param}' is interdependent with '{param_to_index_with}' using inverse scaling.")
+                # Inverse scaling: we will later do maxv - scaled_value + minv
+                # to flip the scaling
+                # This is handled in scale_values function by passing minv and maxv swapped
+                minv, maxv = maxv, minv
+                inverse_scaling = True
+
+        i_use = param_paramindx_map[param_to_index_with]
         for k in range(n_var):
-            if idx >= n_total:
-                break
-            values[idx, j] = var_vals[k]
-            idx += 1
+            values[i_use+idx, j] = var_vals[k]
+        
 
     # Build sample_points dict with rounding
     for j, param in enumerate(checked_config.params):
@@ -344,7 +365,7 @@ def generate_one_at_a_time_sample_points(checked_config: ParameterFileConfig) ->
             out_array = np.around(out_array, int(pdata["ndigits"]))
         sample_points[param] = (["nmb_sim"], out_array)
 
-    return sample_points
+    return sample_points, n_total
 
 
 def generate_paramfile(config: ParameterFileConfig):
@@ -357,7 +378,14 @@ def generate_paramfile(config: ParameterFileConfig):
     log_info_detailed('tinkertool_log', f">> Generating with config: {checked_config.describe(return_string=True)}") # type: ignore
     n_total = len(checked_config.nmb_sim_dim)
     if checked_config.method == 'one_at_a_time' or checked_config.method == 'oat':
-        sample_points = generate_one_at_a_time_sample_points(checked_config)
+        sample_points, n_total = generate_one_at_a_time_sample_points(checked_config)
+        if n_total != len(checked_config.nmb_sim_dim):
+            if checked_config.exclude_default:
+                nmb_sim_dim = np.arange(1, n_total + 1)
+            else:
+                nmb_sim_dim = np.arange(0, n_total + 1)
+        else:
+            nmb_sim_dim = checked_config.nmb_sim_dim
     elif n_total <= 1:
         for param in checked_config.params:
             pdata = checked_config.param_ranges[param]
@@ -365,6 +393,7 @@ def generate_paramfile(config: ParameterFileConfig):
             sample_points[param] = (["nmb_sim"], out_array)
     elif checked_config.method == 'latin_hypercube' or checked_config.method == 'lh':
         sample_points = generate_latin_hypercube_sample_points(checked_config)
+        nmb_sim_dim = checked_config.nmb_sim_dim
     else:
         raise ValueError(f"Invalid sampling method '{checked_config.method}'.")
 
@@ -379,11 +408,11 @@ def generate_paramfile(config: ParameterFileConfig):
     logging.debug("Creating xarray dataset")
     raw_ds = xr.Dataset(
         data_vars = sample_points,
-        coords={'nmb_sim':checked_config.nmb_sim_dim}
+        coords={'nmb_sim': nmb_sim_dim}
     )
     out_ds = xr.Dataset(
         data_vars = sample_points_with_files,
-        coords={'nmb_sim':checked_config.nmb_sim_dim}
+        coords={'nmb_sim': nmb_sim_dim}
     )
 
     for ds in [raw_ds, out_ds]:

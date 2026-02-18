@@ -139,7 +139,7 @@ class ParameterFileConfig(BaseConfig):
         # avoid_scramble
         self.scramble = not self.avoid_scramble
         if self.method in ['one_at_a_time', 'oat']:
-            self.nmb_sim = len(self.params)*2
+            self.nmb_sim = len(self.params)*2 # this get update if there interdependet parameters
             self.scramble = False
         # exclude_default
         if self.exclude_default:
