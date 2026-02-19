@@ -674,7 +674,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples.md" class="md-nav__link">
+      <a href="../examples/" class="md-nav__link">
         
   
   
@@ -791,8 +791,8 @@
 </ul>
 <h2 id="prerequisites">📣 Prerequisites</h2>
 <p>Before the package can be used, the path to the NorESM directory must be set, by specifying the <code>CESMROOT</code> enviromental variable, such that it can find the required CIME libraries.</p>
-<pre><code class="language-bash">export CESMROOT=/path/to/NorESM
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">CESMROOT</span><span class="o">=</span>/path/to/NorESM
+</code></pre></div>
 <h2 id="generate-the-ppe-parameter-file">Generate the PPE parameter file</h2>
 <p>To generate the parameter file for the PPE we use <code>generate_paramfile</code> program. If you would like to use the CLI have a look under the CLI documentation. Below we will describe how to use API in a stand alone python script.</p>
 <div class="admonition note prerequisites">
@@ -812,86 +812,89 @@ stored as a variable in the dataset and is scaled according to its
 specified range and sampling method. The ranges as described in the
 <code>default_config/default_param_ranges.ini</code> file are used to distribute
 parameter values between its minimum and maximum bounds.</p>
-<pre><code class="language-python">from pathlib import Path
-from tinkertool.scripts.generate_paramfile.config import ParameterFileConfig
-from tinkertool.scripts.generate_paramfile.generate_paramfile import generate_paramfile
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tinkertool.scripts.generate_paramfile.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParameterFileConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tinkertool.scripts.generate_paramfile.generate_paramfile</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_paramfile</span>
 
-parmfile_config = ParameterFileConfig(
-  param_ranges_inpath=Path(&lt;param_ranges.ini&gt;).resolve(),
-  param_sample_outpath=Path(&lt;param_samples.nc&gt;).resolve(),
-  chem_mech_file=Path(&lt;NorESMTinkerTool/default_config/default_chem_mech.in&gt;).resolve(),
-  tinkertool_output_dir=Path(&lt;NorESMTinkerTool/output&gt;).resolve(),
-  nmb_sim=30,
-  optimization=None,
-  avoid_scramble=False,
-  params=None,
-  assumed_esm_component='cam',
-  exclude_default=False,
-  verbose=0,
-  log_file=None,
-  log_mode='w'
-)
-</code></pre>
-<p>Common for both the CLI and scripting is that you will have to provide the same arguments. See the <code>generate_paramfile --help</code> print above for details. For <code>param_ranges_inpath</code> the expected format used by the script is:</p>
-<pre><code class="language-ini">[parameter_name]
-description = &lt;short description of the parameter&gt;
-justification = &lt;justification for sampling range&gt;
-min = &lt;lower bound for sampling&gt;
-max = &lt;upper bound for sampling&gt;
-default = &lt;default value for the parameter in the model version&gt;
-ndigits = &lt;number of digits to use in sampling, i.e. sampling resolution&gt;
-sampling = &lt;linear/log&gt; (linear or log_10 scale sampling)
-format_to_file_method = &lt;f-string, if you want to use f-string to specify parameter values&gt;
-esm_component = &lt;Which component of the model this parameter belongs to e.g. CAM&gt;
-</code></pre>
+<span class="n">parmfile_config</span> <span class="o">=</span> <span class="n">ParameterFileConfig</span><span class="p">(</span>
+  <span class="n">param_ranges_inpath</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="o">&lt;</span><span class="n">param_ranges</span><span class="o">.</span><span class="n">ini</span><span class="o">&gt;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(),</span>
+  <span class="n">param_sample_outpath</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="o">&lt;</span><span class="n">param_samples</span><span class="o">.</span><span class="n">nc</span><span class="o">&gt;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(),</span>
+  <span class="n">chem_mech_file</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="o">&lt;</span><span class="n">NorESMTinkerTool</span><span class="o">/</span><span class="n">default_config</span><span class="o">/</span><span class="n">default_chem_mech</span><span class="o">.</span><span class="ow">in</span><span class="o">&gt;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(),</span>
+  <span class="n">tinkertool_output_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="o">&lt;</span><span class="n">NorESMTinkerTool</span><span class="o">/</span><span class="n">output</span><span class="o">&gt;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(),</span>
+  <span class="n">nmb_sim</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+  <span class="n">optimization</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+  <span class="n">avoid_scramble</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+  <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+  <span class="n">assumed_esm_component</span><span class="o">=</span><span class="s1">&#39;cam&#39;</span><span class="p">,</span>
+  <span class="n">exclude_default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+  <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+  <span class="n">log_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+  <span class="n">log_mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>Common for both the CLI and scripting is that you will have to provide the same arguments. See the <code>generate_paramfile --help</code> print above for details. For <code>param_ranges_inpath</code> the expected format used by the script is:
+<div class="highlight"><pre><span></span><code><span class="k">[parameter_name]</span>
+<span class="na">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&lt;short description of the parameter&gt;</span>
+<span class="na">justification</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&lt;justification for sampling range&gt;</span>
+<span class="na">min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&lt;lower bound for sampling&gt;</span>
+<span class="na">max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&lt;upper bound for sampling&gt;</span>
+<span class="na">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&lt;default value for the parameter in the model version&gt;</span>
+<span class="na">ndigits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&lt;number of digits to use in sampling, i.e. sampling resolution&gt;</span>
+<span class="na">sampling</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&lt;linear/log&gt; (linear or log_10 scale sampling)</span>
+<span class="na">format_to_file_method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&lt;f-string, if you want to use f-string to specify parameter values&gt;</span>
+<span class="na">esm_component</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&lt;Which component of the model this parameter belongs to e.g. CAM&gt;</span>
+</code></pre></div></p>
 <h2 id="create-the-ppe">Create the PPE</h2>
-<p>The main function only takes a CreatePPEConfig object as input. Basic usage
-from pathlib import Path
-from tinkertool.scripts.crate_ppe.config import CreatePPEConfig
-from tinkertool.scripts.create_ppe.create_ppe import create_ppe</p>
-<h1 id="describe-the-expected-input-to-ppeconfig">describe the expected input to PPEConfig</h1>
-<p>CreatePPEConfig.describe()</p>
-<p>ppe_config = CreatePPEConfig(
-  simulation_setup_path = Path(<simulation_setup.ini>).resolve(),
-  build_base_only       = False,
-  build_only            = False,
-  keepexe               = False,
-  overwrite             = False,
-  verbose               = 0,
-  log_file              = Path(<wanted_logfile.out>).resolve(),
-  log_mode              = 'w'
-)</p>
-<p>create_ppe(ppe_config)</p>
-<pre><code>alternatively if you only want to either a) build or b) submit cases use
-```python
-from pathlib import Path
-from tinkertool.scripts.crate_ppe.config import BuildPPEConfig, SubmitPPEConfig
-from tinkertool.scripts.create_ppe.create_ppe import build_ppe, submit_ppe
+<p><div class="highlight"><pre><span></span><code><span class="n">The</span> <span class="n">main</span> <span class="n">function</span> <span class="n">only</span> <span class="n">takes</span> <span class="n">a</span> <span class="n">CreatePPEConfig</span> <span class="nb">object</span> <span class="k">as</span> <span class="nb">input</span><span class="o">.</span> <span class="n">Basic</span> <span class="n">usage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tinkertool.scripts.crate_ppe.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">CreatePPEConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tinkertool.scripts.create_ppe.create_ppe</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_ppe</span>
 
-# a) Build only
-BuildPPEConfig.help()
-buildppe_config = BuildPPEConfig(
-  simulation_setup_path = Path(&lt;simulation_setup.ini&gt;).resolve(),
-  build_base_only       = False,
-  keepexe               = False,
-  overwrite             = False,
-  verbose               = 0,
-  log_file              = Path(&lt;wanted_logfile.out&gt;).resolve(),
-  log_mode              = 'w'
-)
-build_ppe(buildppe_config)
+<span class="c1"># describe the expected input to PPEConfig</span>
 
-# b) Sumbit only
-SubmitPPEConfig.help()
-submitppe_config = SubmitPPEConfig(
-  cases                 = list(Path(&lt;case1&gt;).resolve(), ..., Path(&lt;caseX&gt;).resolve())
-  verbose               = 0,
-  log_file              = Path(&lt;wanted_logfile.out&gt;).resolve(),
-  log_mode              = 'w'
-)
+<span class="n">CreatePPEConfig</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
 
-submit_ppe(submitppe_config)
-</code></pre>
+<span class="n">ppe_config</span> <span class="o">=</span> <span class="n">CreatePPEConfig</span><span class="p">(</span>
+  <span class="n">simulation_setup_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="o">&lt;</span><span class="n">simulation_setup</span><span class="o">.</span><span class="n">ini</span><span class="o">&gt;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(),</span>
+  <span class="n">build_base_only</span>       <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+  <span class="n">build_only</span>            <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+  <span class="n">keepexe</span>               <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+  <span class="n">overwrite</span>             <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+  <span class="n">verbose</span>               <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="n">log_file</span>              <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="o">&lt;</span><span class="n">wanted_logfile</span><span class="o">.</span><span class="n">out</span><span class="o">&gt;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(),</span>
+  <span class="n">log_mode</span>              <span class="o">=</span> <span class="s1">&#39;w&#39;</span>
+<span class="p">)</span>
+<span class="n">create_ppe</span><span class="p">(</span><span class="n">ppe_config</span><span class="p">)</span>
+</code></pre></div>
+Alternatively if you only want to either a) build or b) submit cases use</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tinkertool.scripts.crate_ppe.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">BuildPPEConfig</span><span class="p">,</span> <span class="n">SubmitPPEConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tinkertool.scripts.create_ppe.create_ppe</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_ppe</span><span class="p">,</span> <span class="n">submit_ppe</span>
+
+<span class="c1"># a) Build only</span>
+<span class="n">BuildPPEConfig</span><span class="o">.</span><span class="n">help</span><span class="p">()</span>
+<span class="n">buildppe_config</span> <span class="o">=</span> <span class="n">BuildPPEConfig</span><span class="p">(</span>
+  <span class="n">simulation_setup_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="o">&lt;</span><span class="n">simulation_setup</span><span class="o">.</span><span class="n">ini</span><span class="o">&gt;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(),</span>
+  <span class="n">build_base_only</span>       <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+  <span class="n">keepexe</span>               <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+  <span class="n">overwrite</span>             <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+  <span class="n">verbose</span>               <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="n">log_file</span>              <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="o">&lt;</span><span class="n">wanted_logfile</span><span class="o">.</span><span class="n">out</span><span class="o">&gt;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(),</span>
+  <span class="n">log_mode</span>              <span class="o">=</span> <span class="s1">&#39;w&#39;</span>
+<span class="p">)</span>
+<span class="n">build_ppe</span><span class="p">(</span><span class="n">buildppe_config</span><span class="p">)</span>
+
+<span class="c1"># b) Sumbit only</span>
+<span class="n">SubmitPPEConfig</span><span class="o">.</span><span class="n">help</span><span class="p">()</span>
+<span class="n">submitppe_config</span> <span class="o">=</span> <span class="n">SubmitPPEConfig</span><span class="p">(</span>
+  <span class="n">cases</span>                 <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="o">&lt;</span><span class="n">case1</span><span class="o">&gt;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(),</span> <span class="o">...</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="o">&lt;</span><span class="n">caseX</span><span class="o">&gt;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">())</span>
+  <span class="n">verbose</span>               <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="n">log_file</span>              <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="o">&lt;</span><span class="n">wanted_logfile</span><span class="o">.</span><span class="n">out</span><span class="o">&gt;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(),</span>
+  <span class="n">log_mode</span>              <span class="o">=</span> <span class="s1">&#39;w&#39;</span>
+<span class="p">)</span>
+
+<span class="n">submit_ppe</span><span class="p">(</span><span class="n">submitppe_config</span><span class="p">)</span>
+</code></pre></div>
 <p>The <code>simulation_setup.ini</code> file is described in detail <a href="../configuration/">configuration</a>.</p>
 
 
@@ -942,7 +945,7 @@ submit_ppe(submitppe_config)
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
