@@ -9,8 +9,6 @@
       
       
       
-        <link rel="prev" href="../usage/">
-      
       
       
         
@@ -21,7 +19,7 @@
     
     
       
-        <title>API - NorESMTinkerTool</title>
+        <title>Contribution Guidelines - NorESMTinkerTool</title>
       
     
     
@@ -44,6 +42,8 @@
       
     
     
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -60,6 +60,11 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
+      
+        
+        <a href="#contribution-guidelines" class="md-skip">
+          Skip to content
+        </a>
       
     </div>
     <div data-md-component="announce">
@@ -93,7 +98,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              API
+              Contribution Guidelines
             
           </span>
         </div>
@@ -321,18 +326,22 @@
       
   
   
+  
+  
     
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
       
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -346,7 +355,218 @@
   
   
 
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/generate_paramfile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generate Parameter File
+  
+
+    
+  </span>
+  
+  
+
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/create_ppe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Create PPE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PPE setup interface
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/config_utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Config utilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    General utilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/sampling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sampling utilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/aerosol_ppe_utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Aerosol PPE utility functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -396,6 +616,49 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-contribute" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to Contribute
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-of-conduct" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code of Conduct
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        License
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -412,9 +675,26 @@
 
 
 
-  <h1>API</h1>
-
-
+<h1 id="contribution-guidelines">Contribution Guidelines</h1>
+<p>Thank you for considering contributing to the NorESM TinkerTool project! We welcome contributions from the community to help improve the tool and make it more useful for everyone. Below are some guidelines to help you get started.</p>
+<h2 id="how-to-contribute">How to Contribute</h2>
+<ol>
+<li><strong>Fork the Repository</strong>: Start by forking the repository to your own GitHub account.</li>
+<li><strong>Create a Branch</strong>: Create a new branch for your feature or bug fix. Use a descriptive name for your branch, such as <code>feature/new-feature</code> or <code>bugfix/fix-issue</code>.</li>
+<li><strong>Make Your Changes</strong>: Make the necessary changes to the codebase. Ensure that<ul>
+<li>Your code follows the existing style and conventions.</li>
+<li>You have added tests for any new features or bug fixes.</li>
+</ul>
+</li>
+<li><strong>Commit Your Changes</strong>: Commit your changes with a clear and concise commit message that describes what you have done.</li>
+<li><strong>Push to Your Fork</strong>: Push your changes to your forked repository on GitHub.</li>
+<li><strong>Create a Pull Request</strong>: Open a pull request from your branch to the main repository. Provide a detailed description of your changes and why they are necessary.</li>
+</ol>
+<p>Suggestions for improvement are also welcome! If you have an idea for a new feature or an improvement to an existing one, feel free to open an issue to discuss it. Feedback helps understand which features are most important to users and can guide the development of the tool.</p>
+<h2 id="code-of-conduct">Code of Conduct</h2>
+<p>We ask that all contributors adhere to treat each other with respect and kindness. DO NO HARM. </p>
+<h2 id="license">License</h2>
+<p>By contributing to this project, you agree that your contributions will be licensed under the same license as the project, which is <a href="LICENSE">MIT License</a>.</p>
 
 
 

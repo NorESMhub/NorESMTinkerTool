@@ -1,0 +1,3525 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../config_utils/">
+      
+      
+        <link rel="next" href="../sampling/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>General utilities - NorESMTinkerTool</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#tinkertool.utils.read_files" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="NorESMTinkerTool" class="md-header__button md-logo" aria-label="NorESMTinkerTool" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            NorESMTinkerTool
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              General utilities
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="NorESMTinkerTool" class="md-nav__button md-logo" aria-label="NorESMTinkerTool" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    NorESMTinkerTool
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../generate_paramfile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generate Parameter File
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../create_ppe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Create PPE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PPE setup interface
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config_utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Config utilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    General utilities
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    General utilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.read_files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.read_files.read_config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_config
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="read_config">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.read_files.read_config--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.read_files.read_config--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.read_files.safe_get_param_value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        safe_get_param_value
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="safe_get_param_value">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.read_files.safe_get_param_value--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.read_files.safe_get_param_value--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        make_land_parameterfiles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.check_if_ctsm_param_is_perturbed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check_if_ctsm_param_is_perturbed
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="check_if_ctsm_param_is_perturbed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.check_if_ctsm_param_is_perturbed--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.check_if_ctsm_param_is_perturbed--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.check_if_fates_param_is_perturbed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check_if_fates_param_is_perturbed
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="check_if_fates_param_is_perturbed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.check_if_fates_param_is_perturbed--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.check_if_fates_param_is_perturbed--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.make_new_ctsm_pamfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        make_new_ctsm_pamfile
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="make_new_ctsm_pamfile">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.make_new_ctsm_pamfile--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.make_new_fates_pamfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        make_new_fates_pamfile
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="make_new_fates_pamfile">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.make_new_fates_pamfile--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.make_new_fates_pamfile--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.make_new_fates_pamfile--raises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Raises
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_chem_in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        make_chem_in
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_chem_in.generate_chem_in_ppe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        generate_chem_in_ppe
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="generate_chem_in_ppe">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_chem_in.generate_chem_in_ppe--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_chem_in.generate_chem_in_ppe--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_chem_in.check_if_chem_mech_is_perturbed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check_if_chem_mech_is_perturbed
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="check_if_chem_mech_is_perturbed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_chem_in.check_if_chem_mech_is_perturbed--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_chem_in.check_if_chem_mech_is_perturbed--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        custom_logging
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.patch_info_detailed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        patch_info_detailed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.log_info_detailed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        log_info_detailed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.setup_logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setup_logging
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="setup_logging">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.setup_logging--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.cime_logger" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cime_logger
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="cime_logger">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.cime_logger--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.cime_logger--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.cime_logger--examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.cime_logger--logs-to-both-stdout-and-outputcimelog-at-info-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logs to both stdout and 'output.CIME.log' at INFO level.
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.cime_logger--logs-only-to-stdout-at-warning-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logs only to stdout at WARNING level.
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.custom_logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        custom_logging
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="custom_logging">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.custom_logging--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.type_check_decorator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        type_check_decorator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.type_check_decorator.type_check_decorator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        type_check_decorator
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="type_check_decorator">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.type_check_decorator.type_check_decorator--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sampling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sampling utilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aerosol_ppe_utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Aerosol PPE utility functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.read_files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.read_files.read_config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_config
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="read_config">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.read_files.read_config--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.read_files.read_config--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.read_files.safe_get_param_value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        safe_get_param_value
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="safe_get_param_value">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.read_files.safe_get_param_value--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.read_files.safe_get_param_value--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        make_land_parameterfiles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.check_if_ctsm_param_is_perturbed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check_if_ctsm_param_is_perturbed
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="check_if_ctsm_param_is_perturbed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.check_if_ctsm_param_is_perturbed--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.check_if_ctsm_param_is_perturbed--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.check_if_fates_param_is_perturbed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check_if_fates_param_is_perturbed
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="check_if_fates_param_is_perturbed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.check_if_fates_param_is_perturbed--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.check_if_fates_param_is_perturbed--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.make_new_ctsm_pamfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        make_new_ctsm_pamfile
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="make_new_ctsm_pamfile">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.make_new_ctsm_pamfile--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.make_new_fates_pamfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        make_new_fates_pamfile
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="make_new_fates_pamfile">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.make_new_fates_pamfile--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.make_new_fates_pamfile--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_land_parameterfiles.make_new_fates_pamfile--raises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Raises
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_chem_in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        make_chem_in
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_chem_in.generate_chem_in_ppe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        generate_chem_in_ppe
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="generate_chem_in_ppe">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_chem_in.generate_chem_in_ppe--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_chem_in.generate_chem_in_ppe--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_chem_in.check_if_chem_mech_is_perturbed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check_if_chem_mech_is_perturbed
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="check_if_chem_mech_is_perturbed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_chem_in.check_if_chem_mech_is_perturbed--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.make_chem_in.check_if_chem_mech_is_perturbed--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        custom_logging
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.patch_info_detailed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        patch_info_detailed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.log_info_detailed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        log_info_detailed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.setup_logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        setup_logging
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="setup_logging">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.setup_logging--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.cime_logger" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cime_logger
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="cime_logger">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.cime_logger--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.cime_logger--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.cime_logger--examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.cime_logger--logs-to-both-stdout-and-outputcimelog-at-info-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logs to both stdout and 'output.CIME.log' at INFO level.
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.cime_logger--logs-only-to-stdout-at-warning-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logs only to stdout at WARNING level.
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.custom_logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        custom_logging
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="custom_logging">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.custom_logging.custom_logging--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.type_check_decorator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        type_check_decorator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.type_check_decorator.type_check_decorator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        type_check_decorator
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="type_check_decorator">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.type_check_decorator.type_check_decorator--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>General utilities</h1>
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="tinkertool.utils.read_files"></a>
+    <div class="doc doc-contents first">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="tinkertool.utils.read_files.read_config" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">read_config</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">read_config</span><span class="p">(</span><span class="n">config_file</span><span class="p">:</span> <span class="n"><span title="typing.Union">Union</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="pathlib.Path">Path</span></span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n"><span title="configparser.ConfigParser">ConfigParser</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Read a .ini config file and return a ConfigParser object.</p>
+<h4 id="tinkertool.utils.read_files.read_config--parameters">Parameters</h4>
+<p>config_file : str, Path
+    Absolute path to the config file to be read. The config file should be in the .ini format [1].</p>
+<h4 id="tinkertool.utils.read_files.read_config--returns">Returns</h4>
+<p>configparser.ConfigParser
+    A ConfigParser object containing the configuration parameters.
+    To access the parameters, use the <code>config.get(section, option)</code> method,
+    where <code>section</code> is the name of the section in the config file and <code>option</code>
+    is the name of the option within that section.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/utils/read_files.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">read_config</span><span class="p">(</span>
+    <span class="n">config_file</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read a .ini config file and return a ConfigParser object.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config_file : str, Path</span>
+<span class="sd">        Absolute path to the config file to be read. The config file should be in the .ini format [1].</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    configparser.ConfigParser</span>
+<span class="sd">        A ConfigParser object containing the configuration parameters.</span>
+<span class="sd">        To access the parameters, use the `config.get(section, option)` method,</span>
+<span class="sd">        where `section` is the name of the section in the config file and `option`</span>
+<span class="sd">        is the name of the option within that section.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">config_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">optionxform</span> <span class="o">=</span> <span class="nb">str</span> <span class="c1"># Preserve case sensitivity of option names</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="n">config</span><span class="o">.</span><span class="n">input_file</span> <span class="o">=</span> <span class="n">config_file</span>
+    <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="tinkertool.utils.read_files.safe_get_param_value" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">safe_get_param_value</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">safe_get_param_value</span><span class="p">(</span>
+    <span class="n">config_section</span><span class="p">,</span> <span class="n">option</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="typing.Any">Any</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Get a parameter value from config,
+converting 'nan', 'none', 'null', '' strings to None or fallback.</p>
+<h4 id="tinkertool.utils.read_files.safe_get_param_value--parameters">Parameters</h4>
+<p>config_section : configparser.SectionProxy
+    The config section to read from
+option : str
+    The option name to get
+fallback : any, optional
+    Value to return if option doesn't exist or is nan/none/null/empty string, by default None</p>
+<h4 id="tinkertool.utils.read_files.safe_get_param_value--returns">Returns</h4>
+<p>Any
+    The parameter value, or None if it was a nan/none/null/empty string</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/utils/read_files.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">safe_get_param_value</span><span class="p">(</span>
+    <span class="n">config_section</span><span class="p">,</span>
+    <span class="n">option</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">fallback</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a parameter value from config,</span>
+<span class="sd">    converting &#39;nan&#39;, &#39;none&#39;, &#39;null&#39;, &#39;&#39; strings to None or fallback.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config_section : configparser.SectionProxy</span>
+<span class="sd">        The config section to read from</span>
+<span class="sd">    option : str</span>
+<span class="sd">        The option name to get</span>
+<span class="sd">    fallback : any, optional</span>
+<span class="sd">        Value to return if option doesn&#39;t exist or is nan/none/null/empty string, by default None</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Any</span>
+<span class="sd">        The parameter value, or None if it was a nan/none/null/empty string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># If the option is absent, config_section.get should return fallback.</span>
+        <span class="c1"># Use get with fallback=None to detect &quot;missing&quot; vs &quot;present-but-empty&quot;.</span>
+        <span class="n">raw</span> <span class="o">=</span> <span class="n">config_section</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="c1"># If option is missing, return the caller&#39;s fallback unchanged.</span>
+        <span class="k">if</span> <span class="n">raw</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">fallback</span>
+
+        <span class="c1"># If value is a string sentinel meaning &quot;no value&quot;, return None.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">raw</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="n">raw</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;null&quot;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">fallback</span>
+
+        <span class="c1"># Otherwise return the raw (present) value.</span>
+        <span class="k">return</span> <span class="n">raw</span>
+    <span class="k">except</span> <span class="p">(</span><span class="n">configparser</span><span class="o">.</span><span class="n">NoOptionError</span><span class="p">,</span> <span class="n">configparser</span><span class="o">.</span><span class="n">NoSectionError</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">fallback</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="tinkertool.utils.make_land_parameterfiles"></a>
+    <div class="doc doc-contents first">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="tinkertool.utils.make_land_parameterfiles.check_if_ctsm_param_is_perturbed" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">check_if_ctsm_param_is_perturbed</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">check_if_ctsm_param_is_perturbed</span><span class="p">(</span>
+    <span class="n">param_ranges_inpath</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="pathlib.Path">Path</span></span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="bool">bool</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Check if any CTSM parameters are perturbed in the parameter ranges file.</p>
+<h4 id="tinkertool.utils.make_land_parameterfiles.check_if_ctsm_param_is_perturbed--parameters">Parameters</h4>
+<p>param_ranges_inpath : str | Path
+    The path to the parameter ranges file.</p>
+<h4 id="tinkertool.utils.make_land_parameterfiles.check_if_ctsm_param_is_perturbed--returns">Returns</h4>
+<p>bool
+    True if any CTSM parameters are perturbed, False otherwise.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/utils/make_land_parameterfiles.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">check_if_ctsm_param_is_perturbed</span><span class="p">(</span>
+    <span class="n">param_ranges_inpath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if any CTSM parameters are perturbed in the parameter ranges file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param_ranges_inpath : str | Path</span>
+<span class="sd">        The path to the parameter ranges file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if any CTSM parameters are perturbed, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ctsm_param_flag</span> <span class="o">=</span> <span class="s2">&quot;CTSM_param_file&quot;</span>
+    <span class="k">return</span> <span class="n">_check_keyword_in_stream</span><span class="p">(</span><span class="n">param_ranges_inpath</span><span class="p">,</span> <span class="n">ctsm_param_flag</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="tinkertool.utils.make_land_parameterfiles.check_if_fates_param_is_perturbed" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">check_if_fates_param_is_perturbed</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">check_if_fates_param_is_perturbed</span><span class="p">(</span>
+    <span class="n">param_ranges_inpath</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="pathlib.Path">Path</span></span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="bool">bool</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Check if any FATES parameters are perturbed in the parameter ranges file.</p>
+<h4 id="tinkertool.utils.make_land_parameterfiles.check_if_fates_param_is_perturbed--parameters">Parameters</h4>
+<p>param_ranges_inpath : str | Path
+    The path to the parameter ranges file.</p>
+<h4 id="tinkertool.utils.make_land_parameterfiles.check_if_fates_param_is_perturbed--returns">Returns</h4>
+<p>bool
+    True if any FATES parameters are perturbed, False otherwise.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/utils/make_land_parameterfiles.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">check_if_fates_param_is_perturbed</span><span class="p">(</span>
+    <span class="n">param_ranges_inpath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if any FATES parameters are perturbed in the parameter ranges file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param_ranges_inpath : str | Path</span>
+<span class="sd">        The path to the parameter ranges file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if any FATES parameters are perturbed, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fates_param_flag</span> <span class="o">=</span> <span class="s2">&quot;FATES_param_file&quot;</span>
+    <span class="k">return</span> <span class="n">_check_keyword_in_file</span><span class="p">(</span><span class="n">param_ranges_inpath</span><span class="p">,</span> <span class="n">fates_param_flag</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="tinkertool.utils.make_land_parameterfiles.make_new_ctsm_pamfile" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">make_new_ctsm_pamfile</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">make_new_ctsm_pamfile</span><span class="p">(</span>
+    <span class="n">pam_change_dict</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">,</span>
+    <span class="n">orig_pamfile</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="pathlib.Path">Path</span></span><span class="p">,</span>
+    <span class="n">file_dump</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="pathlib.Path">Path</span></span> <span class="o">=</span> <span class="s2">&quot;ctsm_pamfile.nc&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="pathlib.Path">Path</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Make a new ctsm pamfile for the PPE, by changing parameters as specified in pam_change_dict.</p>
+<h4 id="tinkertool.utils.make_land_parameterfiles.make_new_ctsm_pamfile--parameters">Parameters</h4>
+<p>pam_change_dict : dict
+    Dictionary with parameter names as keys and new values or scaling
+    factors as values. The pam_change_dict has parameter should have
+    name of parameter to change as key, and change value as value.
+    For scalar parameters this is assumed to be the new value of
+    the parameter. For vector parameters the value is assumed to
+    be a scaling value to scale the value in the original file with
+orig_pamfile : str or Path
+    Path to the original CTSM parameter file to be modified.
+file_dump : str or Path, optional
+    Path to save the new CTSM parameter file, by default "ctsm_pamfile.nc".</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/utils/make_land_parameterfiles.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">make_new_ctsm_pamfile</span><span class="p">(</span>
+    <span class="n">pam_change_dict</span><span class="p">:</span>    <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">orig_pamfile</span><span class="p">:</span>       <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">file_dump</span><span class="p">:</span>          <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">=</span> <span class="s2">&quot;ctsm_pamfile.nc&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Make a new ctsm pamfile for the PPE, by changing parameters as specified in pam_change_dict.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pam_change_dict : dict</span>
+<span class="sd">        Dictionary with parameter names as keys and new values or scaling</span>
+<span class="sd">        factors as values. The pam_change_dict has parameter should have</span>
+<span class="sd">        name of parameter to change as key, and change value as value.</span>
+<span class="sd">        For scalar parameters this is assumed to be the new value of</span>
+<span class="sd">        the parameter. For vector parameters the value is assumed to</span>
+<span class="sd">        be a scaling value to scale the value in the original file with</span>
+<span class="sd">    orig_pamfile : str or Path</span>
+<span class="sd">        Path to the original CTSM parameter file to be modified.</span>
+<span class="sd">    file_dump : str or Path, optional</span>
+<span class="sd">        Path to save the new CTSM parameter file, by default &quot;ctsm_pamfile.nc&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">Path</span><span class="p">(</span><span class="n">orig_pamfile</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Original CTSM parameter file </span><span class="si">{</span><span class="n">orig_pamfile</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Original CTSM parameter file </span><span class="si">{</span><span class="n">orig_pamfile</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
+
+    <span class="n">ctsm_orig</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">orig_pamfile</span><span class="p">,</span> <span class="n">decode_cf</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CTSM parameter file keys: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">ctsm_orig</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">pam</span><span class="p">,</span> <span class="n">new_value</span> <span class="ow">in</span> <span class="n">pam_change_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing parameter: </span><span class="si">{</span><span class="n">pam</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pam</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ctsm_orig</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameter </span><span class="si">{</span><span class="n">pam</span><span class="si">}</span><span class="s2"> not found in CTSM file </span><span class="si">{</span><span class="n">orig_pamfile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameter </span><span class="si">{</span><span class="n">pam</span><span class="si">}</span><span class="s2"> shape: </span><span class="si">{</span><span class="n">ctsm_orig</span><span class="p">[</span><span class="n">pam</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameter </span><span class="si">{</span><span class="n">pam</span><span class="si">}</span><span class="s2"> original value: </span><span class="si">{</span><span class="n">ctsm_orig</span><span class="p">[</span><span class="n">pam</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ctsm_orig</span><span class="p">[</span><span class="n">pam</span><span class="p">],</span> <span class="n">abc</span><span class="o">.</span><span class="n">Sequence</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ctsm_orig</span><span class="p">[</span><span class="n">pam</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameter </span><span class="si">{</span><span class="n">pam</span><span class="si">}</span><span class="s2"> is sequence - applying scaling factor </span><span class="si">{</span><span class="n">new_value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">ctsm_orig</span><span class="p">[</span><span class="n">pam</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_value</span> <span class="o">*</span> <span class="n">ctsm_orig</span><span class="p">[</span><span class="n">pam</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameter </span><span class="si">{</span><span class="n">pam</span><span class="si">}</span><span class="s2"> is scalar - setting new value </span><span class="si">{</span><span class="n">new_value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">ctsm_orig</span><span class="p">[</span><span class="n">pam</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_value</span>
+
+    <span class="n">validate_file</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">file_dump</span><span class="p">,</span> <span class="n">expected_suffix</span><span class="o">=</span><span class="s2">&quot;.nc&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Generated CTSM parameter file&quot;</span><span class="p">,</span> <span class="n">new_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated CTSM parameter file: </span><span class="si">{</span><span class="n">file_dump</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">ctsm_orig</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="n">file_dump</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">file_dump</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="tinkertool.utils.make_land_parameterfiles.make_new_fates_pamfile" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">make_new_fates_pamfile</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">make_new_fates_pamfile</span><span class="p">(</span>
+    <span class="n">pam_change_dict</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">,</span>
+    <span class="n">orig_pamfile</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="pathlib.Path">Path</span></span><span class="p">,</span>
+    <span class="n">file_dump</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="pathlib.Path">Path</span></span> <span class="o">=</span> <span class="s2">&quot;fates_pamfile.nc&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="pathlib.Path">Path</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Make a new fates pamfile for the PPE, by changing parameters as
+specified in pam_change_dict.</p>
+<h4 id="tinkertool.utils.make_land_parameterfiles.make_new_fates_pamfile--parameters">Parameters</h4>
+<p>pam_change_dict : dict
+    Dictionary with parameter names as keys and new values or scaling
+    factors as values. The pam_change_dict has parameter should have
+    name of parameter to change as key, and change value as value.
+    For scalar parameters this is assumed to be the new value of
+    the parameter. For vector parameters the value is assumed to
+    be a scaling value to scale the value in the original file with.
+orig_pamfile : str | Path
+    Path to the original FATES parameter file to be modified.
+file_dump : str | Path, optional
+    Path to save the new FATES parameter file, by default "fates_pamfile.nc".</p>
+<h4 id="tinkertool.utils.make_land_parameterfiles.make_new_fates_pamfile--returns">Returns</h4>
+<p>Path
+    Path to the new FATES parameter file.</p>
+<h4 id="tinkertool.utils.make_land_parameterfiles.make_new_fates_pamfile--raises">Raises</h4>
+<p>FileNotFoundError
+    If the original FATES parameter file is not found.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/utils/make_land_parameterfiles.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">make_new_fates_pamfile</span><span class="p">(</span>
+    <span class="n">pam_change_dict</span><span class="p">:</span>    <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">orig_pamfile</span><span class="p">:</span>       <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">file_dump</span><span class="p">:</span>          <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">=</span> <span class="s2">&quot;fates_pamfile.nc&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Make a new fates pamfile for the PPE, by changing parameters as</span>
+<span class="sd">    specified in pam_change_dict.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pam_change_dict : dict</span>
+<span class="sd">        Dictionary with parameter names as keys and new values or scaling</span>
+<span class="sd">        factors as values. The pam_change_dict has parameter should have</span>
+<span class="sd">        name of parameter to change as key, and change value as value.</span>
+<span class="sd">        For scalar parameters this is assumed to be the new value of</span>
+<span class="sd">        the parameter. For vector parameters the value is assumed to</span>
+<span class="sd">        be a scaling value to scale the value in the original file with.</span>
+<span class="sd">    orig_pamfile : str | Path</span>
+<span class="sd">        Path to the original FATES parameter file to be modified.</span>
+<span class="sd">    file_dump : str | Path, optional</span>
+<span class="sd">        Path to save the new FATES parameter file, by default &quot;fates_pamfile.nc&quot;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Path</span>
+<span class="sd">        Path to the new FATES parameter file.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    FileNotFoundError</span>
+<span class="sd">        If the original FATES parameter file is not found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">Path</span><span class="p">(</span><span class="n">orig_pamfile</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Original FATES parameter file </span><span class="si">{</span><span class="n">orig_pamfile</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Original FATES parameter file </span><span class="si">{</span><span class="n">orig_pamfile</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
+
+    <span class="n">fates_orig</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">orig_pamfile</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FATES parameter file dimensions: </span><span class="si">{</span><span class="n">fates_orig</span><span class="o">.</span><span class="n">dims</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">pam</span><span class="p">,</span> <span class="n">new_value</span> <span class="ow">in</span> <span class="n">pam_change_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing parameter: </span><span class="si">{</span><span class="n">pam</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pam</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fates_orig</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameter </span><span class="si">{</span><span class="n">pam</span><span class="si">}</span><span class="s2"> not found in FATES file </span><span class="si">{</span><span class="n">orig_pamfile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">fates_orig</span><span class="p">[</span><span class="n">pam</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameter </span><span class="si">{</span><span class="n">pam</span><span class="si">}</span><span class="s2"> is sequence - applying scaling factor </span><span class="si">{</span><span class="n">new_value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">fates_orig</span><span class="p">[</span><span class="n">pam</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_value</span> <span class="o">*</span> <span class="n">fates_orig</span><span class="p">[</span><span class="n">pam</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameter </span><span class="si">{</span><span class="n">pam</span><span class="si">}</span><span class="s2"> is scalar - setting new value </span><span class="si">{</span><span class="n">new_value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">fates_orig</span><span class="p">[</span><span class="n">pam</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_value</span>
+
+    <span class="n">validate_file</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">file_dump</span><span class="p">,</span> <span class="n">expected_suffix</span><span class="o">=</span><span class="s2">&quot;.nc&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Generated FATES parameter file&quot;</span><span class="p">,</span> <span class="n">new_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated FATES parameter file: </span><span class="si">{</span><span class="n">file_dump</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">fates_orig</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="n">file_dump</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">file_dump</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="tinkertool.utils.make_chem_in"></a>
+    <div class="doc doc-contents first">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="tinkertool.utils.make_chem_in.generate_chem_in_ppe" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">generate_chem_in_ppe</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">generate_chem_in_ppe</span><span class="p">(</span>
+    <span class="n">scale_factor</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span>
+    <span class="n">input_file</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="pathlib.Path">Path</span></span><span class="p">,</span>
+    <span class="n">outfolder_base</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="pathlib.Path">Path</span></span><span class="p">,</span>
+    <span class="n">outfolder_name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="str">str</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Generate a chemistry namelist file for a given scale factor and input file.</p>
+<h4 id="tinkertool.utils.make_chem_in.generate_chem_in_ppe--parameters">Parameters:</h4>
+<p>scale_factor : float
+    The scale factor to use for the chemistry file.
+input_file : str | Path
+    The input file to use for the chemistry file.
+outfolder_base : str | Path
+    The base folder to use for the output files.
+outfolder_name : str
+    The name of the folder to use for the output files.
+verbose : bool, optional
+    If True, print verbose output. Default False.</p>
+<h4 id="tinkertool.utils.make_chem_in.generate_chem_in_ppe--returns">Returns</h4>
+<p>str
+    The path to the generated chemistry file.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/utils/make_chem_in.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generate_chem_in_ppe</span><span class="p">(</span>
+    <span class="n">scale_factor</span><span class="p">:</span>   <span class="nb">float</span><span class="p">,</span>
+    <span class="n">input_file</span><span class="p">:</span>     <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">outfolder_base</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">outfolder_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a chemistry namelist file for a given scale factor and input file.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    scale_factor : float</span>
+<span class="sd">        The scale factor to use for the chemistry file.</span>
+<span class="sd">    input_file : str | Path</span>
+<span class="sd">        The input file to use for the chemistry file.</span>
+<span class="sd">    outfolder_base : str | Path</span>
+<span class="sd">        The base folder to use for the output files.</span>
+<span class="sd">    outfolder_name : str</span>
+<span class="sd">        The name of the folder to use for the output files.</span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        If True, print verbose output. Default False.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The path to the generated chemistry file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># handle input arguments and defaults</span>
+    <span class="n">scale_factor</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">scale_factor</span><span class="p">)</span>
+    <span class="n">input_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">input_file</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+
+    <span class="n">outfolder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">outfolder_base</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">outfolder_name</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">outfolder</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">outfolder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">outputfile</span> <span class="o">=</span> <span class="n">outfolder</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;chem_mech_scale_</span><span class="si">{</span><span class="n">scale_factor</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">.in&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;creating chem_mech file for scale_factor&quot;</span><span class="p">,</span>
+            <span class="n">scale_factor</span><span class="p">,</span>
+            <span class="s2">&quot; in</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">outputfile</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+        <span class="n">infile_lines</span> <span class="o">=</span> <span class="n">infile</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outputfile</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">infile_lines</span><span class="p">:</span>
+            <span class="n">replace</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="s2">&quot;monoterp&quot;</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">or</span> <span class="s2">&quot;isoprene&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;-&gt;&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s2">&quot;+&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="s2">&quot;;&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                            <span class="n">replace</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">replace</span><span class="p">:</span>
+
+                <span class="n">yld</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&gt;&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">new_yld</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">yld</span><span class="p">)</span> <span class="o">*</span> <span class="n">scale_factor</span>
+                <span class="n">new_yld</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">new_yld</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">replacement_text</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">yld</span><span class="p">,</span> <span class="n">new_yld</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Replacing </span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2"> with </span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">replacement_text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">replacement_text</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">outputfile</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="tinkertool.utils.make_chem_in.check_if_chem_mech_is_perturbed" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">check_if_chem_mech_is_perturbed</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">check_if_chem_mech_is_perturbed</span><span class="p">(</span><span class="n">param_ranges</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="bool">bool</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Check if the chemistry mechanism is perturbed. The check is
+performed by looking for specific section headers defined in
+chem_mech_variable_flags in the parameter ranges file.</p>
+<h4 id="tinkertool.utils.make_chem_in.check_if_chem_mech_is_perturbed--parameters">Parameters</h4>
+<p>param_ranges_inpath : str | Path
+    The path to the parameter ranges file.</p>
+<h4 id="tinkertool.utils.make_chem_in.check_if_chem_mech_is_perturbed--returns">Returns</h4>
+<p>bool
+    True if the chemistry mechanism is perturbed, False otherwise.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/utils/make_chem_in.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span>
+<span class="normal">92</span>
+<span class="normal">93</span>
+<span class="normal">94</span>
+<span class="normal">95</span>
+<span class="normal">96</span>
+<span class="normal">97</span>
+<span class="normal">98</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">check_if_chem_mech_is_perturbed</span><span class="p">(</span>
+    <span class="n">param_ranges</span><span class="p">:</span> <span class="nb">dict</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the chemistry mechanism is perturbed. The check is</span>
+<span class="sd">    performed by looking for specific section headers defined in</span>
+<span class="sd">    chem_mech_variable_flags in the parameter ranges file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param_ranges_inpath : str | Path</span>
+<span class="sd">        The path to the parameter ranges file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if the chemistry mechanism is perturbed, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">chem_mech_variable_flags</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SOA_y_scale_chem_mech_in&quot;</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">param_ranges</span><span class="o">.</span><span class="n">sections</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">chem_mech_variable_flags</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="tinkertool.utils.custom_logging"></a>
+    <div class="doc doc-contents first">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="tinkertool.utils.custom_logging.patch_info_detailed" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">patch_info_detailed</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">patch_info_detailed</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Patch Logger class to add info_detailed method and custom level.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/utils/custom_logging.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">patch_info_detailed</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Patch Logger class to add info_detailed method and custom level.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="s2">&quot;info_detailed&quot;</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">addLevelName</span><span class="p">(</span><span class="n">INFO_DETAILED</span><span class="p">,</span> <span class="s2">&quot;INFO_DETAILED&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">info_detailed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">INFO_DETAILED</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">INFO_DETAILED</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="s1">&#39;info_detailed&#39;</span><span class="p">,</span> <span class="n">info_detailed</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="tinkertool.utils.custom_logging.log_info_detailed" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">log_info_detailed</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">log_info_detailed</span><span class="p">(</span><span class="n">logger_name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Helper function to log info_detailed messages with proper type handling.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/utils/custom_logging.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">log_info_detailed</span><span class="p">(</span><span class="n">logger_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function to log info_detailed messages with proper type handling.&quot;&quot;&quot;</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">logger_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="s1">&#39;info_detailed&#39;</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info_detailed</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[DETAILED] </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="tinkertool.utils.custom_logging.setup_logging" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">setup_logging</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">setup_logging</span><span class="p">(</span>
+    <span class="n">verbosity</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span>
+    <span class="n">log_file</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="typing.Union">Union</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="pathlib.Path">Path</span></span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">log_mode</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span>
+    <span class="n">logger_name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s2">&quot;tinkertool_log&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Set up logging configuration. Both for the root logger and a custom logger.</p>
+<h4 id="tinkertool.utils.custom_logging.setup_logging--parameters">Parameters</h4>
+<p>verbosity : int
+    Verbosity level for logging. 0 for WARNING, 1 for INFO, 2 for INFO_DETAILED, 3 for DEBUG.
+log_file : str or Path, optional
+    Path to the log file where logs will be written. If None, logs will not be saved to a file.
+    Default is None.
+log_mode : str
+    Mode for opening the log file. 'w' for write (overwrite), 'a' for append.
+    Default is 'w'.
+logger_name : str
+    Name of the logger. Default is 'tinkertool_log'.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/utils/custom_logging.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">setup_logging</span><span class="p">(</span>
+    <span class="n">verbosity</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">log_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">log_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span>
+    <span class="n">logger_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;tinkertool_log&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set up logging configuration. Both for the root logger and a custom logger.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    verbosity : int</span>
+<span class="sd">        Verbosity level for logging. 0 for WARNING, 1 for INFO, 2 for INFO_DETAILED, 3 for DEBUG.</span>
+<span class="sd">    log_file : str or Path, optional</span>
+<span class="sd">        Path to the log file where logs will be written. If None, logs will not be saved to a file.</span>
+<span class="sd">        Default is None.</span>
+<span class="sd">    log_mode : str</span>
+<span class="sd">        Mode for opening the log file. &#39;w&#39; for write (overwrite), &#39;a&#39; for append.</span>
+<span class="sd">        Default is &#39;w&#39;.</span>
+<span class="sd">    logger_name : str</span>
+<span class="sd">        Name of the logger. Default is &#39;tinkertool_log&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># root logger do not have a info_detailed level</span>
+    <span class="c1"># so 2 would yeald debug level in root logger</span>
+    <span class="c1"># therefore we set the root logger to one level lower than the custom logger</span>
+    <span class="c1"># when verbosity is greater than 1.</span>
+    <span class="n">cime_verbosity</span> <span class="o">=</span> <span class="n">verbosity</span> <span class="k">if</span> <span class="n">verbosity</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">verbosity</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">cime_logger</span><span class="p">(</span><span class="n">cime_verbosity</span><span class="p">,</span> <span class="n">log_file</span><span class="p">,</span> <span class="n">log_mode</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">custom_logging</span><span class="p">(</span><span class="n">verbosity</span><span class="p">,</span> <span class="n">log_file</span><span class="p">,</span> <span class="n">log_mode</span><span class="p">,</span> <span class="n">logger_name</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="tinkertool.utils.custom_logging.cime_logger" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">cime_logger</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">cime_logger</span><span class="p">(</span>
+    <span class="n">verbosity</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span>
+    <span class="n">log_file</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="typing.Union">Union</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="pathlib.Path">Path</span></span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">log_mode</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Set up the CIME logger with a stream handler and an optional file handler.</p>
+<p>If a log file is provided, the CIME logger writes to a file with the same name as <code>log_file</code>,
+but with <code>.CIME</code> inserted before the suffix (e.g., <code>build_ppe.log</code> → <code>build_ppe.CIME.log</code>).</p>
+<h4 id="tinkertool.utils.custom_logging.cime_logger--parameters">Parameters</h4>
+<p>verbosity : int
+    Verbosity level for logging. 0 for WARNING, 1 for INFO, 3 for DEBUG.
+log_file : str or Path, optional
+    Path to the base log file. If provided, the CIME logger writes to a file with
+    <code>.CIME</code> added to the stem (e.g., <code>mylog.log</code> → <code>mylog.CIME.log</code>). If None, logs
+    are not written to a file.
+log_mode : str, default 'w'
+    Mode to open the log file. 'w' for overwrite, 'a' for append.</p>
+<h4 id="tinkertool.utils.custom_logging.cime_logger--returns">Returns</h4>
+<p>None</p>
+<h4 id="tinkertool.utils.custom_logging.cime_logger--examples">Examples</h4>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>cime_logger(1, Path("output.log"), "w")</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<h3 id="tinkertool.utils.custom_logging.cime_logger--logs-to-both-stdout-and-outputcimelog-at-info-level">Logs to both stdout and 'output.CIME.log' at INFO level.</h3>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>cime_logger(0)</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<h3 id="tinkertool.utils.custom_logging.cime_logger--logs-only-to-stdout-at-warning-level">Logs only to stdout at WARNING level.</h3>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/utils/custom_logging.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">cime_logger</span><span class="p">(</span>
+    <span class="n">verbosity</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">log_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">log_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set up the CIME logger with a stream handler and an optional file handler.</span>
+
+<span class="sd">    If a log file is provided, the CIME logger writes to a file with the same name as `log_file`,</span>
+<span class="sd">    but with `.CIME` inserted before the suffix (e.g., `build_ppe.log` → `build_ppe.CIME.log`).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    verbosity : int</span>
+<span class="sd">        Verbosity level for logging. 0 for WARNING, 1 for INFO, 3 for DEBUG.</span>
+<span class="sd">    log_file : str or Path, optional</span>
+<span class="sd">        Path to the base log file. If provided, the CIME logger writes to a file with</span>
+<span class="sd">        `.CIME` added to the stem (e.g., `mylog.log` → `mylog.CIME.log`). If None, logs</span>
+<span class="sd">        are not written to a file.</span>
+<span class="sd">    log_mode : str, default &#39;w&#39;</span>
+<span class="sd">        Mode to open the log file. &#39;w&#39; for overwrite, &#39;a&#39; for append.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; cime_logger(1, Path(&quot;output.log&quot;), &quot;w&quot;)</span>
+<span class="sd">    # Logs to both stdout and &#39;output.CIME.log&#39; at INFO level.</span>
+
+<span class="sd">    &gt;&gt;&gt; cime_logger(0)</span>
+<span class="sd">    # Logs only to stdout at WARNING level.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">level</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="n">verbosity</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+    <span class="p">)</span>
+
+    <span class="n">handlers</span> <span class="o">=</span> <span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()]</span>
+    <span class="k">if</span> <span class="n">log_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cime_log_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">log_file</span><span class="p">)</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span>
+            <span class="n">Path</span><span class="p">(</span><span class="n">log_file</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span> <span class="o">+</span> <span class="s2">&quot;.CIME&quot;</span> <span class="o">+</span> <span class="n">Path</span><span class="p">(</span><span class="n">log_file</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span>
+        <span class="p">)</span>
+        <span class="n">validate_file</span><span class="p">(</span><span class="n">cime_log_file</span><span class="p">,</span> <span class="s2">&quot;.log&quot;</span><span class="p">,</span> <span class="s2">&quot;log file&quot;</span><span class="p">,</span> <span class="n">new_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cime_log_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">cime_log_file</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">cime_log_file</span><span class="o">.</span><span class="n">touch</span><span class="p">()</span>
+        <span class="n">handlers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cime_log_file</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="n">log_mode</span><span class="p">))</span>
+
+    <span class="c1"># Remove any existing handlers to avoid duplicate logs</span>
+    <span class="n">cime_logger_obj</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">cime_logger_obj</span><span class="o">.</span><span class="n">handlers</span><span class="p">[:]:</span>
+        <span class="n">cime_logger_obj</span><span class="o">.</span><span class="n">removeHandler</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">handlers</span><span class="p">:</span>
+        <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> [</span><span class="si">%(levelname)s</span><span class="s2">/CIME] </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">datefmt</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">cime_logger_obj</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+
+    <span class="n">cime_logger_obj</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="tinkertool.utils.custom_logging.custom_logging" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">custom_logging</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">custom_logging</span><span class="p">(</span>
+    <span class="n">verbosity</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span>
+    <span class="n">log_file</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="typing.Union">Union</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="pathlib.Path">Path</span></span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">log_mode</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span>
+    <span class="n">logger_name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s2">&quot;tinkertool_log&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Set up logging configuration. for a custom logger with a custom level.</p>
+<h4 id="tinkertool.utils.custom_logging.custom_logging--parameters">Parameters</h4>
+<p>verbosity : int
+    Verbosity level for logging. 0 for WARNING, 1 for INFO, 2 for INFO_DETAILED, 3 for DEBUG.
+log_file : str or Path, optional
+    Path to the log file where logs will be written. If None, logs will not be saved to a file.
+    Default is None.
+log_mode : str
+    Mode for opening the log file. 'w' for write (overwrite), 'a' for append.
+    Default is 'w'.
+logger_name : str
+    Name of the logger. Default is 'tinkertool_log'.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/utils/custom_logging.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">custom_logging</span><span class="p">(</span>
+    <span class="n">verbosity</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">log_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">log_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span>
+    <span class="n">logger_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;tinkertool_log&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set up logging configuration. for a custom logger with a custom level.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    verbosity : int</span>
+<span class="sd">        Verbosity level for logging. 0 for WARNING, 1 for INFO, 2 for INFO_DETAILED, 3 for DEBUG.</span>
+<span class="sd">    log_file : str or Path, optional</span>
+<span class="sd">        Path to the log file where logs will be written. If None, logs will not be saved to a file.</span>
+<span class="sd">        Default is None.</span>
+<span class="sd">    log_mode : str</span>
+<span class="sd">        Mode for opening the log file. &#39;w&#39; for write (overwrite), &#39;a&#39; for append.</span>
+<span class="sd">        Default is &#39;w&#39;.</span>
+<span class="sd">    logger_name : str</span>
+<span class="sd">        Name of the logger. Default is &#39;tinkertool_log&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Patch the logging module to add info_detailed level</span>
+    <span class="n">patch_info_detailed</span><span class="p">()</span>
+
+    <span class="c1"># Map verbosity to logging levels</span>
+    <span class="n">level</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
+        <span class="mi">1</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+        <span class="mi">2</span><span class="p">:</span> <span class="n">INFO_DETAILED</span><span class="p">,</span>
+        <span class="mi">3</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
+    <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">verbosity</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+    <span class="c1"># Set up the logger</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">logger_name</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># Remove all existing handlers</span>
+    <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">[:]:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">removeHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+
+    <span class="c1"># Create new handlers</span>
+    <span class="n">handlers</span> <span class="o">=</span> <span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()]</span>
+    <span class="k">if</span> <span class="n">log_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">log_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">log_file</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+        <span class="n">validate_file</span><span class="p">(</span><span class="n">log_file</span><span class="p">,</span> <span class="s1">&#39;.log&#39;</span><span class="p">,</span> <span class="s2">&quot;log file&quot;</span><span class="p">,</span> <span class="n">new_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">log_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">log_file</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">log_file</span><span class="o">.</span><span class="n">touch</span><span class="p">()</span>
+        <span class="n">handlers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">log_file</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="n">log_mode</span><span class="p">))</span>
+    <span class="c1"># Set the formatter for the handlers</span>
+    <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span>
+        <span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> [</span><span class="si">%(levelname)s</span><span class="s2">/</span><span class="si">{}</span><span class="s2">] </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">logger_name</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()),</span>
+        <span class="n">datefmt</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">handlers</span><span class="p">:</span>
+        <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">logger</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="tinkertool.utils.type_check_decorator"></a>
+    <div class="doc doc-contents first">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="tinkertool.utils.type_check_decorator.type_check_decorator" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">type_check_decorator</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">type_check_decorator</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Decorator [1] for type checking of user input to functions at runtime.
+Known limitations:
+    - Does not support parameterized typechecking as it is based on isinstance [3]. That is does not support
+      hints like list[int] or numpy._typing._array_like._SupportsArray[numpy.dtype[typing.Any]], etc. Therefor
+      aliases like numpy.typing.ArrayLike are not supported. The workaround is to be more specific with the type hints
+      and use things like Union[int, list, numpy.ndarray].</p>
+<h4 id="tinkertool.utils.type_check_decorator.type_check_decorator--parameters">Parameters</h4>
+<p>func : Callable
+    A function with implemented type hints [2].</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/utils/type_check_decorator.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">type_check_decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator [1] for type checking of user input to functions at runtime.</span>
+<span class="sd">    Known limitations:</span>
+<span class="sd">        - Does not support parameterized typechecking as it is based on isinstance [3]. That is does not support</span>
+<span class="sd">          hints like list[int] or numpy._typing._array_like._SupportsArray[numpy.dtype[typing.Any]], etc. Therefor</span>
+<span class="sd">          aliases like numpy.typing.ArrayLike are not supported. The workaround is to be more specific with the type hints</span>
+<span class="sd">          and use things like Union[int, list, numpy.ndarray].</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func : Callable</span>
+<span class="sd">        A function with implemented type hints [2].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">type_hints</span> <span class="o">=</span> <span class="n">get_type_hints</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="n">bound_args</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">bound_args</span><span class="o">.</span><span class="n">apply_defaults</span><span class="p">()</span>
+        <span class="n">user_passed_args</span> <span class="o">=</span> <span class="n">bound_args</span><span class="o">.</span><span class="n">arguments</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">user_passed_args</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">type_hints</span><span class="p">:</span>
+                <span class="n">expected_type</span> <span class="o">=</span> <span class="n">type_hints</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+                <span class="n">origin</span> <span class="o">=</span> <span class="n">get_origin</span><span class="p">(</span><span class="n">expected_type</span><span class="p">)</span>
+                <span class="n">args_</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">(</span><span class="n">expected_type</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="n">Union</span><span class="p">:</span>
+                    <span class="c1"># Remove NoneType from args for Optional</span>
+                    <span class="n">valid_types</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">arg</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args_</span> <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">valid_types</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Argument &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; must be of type </span><span class="si">{</span><span class="n">expected_type</span><span class="si">}</span><span class="s2">, but got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Argument &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; must be of type </span><span class="si">{</span><span class="n">expected_type</span><span class="si">}</span><span class="s2">, but got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

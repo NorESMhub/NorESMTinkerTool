@@ -1,0 +1,2278 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../../usage/">
+      
+      
+        <link rel="next" href="../create_ppe/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Generate Parameter File - NorESMTinkerTool</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#tinkertool.scripts.generate_paramfile.config" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="NorESMTinkerTool" class="md-header__button md-logo" aria-label="NorESMTinkerTool" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            NorESMTinkerTool
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Generate Parameter File
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="NorESMTinkerTool" class="md-nav__button md-logo" aria-label="NorESMTinkerTool" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    NorESMTinkerTool
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generate Parameter File
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generate Parameter File
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        config
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.config.ParameterFileConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ParameterFileConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ParameterFileConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.config.ParameterFileConfig.get_checked_and_derived_config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_checked_and_derived_config
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.generate_paramfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        generate_paramfile
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.generate_paramfile.generate_chem_mech_files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        generate_chem_mech_files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.generate_paramfile.generate_latin_hypercube_sample_points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        generate_latin_hypercube_sample_points
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.generate_paramfile.generate_one_at_a_time_sample_points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        generate_one_at_a_time_sample_points
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.generate_paramfile.generate_paramfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        generate_paramfile
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.visualize_paramfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        visualize_paramfile
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.visualize_paramfile.visualize_paramfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        visualize_paramfile
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="visualize_paramfile">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.visualize_paramfile.visualize_paramfile--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../create_ppe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Create PPE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PPE setup interface
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config_utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Config utilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    General utilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sampling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sampling utilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aerosol_ppe_utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Aerosol PPE utility functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        config
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.config.ParameterFileConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ParameterFileConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ParameterFileConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.config.ParameterFileConfig.get_checked_and_derived_config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_checked_and_derived_config
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.generate_paramfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        generate_paramfile
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.generate_paramfile.generate_chem_mech_files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        generate_chem_mech_files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.generate_paramfile.generate_latin_hypercube_sample_points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        generate_latin_hypercube_sample_points
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.generate_paramfile.generate_one_at_a_time_sample_points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        generate_one_at_a_time_sample_points
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.generate_paramfile.generate_paramfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        generate_paramfile
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.visualize_paramfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        visualize_paramfile
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.visualize_paramfile.visualize_paramfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        visualize_paramfile
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="visualize_paramfile">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.scripts.generate_paramfile.visualize_paramfile.visualize_paramfile--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>Generate Parameter File</h1>
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="tinkertool.scripts.generate_paramfile.config"></a>
+    <div class="doc doc-contents first">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="tinkertool.scripts.generate_paramfile.config.ParameterFileConfig" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">ParameterFileConfig</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ParameterFileConfig</span><span class="p">(</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">log_dir</span><span class="p">:</span> <span class="n"><span title="pathlib.Path">Path</span></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">log_mode</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">param_ranges_inpath</span><span class="p">:</span> <span class="n"><span title="pathlib.Path">Path</span></span><span class="p">,</span>
+    <span class="n">param_sample_outpath</span><span class="p">:</span> <span class="n"><span title="pathlib.Path">Path</span></span><span class="p">,</span>
+    <span class="n">nmb_sim</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s2">&quot;latin_hypercube&quot;</span><span class="p">,</span>
+    <span class="n">chem_mech_file</span><span class="p">:</span> <span class="n"><span title="pathlib.Path">Path</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ctsm_default_param_file</span><span class="p">:</span> <span class="n"><span title="pathlib.Path">Path</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">fates_default_param_file</span><span class="p">:</span> <span class="n"><span title="pathlib.Path">Path</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">tinkertool_output_dir</span><span class="p">:</span> <span class="n"><span title="pathlib.Path">Path</span></span> <span class="o">=</span> <span class="n"><span title="resolve">resolve</span></span><span class="p">(),</span>
+    <span class="n">optimization</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">avoid_scramble</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n"><span title="list">list</span></span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">exclude_default</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="BaseConfig
+
+
+  
+      dataclass
+   (tinkertool.utils.config_utils.BaseConfig)" href="../config_utils/#tinkertool.utils.config_utils.BaseConfig">BaseConfig</a></code></p>
+
+
+
+        <p>Parameter file generation configuration.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="tinkertool.scripts.generate_paramfile.config.ParameterFileConfig.get_checked_and_derived_config" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">get_checked_and_derived_config</span>
+
+
+</h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_checked_and_derived_config</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="ParameterFileConfig
+
+
+  
+      dataclass
+   (tinkertool.scripts.generate_paramfile.config.ParameterFileConfig)" href="#tinkertool.scripts.generate_paramfile.config.ParameterFileConfig">ParameterFileConfig</a></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Performs full, I/O-dependent validation and populates derived fields on the instance.
+This method should be called once at the start of the application.
+It now returns <code>self</code>.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/scripts/generate_paramfile/config.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_checked_and_derived_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ParameterFileConfig&#39;</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs full, I/O-dependent validation and populates derived fields on the instance.</span>
+<span class="sd">    This method should be called once at the start of the application.</span>
+<span class="sd">    It now returns `self`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_checked_and_derived_config</span><span class="p">()</span>
+    <span class="c1"># If derived fields are already populated, we can assume this has been run.</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_ranges</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Configuration already checked. Skipping full validation.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="c1"># --- Read files and perform heavy validation ---</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">param_ranges</span> <span class="o">=</span> <span class="n">read_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_ranges_inpath</span><span class="p">)</span>
+
+    <span class="c1"># --- Populate derived fields ---</span>
+    <span class="c1"># params</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">param</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_ranges</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameter &#39;</span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2">&#39; not found in parameter ranges file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">param_ranges_inpath</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="c1"># Subset param_ranges to only include specified params</span>
+        <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_ranges</span><span class="o">.</span><span class="n">sections</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">section</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">param_ranges</span><span class="o">.</span><span class="n">remove_section</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_ranges</span><span class="o">.</span><span class="n">sections</span><span class="p">())</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">nparams</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="c1"># param_sample_outpath (interactive check)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_sample_outpath</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">overwrite</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">param_sample_outpath</span><span class="si">}</span><span class="s2"> already exists. Overwrite? (y/n): &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">overwrite</span> <span class="o">!=</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exiting without overwriting existing file.&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_sample_outpath</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Check for perturbations and validate corresponding files</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">change_chem_mech</span> <span class="o">=</span> <span class="n">check_if_chem_mech_is_perturbed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_ranges</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_chem_mech</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chem_mech_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Chemistry perturbations detected, but &#39;chem_mech_file&#39; was not provided.&quot;</span><span class="p">)</span>
+        <span class="n">validate_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chem_mech_file</span><span class="p">,</span> <span class="s1">&#39;.in&#39;</span><span class="p">,</span> <span class="s2">&quot;Chemistry mechanism file&quot;</span><span class="p">,</span> <span class="n">new_file</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">str_buffer</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">param_ranges</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">str_buffer</span><span class="p">)</span>
+    <span class="n">cfg_str</span> <span class="o">=</span> <span class="n">str_buffer</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">change_ctsm_params</span> <span class="o">=</span> <span class="n">check_if_ctsm_param_is_perturbed</span><span class="p">(</span><span class="n">cfg_str</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_ctsm_params</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctsm_default_param_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;CTSM perturbations detected, but &#39;ctsm_default_param_file&#39; was not provided.&quot;</span><span class="p">)</span>
+        <span class="n">validate_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ctsm_default_param_file</span><span class="p">,</span> <span class="s1">&#39;.nc&#39;</span><span class="p">,</span> <span class="s2">&quot;Default CTSM parameter file&quot;</span><span class="p">,</span> <span class="n">new_file</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">change_fates_params</span> <span class="o">=</span> <span class="n">check_if_fates_param_is_perturbed</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_ranges_inpath</span><span class="p">))</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_fates_params</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fates_default_param_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;FATES perturbations detected, but &#39;fates_default_param_file&#39; was not provided.&quot;</span><span class="p">)</span>
+        <span class="n">validate_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fates_default_param_file</span><span class="p">,</span> <span class="s1">&#39;.nc&#39;</span><span class="p">,</span> <span class="s2">&quot;Default FATES parameter file&quot;</span><span class="p">,</span> <span class="n">new_file</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># tinkertool_output_dir</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">tinkertool_output_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># avoid_scramble</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">scramble</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">avoid_scramble</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;one_at_a_time&#39;</span><span class="p">,</span> <span class="s1">&#39;oat&#39;</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nmb_sim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span> <span class="c1"># this get update if there interdependet parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scramble</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># exclude_default</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude_default</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nmb_sim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;nmb_sim=0 is not allowed when exclude_default=True.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nmb_sim_dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nmb_sim</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nmb_sim_dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nmb_sim</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Configuration successfully checked and derived fields populated.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="tinkertool.scripts.generate_paramfile.generate_paramfile"></a>
+    <div class="doc doc-contents first">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="tinkertool.scripts.generate_paramfile.generate_paramfile.generate_chem_mech_files" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">generate_chem_mech_files</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">generate_chem_mech_files</span><span class="p">(</span>
+    <span class="n">sample_points</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="ParameterFileConfig
+
+
+  
+      dataclass
+   (tinkertool.scripts.generate_paramfile.config.ParameterFileConfig)" href="#tinkertool.scripts.generate_paramfile.config.ParameterFileConfig">ParameterFileConfig</a></span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Generate chemistry mechanism files and return list of generated file paths.</p>
+<p>This mutates <code>sample_points</code> by removing the
+'SOA_y_scale_chem_mech_in' entry when present.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/scripts/generate_paramfile/generate_paramfile.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span>
+<span class="normal">92</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generate_chem_mech_files</span><span class="p">(</span><span class="n">sample_points</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">ParameterFileConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate chemistry mechanism files and return list of generated file paths.</span>
+
+<span class="sd">    This mutates `sample_points` by removing the</span>
+<span class="sd">    &#39;SOA_y_scale_chem_mech_in&#39; entry when present.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">chem_mech_in</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">sample_points</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;SOA_y_scale_chem_mech_in&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">SOA_y_scale_chem_mech_in</span> <span class="o">=</span> <span class="n">sample_points</span><span class="p">[</span><span class="s2">&quot;SOA_y_scale_chem_mech_in&quot;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">scale_factor</span> <span class="ow">in</span> <span class="n">SOA_y_scale_chem_mech_in</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">outfile</span> <span class="o">=</span> <span class="n">generate_chem_in_ppe</span><span class="p">(</span>
+                <span class="n">scale_factor</span><span class="o">=</span><span class="n">scale_factor</span><span class="p">,</span>
+                <span class="n">input_file</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">chem_mech_file</span><span class="p">,</span>
+                <span class="n">outfolder_base</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">tinkertool_output_dir</span><span class="p">,</span>
+                <span class="n">outfolder_name</span><span class="o">=</span><span class="s2">&quot;chem_mech_files&quot;</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">chem_mech_in</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">outfile</span><span class="p">)</span>
+
+            <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">info_detailed</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">outfile</span><span class="si">}</span><span class="s2"> generated with SOA_y_scale_chem_mech_in = </span><span class="si">{</span><span class="n">scale_factor</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># remove the entry so it is not written to the final dataset</span>
+        <span class="k">del</span> <span class="n">sample_points</span><span class="p">[</span><span class="s2">&quot;SOA_y_scale_chem_mech_in&quot;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">chem_mech_in</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="tinkertool.scripts.generate_paramfile.generate_paramfile.generate_latin_hypercube_sample_points" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">generate_latin_hypercube_sample_points</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">generate_latin_hypercube_sample_points</span><span class="p">(</span>
+    <span class="n">checked_config</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="ParameterFileConfig
+
+
+  
+      dataclass
+   (tinkertool.scripts.generate_paramfile.config.ParameterFileConfig)" href="#tinkertool.scripts.generate_paramfile.config.ParameterFileConfig">ParameterFileConfig</a></span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Generate sample_points using a Latin Hypercube and scale to ranges.</p>
+<p>Returns a dict mapping parameter name -&gt; (["nmb_sim"], values_array).</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/scripts/generate_paramfile/generate_paramfile.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generate_latin_hypercube_sample_points</span><span class="p">(</span><span class="n">checked_config</span><span class="p">:</span> <span class="n">ParameterFileConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate sample_points using a Latin Hypercube and scale to ranges.</span>
+
+<span class="sd">    Returns a dict mapping parameter name -&gt; ([&quot;nmb_sim&quot;], values_array).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Generating Latin Hypercube sample&quot;</span><span class="p">)</span>
+    <span class="n">opt_literal</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Literal[&#39;random-cd&#39;,&#39;lloyd&#39;] | None&quot;</span><span class="p">,</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">optimization</span><span class="p">)</span>
+    <span class="n">interdependent_params</span> <span class="o">=</span> <span class="p">[</span><span class="n">param</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">params</span> <span class="k">if</span> <span class="n">safe_get_param_value</span><span class="p">(</span><span class="n">checked_config</span><span class="o">.</span><span class="n">param_ranges</span><span class="p">[</span><span class="n">param</span><span class="p">],</span> <span class="s2">&quot;interdependent_with&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">hypc_params</span> <span class="o">=</span> <span class="p">[</span><span class="n">param</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">params</span> <span class="k">if</span> <span class="n">param</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">interdependent_params</span><span class="p">]</span>
+    <span class="n">hypc_param_paramindx_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">param</span><span class="p">:</span> <span class="n">indx</span> <span class="k">for</span> <span class="n">indx</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hypc_params</span><span class="p">)}</span>
+
+    <span class="n">hypc</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">qmc</span><span class="o">.</span><span class="n">LatinHypercube</span><span class="p">(</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">hypc_param_paramindx_map</span><span class="p">),</span>
+        <span class="n">scramble</span><span class="o">=</span><span class="n">checked_config</span><span class="o">.</span><span class="n">scramble</span><span class="p">,</span>
+        <span class="n">optimization</span><span class="o">=</span><span class="n">opt_literal</span>
+    <span class="p">)</span>
+    <span class="n">hyp_cube_params</span> <span class="o">=</span> <span class="n">hypc</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">checked_config</span><span class="o">.</span><span class="n">nmb_sim</span><span class="p">)</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Hypersample shape (</span><span class="si">{</span><span class="n">checked_config</span><span class="o">.</span><span class="n">nmb_sim_dim</span><span class="si">}</span><span class="s2">, n_params - n_interdependent_params): </span><span class="si">{</span><span class="n">hyp_cube_params</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">sample_points</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># Scale the values to the parameter ranges</span>
+    <span class="c1"># and add component information</span>
+    <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
+        <span class="n">pdata</span> <span class="o">=</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">param_ranges</span><span class="p">[</span><span class="n">param</span><span class="p">]</span>
+
+        <span class="n">defaultv</span> <span class="o">=</span> <span class="n">safe_get_param_value</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">defaultv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Default value for parameter &#39;</span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2">&#39; cannot be None.&quot;</span>
+
+        <span class="c1"># Use safe parameter access to handle nan values properly</span>
+        <span class="n">scale_fact</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">safe_get_param_value</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="s2">&quot;scale_fact&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">scale_fact</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">minv</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">defaultv</span><span class="p">)</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">defaultv</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">scale_fact</span><span class="p">)</span>
+            <span class="n">maxv</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">defaultv</span><span class="p">)</span> <span class="o">+</span> <span class="nb">float</span><span class="p">(</span><span class="n">defaultv</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">scale_fact</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">minv_raw</span> <span class="o">=</span> <span class="n">safe_get_param_value</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">)</span>
+            <span class="n">maxv_raw</span> <span class="o">=</span> <span class="n">safe_get_param_value</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">minv_raw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Min value for parameter &#39;</span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2">&#39; cannot be None when scale_fact is not provided.&quot;</span>
+            <span class="k">assert</span> <span class="n">maxv_raw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Max value for parameter &#39;</span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2">&#39; cannot be None when scale_fact is not provided.&quot;</span>
+            <span class="n">minv</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">minv_raw</span><span class="p">)</span>
+            <span class="n">maxv</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">maxv_raw</span><span class="p">)</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameter &#39;</span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2">&#39;: min=</span><span class="si">{</span><span class="n">minv</span><span class="si">}</span><span class="s2">, max=</span><span class="si">{</span><span class="n">maxv</span><span class="si">}</span><span class="s2">, default=</span><span class="si">{</span><span class="n">defaultv</span><span class="si">}</span><span class="s2">, scale_fact=</span><span class="si">{</span><span class="n">scale_fact</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># check what index in hyp_cube_params to use</span>
+        <span class="c1"># if the param is not interdependent, use hypc_param_paramindx_map[param]</span>
+        <span class="c1"># if it is interdependent use the index of the param</span>
+        <span class="c1"># that it is interdependent with</span>
+        <span class="n">inverse_scaling</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">param_to_index_with</span> <span class="o">=</span> <span class="n">param</span>
+        <span class="k">if</span> <span class="n">param</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hypc_param_paramindx_map</span><span class="p">:</span> <span class="c1"># then it is interdependent</span>
+            <span class="k">assert</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">interdependent_params</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Parameter &#39;</span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2">&#39; not found in hypc_param_paramindx_map or interdependent_params.&quot;</span>
+            <span class="n">param_to_index_with</span> <span class="o">=</span> <span class="n">safe_get_param_value</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="s2">&quot;interdependent_with&quot;</span><span class="p">)</span>
+            <span class="c1"># check if we are to use inverse scaling by checking for</span>
+            <span class="c1"># &quot;-&quot; prefix/first character</span>
+            <span class="k">if</span> <span class="n">param_to_index_with</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">):</span>
+                <span class="n">param_to_index_with</span> <span class="o">=</span> <span class="n">param_to_index_with</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># remove the &quot;-&quot; character</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameter &#39;</span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2">&#39; is interdependent with &#39;</span><span class="si">{</span><span class="n">param_to_index_with</span><span class="si">}</span><span class="s2">&#39; using inverse scaling.&quot;</span><span class="p">)</span>
+                <span class="c1"># Inverse scaling: we will later do maxv - scaled_value + minv</span>
+                <span class="c1"># to flip the scaling</span>
+                <span class="c1"># This is handled in scale_values function by passing minv and maxv swapped</span>
+                <span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span> <span class="o">=</span> <span class="n">maxv</span><span class="p">,</span> <span class="n">minv</span>
+                <span class="n">inverse_scaling</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">assert</span> <span class="n">param_to_index_with</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Parameter &#39;</span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2">&#39; is interdependent but &#39;interdependent_with&#39; is None.&quot;</span>
+        <span class="n">i_use</span> <span class="o">=</span> <span class="n">hypc_param_paramindx_map</span><span class="p">[</span><span class="n">param_to_index_with</span><span class="p">]</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameter &#39;</span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2">&#39; uses index </span><span class="si">{</span><span class="n">i_use</span><span class="si">}</span><span class="s2"> from hyp_cube_params.&quot;</span><span class="p">)</span>
+
+        <span class="n">sampling_method</span> <span class="o">=</span> <span class="n">safe_get_param_value</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="s2">&quot;sampling&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sampling_method</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span>
+            <span class="n">out_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">checked_config</span><span class="o">.</span><span class="n">nmb_sim_dim</span><span class="p">))</span>
+            <span class="n">long_vals</span> <span class="o">=</span> <span class="n">scale_values</span><span class="p">(</span><span class="n">hyp_cube_params</span><span class="p">[:,</span><span class="n">i_use</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">minv</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">maxv</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">exclude_default</span><span class="p">:</span>
+                <span class="n">out_array</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="n">long_vals</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out_array</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pdata</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">])</span>
+                <span class="n">out_array</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="n">long_vals</span>
+
+        <span class="k">elif</span> <span class="n">sampling_method</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
+            <span class="n">out_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">checked_config</span><span class="o">.</span><span class="n">nmb_sim_dim</span><span class="p">))</span>
+            <span class="n">long_vals</span> <span class="o">=</span> <span class="n">scale_values</span><span class="p">(</span><span class="n">hyp_cube_params</span><span class="p">[:,</span><span class="n">i_use</span><span class="p">],</span> <span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">exclude_default</span><span class="p">:</span>
+                <span class="n">out_array</span> <span class="o">=</span> <span class="n">long_vals</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out_array</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pdata</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">])</span>
+                <span class="n">out_array</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">long_vals</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">err_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Unknown sampling method &#39;</span><span class="si">{</span><span class="n">sampling_method</span><span class="si">}</span><span class="s2">&#39; for parameter &#39;</span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2">&#39;. Supported methods are </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">VALID_SAMPLING_METHODS</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
+
+        <span class="n">ndigits</span> <span class="o">=</span> <span class="n">safe_get_param_value</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="s2">&quot;ndigits&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ndigits</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Convert to float first, then int to handle strings like &#39;5.0&#39;</span>
+            <span class="n">out_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">(</span><span class="n">out_array</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">ndigits</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="n">inverse_scaling</span><span class="p">:</span>
+            <span class="n">_test_ranges</span><span class="p">(</span><span class="n">maxv</span><span class="p">,</span> <span class="n">minv</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">out_array</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_test_ranges</span><span class="p">(</span><span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">out_array</span><span class="p">)</span>
+        <span class="n">sample_points</span><span class="p">[</span><span class="n">param</span><span class="p">]</span> <span class="o">=</span> <span class="p">([</span><span class="s2">&quot;nmb_sim&quot;</span><span class="p">],</span> <span class="n">out_array</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sample_points</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="tinkertool.scripts.generate_paramfile.generate_paramfile.generate_one_at_a_time_sample_points" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">generate_one_at_a_time_sample_points</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">generate_one_at_a_time_sample_points</span><span class="p">(</span>
+    <span class="n">checked_config</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="ParameterFileConfig
+
+
+  
+      dataclass
+   (tinkertool.scripts.generate_paramfile.config.ParameterFileConfig)" href="#tinkertool.scripts.generate_paramfile.config.ParameterFileConfig">ParameterFileConfig</a></span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Generate sample_points for one-at-a-time tests.</p>
+<p>Behavior:
+- The first simulation (index 0) is the default value for all parameters.
+- Subsequent simulations vary one parameter at a time. With its minimum and maximum 
+  value for each parameter. Parameters that are not being varied retain their default value.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/scripts/generate_paramfile/generate_paramfile.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generate_one_at_a_time_sample_points</span><span class="p">(</span><span class="n">checked_config</span><span class="p">:</span> <span class="n">ParameterFileConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate sample_points for one-at-a-time tests.</span>
+
+<span class="sd">    Behavior:</span>
+<span class="sd">    - The first simulation (index 0) is the default value for all parameters.</span>
+<span class="sd">    - Subsequent simulations vary one parameter at a time. With its minimum and maximum </span>
+<span class="sd">      value for each parameter. Parameters that are not being varied retain their default value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sample_points</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">interdependent_params</span> <span class="o">=</span> <span class="p">[</span><span class="n">param</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">params</span> <span class="k">if</span> <span class="n">safe_get_param_value</span><span class="p">(</span><span class="n">checked_config</span><span class="o">.</span><span class="n">param_ranges</span><span class="p">[</span><span class="n">param</span><span class="p">],</span> <span class="s2">&quot;interdependent_with&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="n">param</span> <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">params</span> <span class="k">if</span> <span class="n">param</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">interdependent_params</span><span class="p">]</span>
+    <span class="n">param_paramindx_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">param</span><span class="p">:</span> <span class="n">indx</span> <span class="k">for</span> <span class="n">indx</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">params</span><span class="p">)}</span>
+    <span class="n">nparams</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">n_total</span> <span class="o">=</span> <span class="n">nparams</span><span class="o">*</span><span class="mi">2</span> 
+    <span class="c1"># Determine how many variation sims per parameter</span>
+
+    <span class="n">n_variations_base</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_total</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">nparams</span>
+    <span class="n">remainder</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_total</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">nparams</span>
+    <span class="n">variations_per_param</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="c1"># Prepare matrix filled with defaults</span>
+    <span class="k">if</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">exclude_default</span><span class="p">:</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_total</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">checked_config</span><span class="o">.</span><span class="n">params</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_total</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">checked_config</span><span class="o">.</span><span class="n">params</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># So here we set the </span>
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">checked_config</span><span class="o">.</span><span class="n">params</span><span class="p">):</span>
+        <span class="n">pdata</span> <span class="o">=</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">param_ranges</span><span class="p">[</span><span class="n">param</span><span class="p">]</span>
+        <span class="n">default_val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pdata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">default_val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameter </span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2"> has no default value defined.&quot;</span><span class="p">)</span>
+        <span class="n">values</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_val</span>
+
+    <span class="k">if</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">exclude_default</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># start after default</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># start at beginning</span>
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">checked_config</span><span class="o">.</span><span class="n">params</span><span class="p">):</span>
+        <span class="n">pdata</span> <span class="o">=</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">param_ranges</span><span class="p">[</span><span class="n">param</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">pdata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scale_fact&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">minv</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pdata</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">])</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">pdata</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span>
+                <span class="n">pdata</span><span class="p">[</span><span class="s2">&quot;scale_fact&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">maxv</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pdata</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">])</span> <span class="o">+</span> <span class="nb">float</span><span class="p">(</span><span class="n">pdata</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span>
+                <span class="n">pdata</span><span class="p">[</span><span class="s2">&quot;scale_fact&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">minv</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pdata</span><span class="p">[</span><span class="s2">&quot;min&quot;</span><span class="p">])</span>
+            <span class="n">maxv</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pdata</span><span class="p">[</span><span class="s2">&quot;max&quot;</span><span class="p">])</span>
+
+        <span class="n">n_var</span> <span class="o">=</span> <span class="n">variations_per_param</span>
+
+        <span class="n">var_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span><span class="p">,</span> <span class="n">n_var</span><span class="p">)</span>
+        <span class="n">inverse_scaling</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">param_to_index_with</span> <span class="o">=</span> <span class="n">param</span>
+        <span class="k">if</span> <span class="n">param</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">param_paramindx_map</span><span class="p">:</span> <span class="c1"># then it is interdependent</span>
+            <span class="k">assert</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">interdependent_params</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Parameter &#39;</span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2">&#39; not found in aram_paramindx_map or interdependent_params.&quot;</span>
+            <span class="n">param_to_index_with</span> <span class="o">=</span> <span class="n">safe_get_param_value</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="s2">&quot;interdependent_with&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">param_to_index_with</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">):</span>
+                <span class="n">param_to_index_with</span> <span class="o">=</span> <span class="n">param_to_index_with</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># remove the &quot;-&quot; character</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameter &#39;</span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2">&#39; is interdependent with &#39;</span><span class="si">{</span><span class="n">param_to_index_with</span><span class="si">}</span><span class="s2">&#39; using inverse scaling.&quot;</span><span class="p">)</span>
+                <span class="c1"># Inverse scaling: we will later do maxv - scaled_value + minv</span>
+                <span class="c1"># to flip the scaling</span>
+                <span class="c1"># This is handled in scale_values function by passing minv and maxv swapped</span>
+                <span class="n">minv</span><span class="p">,</span> <span class="n">maxv</span> <span class="o">=</span> <span class="n">maxv</span><span class="p">,</span> <span class="n">minv</span>
+                <span class="n">inverse_scaling</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">i_use</span> <span class="o">=</span> <span class="n">param_paramindx_map</span><span class="p">[</span><span class="n">param_to_index_with</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_var</span><span class="p">):</span>
+            <span class="n">values</span><span class="p">[</span><span class="n">i_use</span><span class="o">+</span><span class="n">idx</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_vals</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+
+    <span class="c1"># Build sample_points dict with rounding</span>
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">checked_config</span><span class="o">.</span><span class="n">params</span><span class="p">):</span>
+        <span class="n">pdata</span> <span class="o">=</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">param_ranges</span><span class="p">[</span><span class="n">param</span><span class="p">]</span>
+        <span class="n">out_array</span> <span class="o">=</span> <span class="n">values</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">pdata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ndigits&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">out_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">(</span><span class="n">out_array</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">pdata</span><span class="p">[</span><span class="s2">&quot;ndigits&quot;</span><span class="p">]))</span>
+        <span class="n">sample_points</span><span class="p">[</span><span class="n">param</span><span class="p">]</span> <span class="o">=</span> <span class="p">([</span><span class="s2">&quot;nmb_sim&quot;</span><span class="p">],</span> <span class="n">out_array</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sample_points</span><span class="p">,</span> <span class="n">n_total</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="tinkertool.scripts.generate_paramfile.generate_paramfile.generate_paramfile" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">generate_paramfile</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">generate_paramfile</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="ParameterFileConfig
+
+
+  
+      dataclass
+   (tinkertool.scripts.generate_paramfile.config.ParameterFileConfig)" href="#tinkertool.scripts.generate_paramfile.config.ParameterFileConfig">ParameterFileConfig</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Top-level function to generate parameter files based on the provided configuration.</p>
+        <p>config : ParameterFileConfig
+    The configuration object containing all necessary information for parameter file generation.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/scripts/generate_paramfile/generate_paramfile.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span>
+<span class="normal">448</span>
+<span class="normal">449</span>
+<span class="normal">450</span>
+<span class="normal">451</span>
+<span class="normal">452</span>
+<span class="normal">453</span>
+<span class="normal">454</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span>
+<span class="normal">458</span>
+<span class="normal">459</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generate_paramfile</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">ParameterFileConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Top-level function to generate parameter files based on the provided configuration.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">    config : ParameterFileConfig</span>
+<span class="sd">        The configuration object containing all necessary information for parameter file generation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;&gt; Starting parameter file generation&quot;</span><span class="p">)</span>
+
+    <span class="c1"># check if ParameterFileConfig is valid</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Checking config: </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="n">return_string</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="c1"># type: ignore</span>
+    <span class="n">checked_config</span><span class="p">:</span> <span class="n">ParameterFileConfig</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_checked_and_derived_config</span><span class="p">()</span>
+    <span class="n">log_info_detailed</span><span class="p">(</span><span class="s1">&#39;tinkertool_log&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;&gt;&gt; Generating with config: </span><span class="si">{</span><span class="n">checked_config</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="n">return_string</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="c1"># type: ignore</span>
+    <span class="n">n_total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">checked_config</span><span class="o">.</span><span class="n">nmb_sim_dim</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;one_at_a_time&#39;</span> <span class="ow">or</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;oat&#39;</span><span class="p">:</span>
+        <span class="n">sample_points</span><span class="p">,</span> <span class="n">n_total</span> <span class="o">=</span> <span class="n">generate_one_at_a_time_sample_points</span><span class="p">(</span><span class="n">checked_config</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_total</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">checked_config</span><span class="o">.</span><span class="n">nmb_sim_dim</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">exclude_default</span><span class="p">:</span>
+                <span class="n">nmb_sim_dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_total</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">nmb_sim_dim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_total</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nmb_sim_dim</span> <span class="o">=</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">nmb_sim_dim</span>
+    <span class="k">elif</span> <span class="n">n_total</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
+            <span class="n">pdata</span> <span class="o">=</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">param_ranges</span><span class="p">[</span><span class="n">param</span><span class="p">]</span>
+            <span class="n">out_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">pdata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))])</span>
+            <span class="n">sample_points</span><span class="p">[</span><span class="n">param</span><span class="p">]</span> <span class="o">=</span> <span class="p">([</span><span class="s2">&quot;nmb_sim&quot;</span><span class="p">],</span> <span class="n">out_array</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;latin_hypercube&#39;</span> <span class="ow">or</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;lh&#39;</span><span class="p">:</span>
+        <span class="n">sample_points</span> <span class="o">=</span> <span class="n">generate_latin_hypercube_sample_points</span><span class="p">(</span><span class="n">checked_config</span><span class="p">)</span>
+        <span class="n">nmb_sim_dim</span> <span class="o">=</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">nmb_sim_dim</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid sampling method &#39;</span><span class="si">{</span><span class="n">checked_config</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+
+    <span class="n">sample_points_with_files</span> <span class="o">=</span> <span class="n">sample_points</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">change_chem_mech</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Generating chemistry mechanism files&quot;</span><span class="p">)</span>
+        <span class="n">chem_mech_in</span> <span class="o">=</span> <span class="n">generate_chem_mech_files</span><span class="p">(</span><span class="n">sample_points</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+    <span class="n">generate_land_model_param_files</span><span class="p">(</span><span class="n">sample_points</span><span class="p">,</span> <span class="n">sample_points_with_files</span><span class="p">,</span> <span class="n">checked_config</span><span class="p">)</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating xarray dataset&quot;</span><span class="p">)</span>
+    <span class="n">raw_ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
+        <span class="n">data_vars</span> <span class="o">=</span> <span class="n">sample_points</span><span class="p">,</span>
+        <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;nmb_sim&#39;</span><span class="p">:</span> <span class="n">nmb_sim_dim</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">out_ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
+        <span class="n">data_vars</span> <span class="o">=</span> <span class="n">sample_points_with_files</span><span class="p">,</span>
+        <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;nmb_sim&#39;</span><span class="p">:</span> <span class="n">nmb_sim_dim</span><span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="p">[</span><span class="n">raw_ds</span><span class="p">,</span> <span class="n">out_ds</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
+            <span class="n">pdata</span> <span class="o">=</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">param_ranges</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">param</span><span class="p">)]</span>
+            <span class="n">ds</span><span class="p">[</span><span class="n">param</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">safe_get_param_value</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="s1">&#39;No description available&#39;</span><span class="p">)</span>
+            <span class="n">ds</span><span class="p">[</span><span class="n">param</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">safe_get_param_value</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;No default value available&#39;</span><span class="p">)</span>
+            <span class="n">ds</span><span class="p">[</span><span class="n">param</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;sampling&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">safe_get_param_value</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="s1">&#39;sampling&#39;</span><span class="p">,</span> <span class="s1">&#39;No sampling method available&#39;</span><span class="p">)</span>
+
+            <span class="n">input_type</span> <span class="o">=</span> <span class="n">safe_get_param_value</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="s1">&#39;input_type&#39;</span><span class="p">,</span> <span class="s2">&quot;user_nl&quot;</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_type</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="n">input_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="n">it</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="n">PARAMFILE_INPUT_TYPES</span><span class="p">],</span> \
+                <span class="sa">f</span><span class="s2">&quot;Invalid input type &#39;</span><span class="si">{</span><span class="n">input_type</span><span class="si">}</span><span class="s2">, type(</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">input_type</span><span class="p">)</span><span class="si">}</span><span class="s2">)&#39; for parameter &#39;</span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2">&#39;. Supported types are: </span><span class="si">{</span><span class="n">PARAMFILE_INPUT_TYPES</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="n">ds</span><span class="p">[</span><span class="n">param</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;input_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_type</span>
+            <span class="n">ds</span><span class="p">[</span><span class="n">param</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;interdependent_with&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">safe_get_param_value</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="s2">&quot;interdependent_with&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">ds</span><span class="p">[</span><span class="n">param</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;format_to_file_method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">safe_get_param_value</span><span class="p">(</span><span class="n">pdata</span><span class="p">,</span> <span class="s2">&quot;format_to_file_method&quot;</span><span class="p">,</span> <span class="s2">&quot;write-lines&quot;</span><span class="p">)</span>
+            <span class="n">component</span> <span class="o">=</span> <span class="n">pdata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;esm_component&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">err_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;The component passed to param </span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2"> is of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">component</span><span class="p">)</span><span class="si">}</span><span class="s2">, expected type str&quot;</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">component</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">VALID_COMPONENTS</span><span class="p">:</span>
+                <span class="n">err_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Invalid component &#39;</span><span class="si">{</span><span class="n">component</span><span class="si">}</span><span class="s2">&#39; for parameter &#39;</span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s2">&#39;. Supported components are: </span><span class="si">{</span><span class="n">VALID_COMPONENTS</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
+            <span class="n">ds</span><span class="p">[</span><span class="n">param</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;esm_component&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">component</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="c1"># Add variables with irregular names</span>
+    <span class="k">if</span> <span class="n">checked_config</span><span class="o">.</span><span class="n">change_chem_mech</span><span class="p">:</span>
+        <span class="n">out_ds</span><span class="p">[</span><span class="s1">&#39;chem_mech_in&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;nmb_sim&#39;</span><span class="p">],</span> <span class="n">chem_mech_in</span><span class="p">)</span>
+    <span class="n">current_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">microsecond</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="c1"># Assigning to your attribute</span>
+    <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="p">[</span><span class="n">raw_ds</span><span class="p">,</span> <span class="n">out_ds</span><span class="p">]:</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;created&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Created &quot;</span> <span class="o">+</span> <span class="n">current_time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">)</span>
+    <span class="n">raw_ds</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="n">checked_config</span><span class="o">.</span><span class="n">param_sample_outpath</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s1">&#39;.raw.nc&#39;</span><span class="p">))</span>
+    <span class="n">out_ds</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="n">checked_config</span><span class="o">.</span><span class="n">param_sample_outpath</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s1">&#39;.nc&#39;</span><span class="p">))</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&gt;&gt; Raw parameter file (only numbers) </span><span class="si">{</span><span class="n">checked_config</span><span class="o">.</span><span class="n">param_sample_outpath</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s1">&#39;.raw.nc&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> generated successfully.&quot;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&gt;&gt; Parameter file (with filepaths) </span><span class="si">{</span><span class="n">checked_config</span><span class="o">.</span><span class="n">param_sample_outpath</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s1">&#39;.nc&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> generated successfully.&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="tinkertool.scripts.generate_paramfile.visualize_paramfile"></a>
+    <div class="doc doc-contents first">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="tinkertool.scripts.generate_paramfile.visualize_paramfile.visualize_paramfile" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">visualize_paramfile</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">visualize_paramfile</span><span class="p">(</span>
+    <span class="n">paramfile_path</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="pathlib.Path">Path</span></span><span class="p">,</span>
+    <span class="n">save_path</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="pathlib.Path">Path</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">show</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Visualize the paramfile in a pairplot for each dimension.</p>
+<h4 id="tinkertool.scripts.generate_paramfile.visualize_paramfile.visualize_paramfile--parameters">Parameters</h4>
+<p>paramfile_path : str | Path
+    path to the parameter file in netCDF format.
+save_path : str | Path, optional
+    path to save the plot. If None, saves to same directory as paramfile.
+show : bool, optional
+    whether to show the plot (requires GUI). Default False for headless systems.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/scripts/generate_paramfile/visualize_paramfile.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">visualize_paramfile</span><span class="p">(</span>
+    <span class="n">paramfile_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Visualize the paramfile in a pairplot for each dimension.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    paramfile_path : str | Path</span>
+<span class="sd">        path to the parameter file in netCDF format.</span>
+<span class="sd">    save_path : str | Path, optional</span>
+<span class="sd">        path to save the plot. If None, saves to same directory as paramfile.</span>
+<span class="sd">    show : bool, optional</span>
+<span class="sd">        whether to show the plot (requires GUI). Default False for headless systems.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">paramfile_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">paramfile_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">paramfile_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameter file not found: </span><span class="si">{</span><span class="n">paramfile_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Load the parameter file into a DataFrame</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">paramfile_path</span><span class="p">)</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+
+    <span class="c1"># plot pairplot</span>
+    <span class="n">pairplot</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="c1"># overlay the highlighted point on every off-diagonal scatter axis</span>
+    <span class="c1"># TODO: make which point to highlight configurable and optional</span>
+    <span class="c1"># right now it assumes the point to highlight is the first row</span>
+    <span class="c1"># which is generally true if exclude_default=False in the paramfile generation.</span>
+    <span class="c1"># However, this may not always be the case.</span>
+    <span class="n">default_row</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="nb">vars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">yvar</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">vars</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">xvar</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">vars</span><span class="p">):</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">pairplot</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
+                <span class="c1"># diagonal: draw a vertical line at the value</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">default_row</span><span class="p">[</span><span class="n">yvar</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># off-diagonal: plot the single highlighted point</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">default_row</span><span class="p">[</span><span class="n">xvar</span><span class="p">],</span> <span class="n">default_row</span><span class="p">[</span><span class="n">yvar</span><span class="p">],</span>
+                        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+    <span class="c1"># Save or show the plot</span>
+    <span class="k">if</span> <span class="n">save_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Default: save to same directory as paramfile</span>
+        <span class="n">save_path</span> <span class="o">=</span> <span class="n">paramfile_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">paramfile_path</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">_pairplot.png&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">save_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+        <span class="n">save_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Save the plot</span>
+    <span class="n">pairplot</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Plot saved to: </span><span class="si">{</span><span class="n">save_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Optionally show (only if GUI available)</span>
+    <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not show plot (no display available): </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Plot has been saved to: </span><span class="si">{</span><span class="n">save_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>  <span class="c1"># Clean up to avoid memory issues</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -9,25 +9,25 @@
       
       
       
-        <link rel="prev" href="../cli/">
+        <link rel="prev" href="../utils/">
       
       
-        <link rel="next" href="../api/generate_paramfile/">
+        <link rel="next" href="../aerosol_ppe_utils/">
       
       
         
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
-        <title>API Usage - NorESMTinkerTool</title>
+        <title>Sampling utilities - NorESMTinkerTool</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
       
 
@@ -46,9 +46,9 @@
       
     
     
-      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -66,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#api-usage" class="md-skip">
+        <a href="#tinkertool.utils.sampling" class="md-skip">
           Skip to content
         </a>
       
@@ -82,7 +82,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="NorESMTinkerTool" class="md-header__button md-logo" aria-label="NorESMTinkerTool" data-md-component="logo">
+    <a href="../.." title="NorESMTinkerTool" class="md-header__button md-logo" aria-label="NorESMTinkerTool" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              API Usage
+              Sampling utilities
             
           </span>
         </div>
@@ -180,7 +180,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="NorESMTinkerTool" class="md-nav__button md-logo" aria-label="NorESMTinkerTool" data-md-component="logo">
+    <a href="../.." title="NorESMTinkerTool" class="md-nav__button md-logo" aria-label="NorESMTinkerTool" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -198,7 +198,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -225,7 +225,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../installation/" class="md-nav__link">
+      <a href="../../installation/" class="md-nav__link">
         
   
   
@@ -252,7 +252,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
+      <a href="../../configuration/" class="md-nav__link">
         
   
   
@@ -279,7 +279,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../cli/" class="md-nav__link">
+      <a href="../../cli/" class="md-nav__link">
         
   
   
@@ -303,37 +303,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    API Usage
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../usage/" class="md-nav__link">
         
   
   
@@ -349,70 +322,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#contents" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        📚 Contents
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        📣 Prerequisites
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#generate-the-ppe-parameter-file" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Generate the PPE parameter file
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#create-the-ppe" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Create the PPE
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -421,18 +330,20 @@
       
   
   
+    
   
   
+  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
         
           
           <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
@@ -453,7 +364,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             
@@ -471,7 +382,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/generate_paramfile/" class="md-nav__link">
+      <a href="../generate_paramfile/" class="md-nav__link">
         
   
   
@@ -499,7 +410,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/create_ppe/" class="md-nav__link">
+      <a href="../create_ppe/" class="md-nav__link">
         
   
   
@@ -527,7 +438,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/setup/" class="md-nav__link">
+      <a href="../setup/" class="md-nav__link">
         
   
   
@@ -555,7 +466,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/config_utils/" class="md-nav__link">
+      <a href="../config_utils/" class="md-nav__link">
         
   
   
@@ -583,7 +494,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/utils/" class="md-nav__link">
+      <a href="../utils/" class="md-nav__link">
         
   
   
@@ -608,10 +519,35 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../api/sampling/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sampling utilities
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -627,6 +563,74 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.sampling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sampling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tinkertool.utils.sampling.scale_values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        scale_values
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="scale_values">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.sampling.scale_values--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.sampling.scale_values--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -639,7 +643,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/aerosol_ppe_utils/" class="md-nav__link">
+      <a href="../aerosol_ppe_utils/" class="md-nav__link">
         
   
   
@@ -674,7 +678,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples.md" class="md-nav__link">
+      <a href="../../examples.md" class="md-nav__link">
         
   
   
@@ -711,8 +715,6 @@
   
   
   
-    
-  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -721,10 +723,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#contents" class="md-nav__link">
+  <a href="#tinkertool.utils.sampling" class="md-nav__link">
     <span class="md-ellipsis">
       
-        📚 Contents
+        sampling
       
     </span>
   </a>
@@ -732,35 +734,41 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
+  <a href="#tinkertool.utils.sampling.scale_values" class="md-nav__link">
     <span class="md-ellipsis">
       
-        📣 Prerequisites
+        scale_values
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="scale_values">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.sampling.scale_values--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#generate-the-ppe-parameter-file" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#tinkertool.utils.sampling.scale_values--returns" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Generate the PPE parameter file
+        Returns
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#create-the-ppe" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Create the PPE
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -781,118 +789,115 @@
 
 
 
-<h1 id="api-usage">API Usage</h1>
-<p>This section describes how to use the NorESMTinkerTool package, within a python script using the internal API.</p>
-<h2 id="contents">📚 Contents</h2>
-<ul>
-<li><a href="#prerequisites">Prerequisites</a></li>
-<li><a href="#generate-parameter-file-for-ppe">Generate parameter file for PPE</a></li>
-<li><a href="#create-ppe">Create PPE</a></li>
-</ul>
-<h2 id="prerequisites">📣 Prerequisites</h2>
-<p>Before the package can be used, the path to the NorESM directory must be set, by specifying the <code>CESMROOT</code> enviromental variable, such that it can find the required CIME libraries.</p>
-<pre><code class="language-bash">export CESMROOT=/path/to/NorESM
-</code></pre>
-<h2 id="generate-the-ppe-parameter-file">Generate the PPE parameter file</h2>
-<p>To generate the parameter file for the PPE we use <code>generate_paramfile</code> program. If you would like to use the CLI have a look under the CLI documentation. Below we will describe how to use API in a stand alone python script.</p>
-<div class="admonition note prerequisites">
-<p class="admonition-title">Note</p>
-<ul>
-<li>scipy and xarray should be installed, ensure optional 'sampling' is included in installation command <code>pip install -e .[sampling]</code>.</li>
-<li>Update input files:</li>
-<li>Update parameter ranges by either adding/editing entries in <code>default_config/default_param_ranges.ini</code> or by feeding an updated custom path to --param-ranges-file (see more information bellow).</li>
-<li><code>default_config/chem_mech_default.in</code> should be renewed if you are perturbing values from <code>NorESM/components/cam/src/chemistry/pp_trop_mam_oslo/</code>.</li>
-</ul>
+  <h1>Sampling utilities</h1>
+
+<div class="doc doc-object doc-module">
+
+
+
+<a id="tinkertool.utils.sampling"></a>
+    <div class="doc doc-contents first">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="tinkertool.utils.sampling.scale_values" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">scale_values</span>
+
+
+</h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">scale_values</span><span class="p">(</span>
+    <span class="n">values</span><span class="p">:</span> <span class="n"><span title="numpy.ndarray">ndarray</span></span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n"><span title="float">float</span></span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="numpy.ndarray">ndarray</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Scale values from [0, 1] to [a, b] range</p>
+<h4 id="tinkertool.utils.sampling.scale_values--parameters">Parameters</h4>
+<p>values : np.ndarray
+    arrays of values to be scaled. The values should be in the range [0, 1]
+a : float
+    lower bound of the range to scale to
+b : float
+    upper bound of the range to scale to</p>
+<h4 id="tinkertool.utils.sampling.scale_values--returns">Returns</h4>
+<p>np.ndarray
+    scaled values in the range [a, b]</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>tinkertool/utils/sampling.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">scale_values</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scale values from [0, 1] to [a, b] range</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    values : np.ndarray</span>
+<span class="sd">        arrays of values to be scaled. The values should be in the range [0, 1]</span>
+<span class="sd">    a : float</span>
+<span class="sd">        lower bound of the range to scale to</span>
+<span class="sd">    b : float</span>
+<span class="sd">        upper bound of the range to scale to</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        scaled values in the range [a, b]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">values</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
 </div>
-<p>The parameter file is created using Latin Hypercube sampling 
-to most efficiently span the whole parameter space. 
-The outcome the script is a .nc file that will have one dimension, 
-'nmb_sim', which contains the number of ensemble members. Each parameter is 
-stored as a variable in the dataset and is scaled according to its 
-specified range and sampling method. The ranges as described in the
-<code>default_config/default_param_ranges.ini</code> file are used to distribute
-parameter values between its minimum and maximum bounds.</p>
-<pre><code class="language-python">from pathlib import Path
-from tinkertool.scripts.generate_paramfile.config import ParameterFileConfig
-from tinkertool.scripts.generate_paramfile.generate_paramfile import generate_paramfile
 
-parmfile_config = ParameterFileConfig(
-  param_ranges_inpath=Path(&lt;param_ranges.ini&gt;).resolve(),
-  param_sample_outpath=Path(&lt;param_samples.nc&gt;).resolve(),
-  chem_mech_file=Path(&lt;NorESMTinkerTool/default_config/default_chem_mech.in&gt;).resolve(),
-  tinkertool_output_dir=Path(&lt;NorESMTinkerTool/output&gt;).resolve(),
-  nmb_sim=30,
-  optimization=None,
-  avoid_scramble=False,
-  params=None,
-  assumed_esm_component='cam',
-  exclude_default=False,
-  verbose=0,
-  log_file=None,
-  log_mode='w'
-)
-</code></pre>
-<p>Common for both the CLI and scripting is that you will have to provide the same arguments. See the <code>generate_paramfile --help</code> print above for details. For <code>param_ranges_inpath</code> the expected format used by the script is:</p>
-<pre><code class="language-ini">[parameter_name]
-description = &lt;short description of the parameter&gt;
-justification = &lt;justification for sampling range&gt;
-min = &lt;lower bound for sampling&gt;
-max = &lt;upper bound for sampling&gt;
-default = &lt;default value for the parameter in the model version&gt;
-ndigits = &lt;number of digits to use in sampling, i.e. sampling resolution&gt;
-sampling = &lt;linear/log&gt; (linear or log_10 scale sampling)
-format_to_file_method = &lt;f-string, if you want to use f-string to specify parameter values&gt;
-esm_component = &lt;Which component of the model this parameter belongs to e.g. CAM&gt;
-</code></pre>
-<h2 id="create-the-ppe">Create the PPE</h2>
-<p>The main function only takes a CreatePPEConfig object as input. Basic usage
-from pathlib import Path
-from tinkertool.scripts.crate_ppe.config import CreatePPEConfig
-from tinkertool.scripts.create_ppe.create_ppe import create_ppe</p>
-<h1 id="describe-the-expected-input-to-ppeconfig">describe the expected input to PPEConfig</h1>
-<p>CreatePPEConfig.describe()</p>
-<p>ppe_config = CreatePPEConfig(
-  simulation_setup_path = Path(<simulation_setup.ini>).resolve(),
-  build_base_only       = False,
-  build_only            = False,
-  keepexe               = False,
-  overwrite             = False,
-  verbose               = 0,
-  log_file              = Path(<wanted_logfile.out>).resolve(),
-  log_mode              = 'w'
-)</p>
-<p>create_ppe(ppe_config)</p>
-<pre><code>alternatively if you only want to either a) build or b) submit cases use
-```python
-from pathlib import Path
-from tinkertool.scripts.crate_ppe.config import BuildPPEConfig, SubmitPPEConfig
-from tinkertool.scripts.create_ppe.create_ppe import build_ppe, submit_ppe
 
-# a) Build only
-BuildPPEConfig.help()
-buildppe_config = BuildPPEConfig(
-  simulation_setup_path = Path(&lt;simulation_setup.ini&gt;).resolve(),
-  build_base_only       = False,
-  keepexe               = False,
-  overwrite             = False,
-  verbose               = 0,
-  log_file              = Path(&lt;wanted_logfile.out&gt;).resolve(),
-  log_mode              = 'w'
-)
-build_ppe(buildppe_config)
 
-# b) Sumbit only
-SubmitPPEConfig.help()
-submitppe_config = SubmitPPEConfig(
-  cases                 = list(Path(&lt;case1&gt;).resolve(), ..., Path(&lt;caseX&gt;).resolve())
-  verbose               = 0,
-  log_file              = Path(&lt;wanted_logfile.out&gt;).resolve(),
-  log_mode              = 'w'
-)
+  </div>
 
-submit_ppe(submitppe_config)
-</code></pre>
-<p>The <code>simulation_setup.ini</code> file is described in detail <a href="../configuration/">configuration</a>.</p>
+    </div>
+
+</div>
 
 
 
@@ -942,10 +947,10 @@ submit_ppe(submitppe_config)
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>
