@@ -232,6 +232,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -248,6 +266,58 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup-the-virtual-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup the virtual environment.
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#clone-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clone repository:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -408,6 +478,47 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup-the-virtual-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup the virtual environment.
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#clone-repository" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clone repository:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -424,24 +535,21 @@
 
 
 <h1 id="installation">Installation</h1>
-<ol>
-<li>Setup virtual eviroment.</li>
-</ol>
-<pre><code>python3 -m venv tinkertool &amp;&amp; source tinkertool/bin/activate
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Note that the package requires python &gt;=3.10,&lt;3.12.</p>
+</div>
+<h2 id="setup-the-virtual-environment">Setup the virtual environment.</h2>
+<pre><code>python -m venv tinkertool &amp;&amp; source tinkertool/bin/activate
 </code></pre>
-<p>Note that the package requires python &gt;=3.10,&lt;3.12 to be active in your enviroment.</p>
-<ol>
-<li>clone repository:</li>
-</ol>
+<h2 id="clone-repository">clone repository:</h2>
 <pre><code>git clone https://github.com/Ovewh/NorESMTinkerTool.git &amp;&amp; cd NorESMTinkerTool
 </code></pre>
-<ol>
-<li>Install</li>
-</ol>
+<h2 id="install">Install</h2>
 <pre><code>pip install  ./
 </code></pre>
 <p>Or, to include optionals:</p>
-<pre><code>pip install  .[optional1, ..., optionalx]
+<pre><code>pip install  .[optional1, ..., optional]
 </code></pre>
 <p>Available optionals:</p>
 <ul>
