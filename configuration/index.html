@@ -698,7 +698,7 @@ fincl1 = AQRAIN
 </div>
 <h3 id="f-string-formating">f-string formating</h3>
 <p>f-string formating offers a another way of for perturbing parameters in the namelists. This is done by putting a <em>f-string</em> placeholder that will be resolved with a parameter when building the PPE. The most common use case for this is to scale external forcing files. 
-Below is an example how the <em>f-string</em> formatting looks. Here each placeholder with the same name will be filled with the same value during build</p>
+Below is an example how the <em>f-string</em> formatting looks. Here each placeholder with the same name will be filled with the same value during build. </p>
 <pre><code>ext_frc_specifier = H2O    -&gt; /cluster/shared/noresm/inputdata/atm/cam/chem/emis/elev/H2OemissionCH4oxidationx2_3D_L70_1849-2101_CMIP6ensAvg_SSP2-4.5_c190403.nc
     BC_AX  -&gt;  {bc_scale_specifier}*/cluster/shared/noresm/inputdata/atm/cam/chem/emis/cmip7_emissions_version20250620/emissions_cmip7_noresm3_BC_AX_airALL_vertical_1995-2025_1.9x2.5_version20250620.nc
     BC_AX  -&gt;  {bc_scale_specifier}*/cluster/shared/noresm/inputdata/atm/cam/chem/emis/cmip7_emissions_version20250620/emissions_cmip7_noresm3_BC_AX_anthroprofENEIND_vertical_1995-2025_1.9x2.5_version20250620.nc
@@ -722,6 +722,10 @@ srf_emis_specifier = BC_AX  -&gt;  {bc_scale_specifier}*/cluster/shared/noresm/i
     SO2    -&gt;  {so2_scale_specifier}*/cluster/shared/noresm/inputdata/atm/cam/chem/emis/cmip7_emissions_version20250620/emissions_cmip7_noresm3_SO2_anthrosurfAGRTRADOMSOLWSTSHP_surface_1995-2025_1.9x2.5_version20250620.nc
     SO4_PR -&gt;  {so2_scale_specifier}*/cluster/shared/noresm/inputdata/atm/cam/chem/emis/cmip7_emissions_version20250620/emissions_cmip7_noresm3_SO4_PR_anthrosurfAGRTRADOMSOLWSTSHP_surface_1995-2025_1.9x2.5_version20250620.nc
 </code></pre>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Parameters that should be provided as f-strings need be specified to use the f-string method using the following opition in the .ini file defining the parameters <code>format_to_file_method = f-string</code>.</p>
+</div>
 
 
 
