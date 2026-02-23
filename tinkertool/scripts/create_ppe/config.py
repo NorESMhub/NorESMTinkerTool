@@ -1,290 +1,157 @@
-import configparser
+import os
+import time
 import logging
-from dataclasses import MISSING, dataclass, field, fields
-from pathlib import Path
-from typing import Optional, Union
-
+import configparser
 import numpy as np
-from netCDF4 import Dataset
+from pathlib import Path
+import xarray as xr
+from typing import Union, Optional
+from dataclasses import dataclass, fields, field
 
-from tinkertool.setup.setup_cime_connection import add_CIME_paths_and_import
-from tinkertool.utils.check_arguments import (
-    check_type,
-    validate_directory,
-    validate_file,
-)
 from tinkertool.utils.read_files import read_config
+from tinkertool.utils.config_utils import BaseConfig, CheckedBaseConfig
+from tinkertool.setup.setup_cime_connection import add_CIME_paths_and_import
+from tinkertool.utils.check_arguments import validate_file, validate_directory, check_type
 
 
-def get_ncattr_or_default(var, attr, default=None):
-    try:
-        return var.getncattr(attr)
-    except AttributeError:
-        return default
-
-
-@dataclass
-class BaseConfig:
-    """Base dataclass for parameter file generation configuration."""
-
-    verbose: int = field(
-        default=0,
-        metadata={
-            "help": "Increase verbosity level (0: WARNING, 1: INFO, 2: INFO_DETAILED, 3: DEBUG)"
-        },
-    )
-    log_file: Path = field(
-        default=None,
-        metadata={
-            "help": "Path to the log file where logs will be written. If None, logs will not be saved to a file."
-        },
-    )
-    log_mode: str = field(
-        default="w",
-        metadata={
-            "help": "Mode for opening the log file ('w' for write, 'a' for append)"
-        },
-    )
-
-    def __post_init__(self):
-
-        # check the arguments
-        # verbose
-        if self.verbose not in [0, 1, 2, 3]:
-            raise ValueError(
-                f"Invalid verbosity level: {self.verbose}. Must be 0, 1, 2, or 3."
-            )
-        # log_file
-        if self.log_file is not None:
-            if not self.log_file.exists():
-                self.log_file.parent.mkdir(parents=True, exist_ok=True)
-                self.log_file.touch()
-        # log_mode
-        if self.log_mode not in ["w", "a"]:
-            raise ValueError(f"Invalid log mode: {self.log_mode}. Must be 'w' or 'a'.")
-
-    @classmethod
-    def help(cls):
-        print(f"Dataclass '{cls.__name__}' expects the following fields:")
-        for inputfield in fields(cls):
-            desc = inputfield.metadata.get("help", "")
-            if inputfield.default is not MISSING:
-                desc = f"{desc} (default: {inputfield.default!r})"
-            else:
-                desc = f"{desc} (required)"
-            print(
-                f"  {inputfield.name.ljust(25)}: {str(inputfield.type).ljust(25)} {desc}"
-            )
-
-    def describe(self, return_string: bool = True):
-        lines = [
-            f"Instance of dataclass '{self.__class__.__name__}' has the following values:"
-        ]
-        for inputfield in fields(self):
-            desc = inputfield.metadata.get("help", "")
-            value = getattr(self, inputfield.name)
-            lines.append(
-                f"  {inputfield.name.ljust(25)}: {str(inputfield.type).ljust(25)} = {value!r}  {desc}"
-            )
-        if return_string:
-            return "\n".join(lines)
-        else:
-            print("\n".join(lines))
-
-    def get_checked_and_derived_config(self):
-        pass
-
-
-@dataclass
+@dataclass(kw_only=True)
 class CreatePPEConfig(BaseConfig):
-    # will have the same fields as BaseConfig, but with additional fields:
-    simulation_setup_path: Path = field(
-        default=None,
-        metadata={
-            "help": "Path to user defined configuration file for simulation setup."
-        },
-    )
-    build_base_only: bool = field(
-        default=False, metadata={"help": "Only build the base case - not PPE members"}
-    )
-    build_only: bool = field(
-        default=False,
-        metadata={"help": "Only build the PPE and not submit them to the queue"},
-    )
-    clone_only_during_build: bool = field(
-        default=False,
-        metadata={
-            "help": "Only clone the base case and not build the PPE members. This is useful if you have already built the base_case."
-        },
-    )
-    keepexe: bool = field(
-        default=False,
-        metadata={
-            "help": "Reuse the executable for the base case instead of building a new one for each member"
-        },
-    )
-    overwrite: bool = field(
-        default=False, metadata={"help": "Overwrite existing cases if they exist"}
-    )
+
+    # Core required fields
+    simulation_setup_path:  Path = field(metadata={"help": "Path to user defined configuration file for simulation setup."})
+    # Optional fields with defaults
+    build_base_only:        bool = field(default=False, metadata={"help": "Only build the base case - not PPE members"})
+    build_only:             bool = field(default=False, metadata={"help": "Only build the PPE and not submit them to the queue"})
+    frozen_base_case:       bool = field(default=False, metadata={"help": "Only clone the base case and not build the PPE members. This is useful if you have already built the base_case."})
+    keepexe:                bool = field(default=False, metadata={"help": "Reuse the executable for the base case instead of building a new one for each member"})
+    overwrite_base_case:    bool = field(default=False, metadata={"help": "Overwrite the exisiting base case it it exists, e.g. it will rebuild the entire case from scratch, required if code changes are made."})
+    overwrite_ppe:          bool = field(default=True, metadata={"help":  "Overwrite PPE ensemble cases if they exist"})
 
     def __post_init__(self):
-        # run parent checks for the variables that are inherited from BaseConfig
         super().__post_init__()
-        # check the arguments
         if self.simulation_setup_path is None:
-            raise ValueError(
-                "simulation_setup_path is required. Please provide a valid path to the simulation setup file."
-            )
-        validate_file(
-            self.simulation_setup_path, ".ini", "simulation setup file", new_file=False
-        )
-        # build_base_only
+            raise ValueError("simulation_setup_path is required. Please provide a valid path to the simulation setup file.")
+        validate_file(self.simulation_setup_path, ".ini", "simulation setup file", new_file=False)
         check_type(self.build_base_only, bool)
-        # build_only
-        # avoid checking if it is type BuildPPEConfig.
-        # BuildPPEConfig overrides build_only as a dummy field
         if type(self) is CreatePPEConfig or type(self) is CheckedCreatePPEConfig:
             check_type(self.build_only, bool)
-        # clone_only_during_build
-        check_type(self.clone_only_during_build, bool)
-        # keepexe
+        check_type(self.frozen_base_case, bool)
         check_type(self.keepexe, bool)
-        # overwrite
-        check_type(self.overwrite, bool)
+        check_type(self.overwrite_base_case, bool)
+        check_type(self.overwrite_ppe, bool)
 
-    def get_checked_and_derived_config(self):
+    def get_checked_and_derived_config(self) -> 'CheckedCreatePPEConfig':
         """Check and handle arguments for the PPE configuration."""
-        super().get_checked_and_derived_config()
+        time_str = time.strftime("%Y%m%d-%H%M%S")
+        log_file = Path(self.log_dir).joinpath(f'tinkertool_{time_str}.log')
 
         # derived fields - we unpack the simulation setup file
-        simulation_setup: configparser.ConfigParser = read_config(
-            self.simulation_setup_path
-        )
+        simulation_setup: configparser.ConfigParser = read_config(self.simulation_setup_path)
         # - ppe_settings
-        baseroot = Path(simulation_setup["ppe_settings"]["baseroot"]).resolve()
-        basecasename = simulation_setup["ppe_settings"]["basecasename"]
-        assumed_esm_component: str = simulation_setup["ppe_settings"][
-            "assumed_esm_component"
-        ]
+        baseroot = Path(simulation_setup['ppe_settings'].get('baseroot',vars=os.environ)).resolve()
+        basecasename = simulation_setup['ppe_settings']['basecasename']
         ## - paramfile
-        pdim: str = simulation_setup["ppe_settings"]["pdim"]
-        paramfile_path: Path = Path(
-            simulation_setup["ppe_settings"]["paramfile"]
-        ).resolve()
+        pdim: str = simulation_setup['ppe_settings']['pdim']
+        paramfile_path: Path = Path(simulation_setup['ppe_settings'].get('paramfile',vars=os.environ)).resolve()
         validate_file(paramfile_path, ".nc", "paramfile", new_file=False)
-        paramfile: Dataset = Dataset(paramfile_path, "r")
-        if pdim not in list(paramfile.dimensions.keys()):
-            raise SystemExit(
-                f"ERROR: {pdim} is not a valid dimension in {paramfile_path}. \nParamfile dimensions are: {list(paramfile.dimensions.keys())}"
-            )
-        paramdict: dict = {k: v[:] for k, v in paramfile.variables.items() if k != pdim}
-        componentdict: dict = {
-            k: get_ncattr_or_default(v, "esm_component", assumed_esm_component)
-            for k, v in paramdict.items()
-        }
-        num_sims = paramfile.dimensions[pdim].size
-        num_vars = len(paramfile.variables.keys()) - 1
-        ensemble_num = paramfile[pdim][:]
-        paramfile.close()
-        # - namelist_control
+        paramfile: xr.Dataset = xr.open_dataset(paramfile_path)
+        if pdim not in paramfile.dims:
+            raise SystemExit(f"ERROR: {pdim} is not a valid dimension in {paramfile_path}. \nParamfile dimensions are: {list(paramfile.dims.keys())}")
+        paramDataset: xr.Dataset = paramfile
+        componentdict: dict = {}
+        logging.debug(f"Processing paramfile {paramfile_path} with parameters: {list(paramDataset.variables.keys())}")
+        for param in [ param for param in paramDataset.variables.keys() if param != pdim ]:
+            esm_component = paramDataset.variables[param].attrs.get('esm_component', None)
+            if esm_component is None:
+                err_msg = f"Parameter {param} in paramfile {paramfile_path} does not have an 'esm_component' attribute."
+                logging.error(err_msg)
+                raise ValueError(err_msg)
+            componentdict[param] = esm_component
+        num_sims = paramfile.sizes[pdim]
+        num_vars = len(paramfile.variables.keys())-1
+        ensemble_num = paramfile[pdim][:].values
+
         namelist_collection_dict = {}
-        for control_nl in simulation_setup["namelist_control"].values():
+        for component_nl_name in simulation_setup.options('namelist_control'):
+            control_nl = simulation_setup['namelist_control'].get(component_nl_name,vars=os.environ)
             if control_nl is not None:
                 control_nl = Path(control_nl).resolve()
-                validate_file(
-                    control_nl,
-                    ".ini",
-                    f"namelist control file {control_nl.name}.ini",
-                    new_file=False,
-                )
-                namelist_collection_dict[control_nl.name] = read_config(control_nl)
+                validate_file(control_nl, ".ini", f"namelist control file {control_nl.name}.ini", new_file=False)
+                namelist_collection_dict[component_nl_name] = read_config(control_nl)
             else:
-                logging.warning(
-                    f"Control namelist is None for {control_nl.name}, using model default"
-                )
+                logging.warning(f"Control namelist is None for {control_nl.name}, using model default")
         # - create_case
-        cesmroot = Path(simulation_setup["create_case"]["cesmroot"]).resolve()
+        simulation_setup['create_case']['cesmroot'] = simulation_setup['create_case'].get('cesmroot',vars=os.environ)
+        cesmroot = Path(simulation_setup['create_case']['cesmroot']).resolve()
         validate_directory(cesmroot, "CESM root directory")
-        add_CIME_paths_and_import(cesmroot)
+        if os.environ.get('CESMROOT') != str(cesmroot):
+            logging.warning(f"CESMROOT environment variable is set to {os.environ.get('CESMROOT')}, but the simulation setup file specifies {cesmroot}.")
+            logging.warning("This may cause issues with CIME paths. Consider choosing one cesmroot.")
 
+        add_CIME_paths_and_import(cesmroot)
+        if self.__dict__.get('log_file', log_file) is not None:
+            log_file = self.__dict__.get('log_file', log_file)
+        # remove log_file from __dict__ to avoid duplication
+        if 'log_file' in self.__dict__:
+            del self.__dict__['log_file']
         return CheckedCreatePPEConfig(
             **self.__dict__,
+            log_file=log_file,
             simulation_setup=simulation_setup,
             baseroot=baseroot,
             basecasename=basecasename,
-            assumed_esm_component=assumed_esm_component,
             paramfile_path=paramfile_path,
             pdim=pdim,
-            paramdict=paramdict,
+            paramDataset=paramDataset,
             componentdict=componentdict,
             num_sims=num_sims,
             num_vars=num_vars,
             ensemble_num=ensemble_num,
             namelist_collection_dict=namelist_collection_dict,
-            cesmroot=cesmroot,
+            cesmroot=cesmroot
         )
 
-
-@dataclass
-class CheckedCreatePPEConfig(CreatePPEConfig):
-    # Will have the same fields as CreatePPEConfig, but with additional fields:
-    simulation_setup: configparser.ConfigParser = field(
-        default=None, metadata={"help": "Parsed simulation setup file"}
-    )
+@dataclass(kw_only=True)
+class CheckedCreatePPEConfig(CheckedBaseConfig):
+    # Include all fields from CreatePPEConfig
+    simulation_setup_path:  Path = field(metadata={"help": "Path to user defined configuration file for simulation setup."})
+    build_base_only:        bool = field(default=False, metadata={"help": "Only build the base case - not PPE members"})
+    build_only:             bool = field(default=False, metadata={"help": "Only build the PPE and not submit them to the queue"})
+    frozen_base_case:       bool = field(default=False, metadata={"help": "If true the BaseCase is frozen, and will not be touched during PPE build, useful if already built and not code changes made."})
+    keepexe:                bool = field(default=False, metadata={"help": "Reuse the executable for the base case"})
+    overwrite_base_case:    bool = field(default=False, metadata={"help": "Overwrite the existing base case if it exists, e.g. it will rebuild the entire case from scratch, required if code changes are made."})
+    overwrite_ppe:          bool = field(default=False, metadata={"help": "Overwrite PPE ensemble cases if they exist"})
+    # Additional derived/checked fields:
+    simulation_setup:       configparser.ConfigParser = field(metadata={"help": "Parsed simulation setup file"})
     # - ppe_settings
-    baseroot: Path = field(
-        default=None, metadata={"help": "Path to the base case root directory"}
-    )
-    basecasename: str = field(default=None, metadata={"help": "Name of the base case"})
-    assumed_esm_component: str = field(
-        default=None,
-        metadata={
-            "help": "Assumed ESM component for entries that does not have a specified component attribute in paramfile"
-        },
-    )
+    baseroot:               Path = field(metadata={"help": "Path to the base case root directory"})
+    basecasename:           str = field(metadata={"help": "Name of the base case"})
     # - paramfile
-    paramfile_path: Path = field(
-        default=None, metadata={"help": "Path to the paramfile"}
-    )
-    pdim: str = field(
-        default=None,
-        metadata={"help": "Dimension of ensamble member count in paramfile"},
-    )
-    paramdict: dict = field(
-        default=None, metadata={"help": "Dictionary of parameters in the paramfile"}
-    )
-    componentdict: dict = field(
-        default=None, metadata={"help": "Dictionary of ESM components in the paramfile"}
-    )
-    num_sims: int = field(default=None, metadata={"help": "Number of ensemble members"})
-    num_vars: int = field(
-        default=None, metadata={"help": "Number of variables in the paramfile"}
-    )
-    ensemble_num: np.ndarray = field(
-        default=None, metadata={"help": "Ensemble number in the paramfile"}
-    )
+    paramfile_path:         Path = field(metadata={"help": "Path to the paramfile"})
+    pdim:                   str = field(metadata={"help": "Dimension of ensemble member count in paramfile"})
+    paramDataset:           xr.Dataset = field(metadata={"help": "Dataset of parameters in the paramfile"})
+    componentdict:          dict = field(metadata={"help": "Dictionary of ESM components in the paramfile"})
+    num_sims:               int = field(metadata={"help": "Number of ensemble members"})
+    num_vars:               int = field(metadata={"help": "Number of variables in the paramfile"})
+    ensemble_num:           np.ndarray = field(metadata={"help": "Ensemble number in the paramfile"})
     # - namelist_control
-    namelist_collection_dict: dict = field(
-        default=None,
-        metadata={"help": "Dictionary of namelist parsed namelist_control files"},
-    )
+    namelist_collection_dict: dict = field(metadata={"help": "Dictionary of namelist parsed namelist_control files"})
     # - create_case
-    cesmroot: Path = field(
-        default=None, metadata={"help": "Path to the CESM root directory"}
-    )
+    cesmroot:              Path = field(metadata={"help": "Path to the CESM root directory"})
 
     def __post_init__(self):
         # check the arguments
         check_type(self.simulation_setup, configparser.ConfigParser)
         # - ppe_settings
         validate_directory(self.baseroot, "base case root directory")
+        if isinstance(self.baseroot, str):
+            self.baseroot = Path(self.baseroot).resolve() 
         check_type(self.baseroot, Path)
         check_type(self.basecasename, str)
-        check_type(self.assumed_esm_component, str)
         # - paramfile
         validate_file(self.paramfile_path, ".nc", "paramfile", new_file=False)
         check_type(self.pdim, str)
-        check_type(self.paramdict, dict)
+        check_type(self.paramDataset, xr.Dataset)
         check_type(self.componentdict, dict)
         check_type(self.num_sims, int)
         check_type(self.num_vars, int)
@@ -298,30 +165,28 @@ class CheckedCreatePPEConfig(CreatePPEConfig):
         # - create_case
         check_type(self.cesmroot, Path)
 
-    def get_checked_and_derived_config(self):
-        logging.info(
-            f"{self.__class__.__name__} is a dataclass with all derived fields, no further checks are needed."
-        )
+    def get_checked_and_derived_config(self) -> 'CheckedCreatePPEConfig':
+        logging.info(f"{self.__class__.__name__} is a dataclass with all derived fields, no further checks are needed.")
+        return self
 
-
-@dataclass
+@dataclass(kw_only=True)
 class BuildPPEConfig(CreatePPEConfig):
     # Override build_only: set as a dummy field, not used in BuildConfig
     build_only: Optional[None] = field(
-        default=None, metadata={"help": "Not used in BuildPPEConfig"}
+        default=None,
+        metadata={"help": "Not used in BuildPPEConfig"}
     )
 
     def __post_init__(self):
         # Set the build_only field to None
-        self.build_only = None
+        self.build_only = None  # Not used in BuildPPEConfig
         # run parent checks for the variables that are inherited from CreatePPEConfig
         super().__post_init__()
 
-    def get_checked_and_derived_config(self):
+
+    def get_checked_and_derived_config(self) -> 'CheckedBuildPPEConfig':
         # Run parent checks and get the checked config from CreatePPEConfig
-        checked_create_ppe_config: CheckedCreatePPEConfig = (
-            super().get_checked_and_derived_config()
-        )
+        checked_create_ppe_config: CheckedCreatePPEConfig = super().get_checked_and_derived_config()
 
         # delete the build_only field from the checked config
         for field in fields(checked_create_ppe_config):
@@ -329,73 +194,124 @@ class BuildPPEConfig(CreatePPEConfig):
                 delattr(checked_create_ppe_config, field.name)
 
         return CheckedBuildPPEConfig(
-            **checked_create_ppe_config.__dict__, build_only=self.build_only
+            **checked_create_ppe_config.__dict__,
+            build_only=self.build_only
         )
-
 
 @dataclass
 class CheckedBuildPPEConfig(CheckedCreatePPEConfig):
     # Override build_only: set as a dummy field, not used in BuildConfig
     build_only: Optional[bool] = field(
-        default=None, metadata={"help": "Not used in CheckedBuildPPEConfig"}
-    )
-
-    def get_checked_and_derived_config(self):
-        logging.info(
-            f"{self.__class__.__name__} is a dataclass with all derived fields, no further checks are needed."
-        )
-
-
-@dataclass
-class SubmitPPEConfig(BaseConfig):
-    cases: Union[str, Path, list[str], list[Path]] = field(
         default=None,
-        metadata={"help": "List of case directories to submit to the queue"},
+        metadata={"help": "Not used in CheckedBuildPPEConfig"}
     )
+
+    def get_checked_and_derived_config(self) -> 'CheckedBuildPPEConfig':
+        self.build_only = None  # Not used in CheckedBuildPPEConfig
+        logging.info(f"{self.__class__.__name__} is a dataclass with all derived fields, no further checks are needed.")
+        return self
+
+@dataclass(kw_only=True)
+class SubmitPPEConfig(BaseConfig):
+
+    cases:  Union[str, Path, list[str], list[Path]] = field(metadata={"help": "List of case directories to submit to the queue"})
 
     def __post_init__(self):
         # run parent checks for the variables that are inherited from BaseConfig
         super().__post_init__()
         # check the arguments
         if self.cases is None:
-            raise ValueError(
-                "cases is required. Please provide a valid list of case directories."
-            )
-        check_type(self.cases, (str, Path, list))
-        if isinstance(self.cases, list):
-            for case in self.cases:
-                check_type(case, (str, Path))
-
-    def get_checked_and_derived_config(self):
-        """Check and handle arguments for the PPE configuration."""
-        super().get_checked_and_derived_config()
-
+            raise ValueError("cases is required. Please provide a valid list of case directories.")
         # cases
         if isinstance(self.cases, str):
-            self.cases = [self.cases]
+            self.cases = [Path(self.cases).resolve()]
         elif isinstance(self.cases, Path):
-            self.cases = [self.cases]
-        elif isinstance(self.cases, list) and all(
-            isinstance(case, str) or isinstance(case, Path) for case in self.cases
-        ):
+            self.cases = [self.cases.resolve()]
+        elif isinstance(self.cases, list) and all(isinstance(case, str) or isinstance(case, Path) for case in self.cases):
             self.cases = [Path(case).resolve() for case in self.cases]
+        else:
+            raise TypeError("cases must be a string, Path, or a list of strings or Paths.")
         for case in self.cases:
             validate_directory(case, f"case directory {case.name}")
 
+    def get_checked_and_derived_config(self) -> 'CheckedSubmitPPEConfig':
+        """Check and handle arguments for the PPE configuration."""
+        # Create log file path (from parent class logic)
+        time_str = time.strftime("%Y%m%d-%H%M%S")
+        log_file = Path(self.log_dir).joinpath(f'tinkertool_{time_str}.log')
+        if self.__dict__.get('log_file') is None:
+            self.__dict__['log_file'] = log_file
         return CheckedSubmitPPEConfig(**self.__dict__)
 
-
-@dataclass
-class CheckedSubmitPPEConfig(SubmitPPEConfig):
-    # Will have the same fields as SubmitPPEConfig
+@dataclass(kw_only=True)
+class CheckedSubmitPPEConfig(CheckedBaseConfig):
+    # Include fields from SubmitPPEConfig (cases is always list[Path] after processing)
+    cases: list[Path] = field(default_factory=list, metadata={"help": "List of case directories to submit to the queue"})
 
     def __post_init__(self):
-        # check the arguments
+        # run the parent __post_init__ method
+        super().__post_init__()
+        # check that cases is a list of Paths (should always be true in CheckedSubmitPPEConfig)
         check_type(self.cases, list)
+        if not self.cases:
+            raise ValueError("cases list cannot be empty in CheckedSubmitPPEConfig")
         for case in self.cases:
             check_type(case, Path)
 
-    def get_checked_and_derived_config(self):
-        logging.info(
-            f"{self.__class__.__name__} is a dataclass with all derived fields, no further checks are needed."
-        )
+    def get_checked_and_derived_config(self) -> 'CheckedSubmitPPEConfig':
+        logging.info(f"{self.__class__.__name__} is a dataclass with all derived fields, no further checks are needed.")
+        return self
+
+# wrapper config objects for check_build and prestage. They can
+# use SubmitPPEConfig, we just wrap them to avoid confusion.
+
+class CheckBuildConfig(SubmitPPEConfig):
+    """Configuration for checking build status of PPE cases.
+
+    Functionally identical to SubmitPPEConfig but with a name that clearly
+    indicates its purpose: checking if ensemble member cases have been built successfully.
+    """
+
+    def get_checked_and_derived_config(self) -> 'CheckedCheckBuildConfig':
+        """Check and handle arguments for the build check configuration."""
+        # Get the parent checked config
+        parent_config = super().get_checked_and_derived_config()
+        # Return as CheckedCheckBuildConfig
+        return CheckedCheckBuildConfig(**parent_config.__dict__)
+
+class CheckedCheckBuildConfig(CheckedSubmitPPEConfig):
+    """Checked configuration for checking build status of PPE cases.
+
+    The validated and processed version of CheckBuildConfig with all fields
+    verified and cases converted to Path objects.
+    """
+
+    def get_checked_and_derived_config(self) -> 'CheckedCheckBuildConfig':
+        logging.info(f"{self.__class__.__name__} is a dataclass with all derived fields, no further checks are needed.")
+        return self
+
+class PrestageEnsembleConfig(SubmitPPEConfig):
+    """Configuration for prestaging PPE ensemble cases.
+
+    Functionally identical to SubmitPPEConfig but with a name that clearly
+    indicates its purpose: preparing ensemble member cases by copying restart
+    files and setting up the run environment before job submission.
+    """
+
+    def get_checked_and_derived_config(self) -> 'CheckedPrestageEnsembleConfig':
+        """Check and handle arguments for the prestage configuration."""
+        # Get the parent checked config
+        parent_config = super().get_checked_and_derived_config()
+        # Return as CheckedPrestageEnsembleConfig
+        return CheckedPrestageEnsembleConfig(**parent_config.__dict__)
+
+class CheckedPrestageEnsembleConfig(CheckedSubmitPPEConfig):
+    """Checked configuration for prestaging PPE ensemble cases.
+
+    The validated and processed version of PrestageEnsembleConfig with all fields
+    verified and cases converted to Path objects.
+    """
+
+    def get_checked_and_derived_config(self) -> 'CheckedPrestageEnsembleConfig':
+        logging.info(f"{self.__class__.__name__} is a dataclass with all derived fields, no further checks are needed.")
+        return self

@@ -7,25 +7,33 @@ from tinkertool.utils.type_check_decorator import type_check_decorator
 
 @type_check_decorator
 def validate_file(
-    file_path: Path, expected_suffix: str, description: str, new_file: bool
+    file_path:          Path | str,
+    expected_suffix:    str,
+    description:        str,
+    new_file:           bool
 ):
-    if not file_path.suffix == expected_suffix:
-        raise SystemExit(f"ERROR: {file_path} is not a valid {description}")
+    file_path = Path(file_path).resolve()
+    # Handle compound suffixes like .raw.nc by checking if the filename ends with the expected suffix
+    if not str(file_path).endswith(expected_suffix):
+        raise ValueError(f"ERROR: {file_path} is not a valid {description}")
     else:
         if new_file and file_path.exists():
             Warning(f"WARNING: {file_path} already exists. It will be overwritten.")
         if not new_file and not file_path.exists():
-            traceback.print_stack()
-            raise SystemExit(
+            raise ValueError(
                 f"ERROR: {file_path} does not exist. Please provide a valid file path."
             )
 
 
 @type_check_decorator
-def validate_directory(directory_path: Path, description: str):
+def validate_directory(
+    directory_path: Path | str,
+    description: str
+):
+    directory_path = Path(directory_path).resolve()
     if not directory_path.is_dir():
         traceback.print_stack()
-        raise SystemExit(f"ERROR: {directory_path} is not a valid {description}")
+        raise ValueError(f"ERROR: {directory_path}, {description} does not exist or is not a directory.")
 
 
 def check_type(
@@ -40,4 +48,4 @@ def check_type(
             return
 
     traceback.print_stack()
-    raise SystemExit(f"ERROR: {obj} is not a valid {expected_type}")
+    raise ValueError(f"ERROR: {obj} is not a valid {expected_type}")

@@ -20,7 +20,7 @@ Note that the package requires python >=3.10,<3.12 to be active in your envirome
 
 2. clone repository:
 ```
-git clone https://github.com/Ovewh/NorESMTinkerTool.git && cd NorESMTinkerTool
+git clone git@github.com:Johannesfjeldsaa/NorESMTinkerTool.git && cd NorESMTinkerTool
 ```
 
 3. Install
@@ -30,13 +30,16 @@ pip install -e  ./
 ```
 Or, to include optionals:
 ```
-pip install -e  .[optional1, ..., optionalx]
+pip install -e  .[optional1,...,optionalx]
 ```
 Available optionals:
 
 * sampling
+* plotting
 
-Note that the `-e` puts the package in editable mode, if it is not included changes to configuration files etc will not be available before you re install the package.
+Note that:
+* the `-e` puts the package in editable mode, if it is not included changes to configuration files etc will not be available before you re install the package.
+* There is no spaces between optional's and ',' character.
 
 ## Contributing 
 Contributions are welcome! This is supposed to be a community driven project, so if you have ideas for improvements or new features, please open an issue or a pull request on GitHub.
