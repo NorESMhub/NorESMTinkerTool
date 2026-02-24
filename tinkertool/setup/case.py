@@ -7,13 +7,19 @@ import shutil
 import subprocess
 from itertools import islice
 from pathlib import Path
+import xarray as xr
 
-from tinkertool.setup.namelist import setup_usr_nlstring, write_user_nl_file
+from tinkertool.setup.namelist import setup_usr_nlstring, write_user_nl_file, format_value
 from tinkertool.setup.setup_cime_connection import add_CIME_paths
+from tinkertool.utils.CIME_interaction_utils import set_value_with_status_update
 
+# TODO: get rid of the need to export CESMROOT env variable, use the one in the config file instead?
 try:
-    add_CIME_paths(cesmroot=os.environ.get("CESMROOT"))
-except TypeError:
+    environ_CESMROOT = os.environ.get('CESMROOT')
+    if environ_CESMROOT is None:
+        raise ImportError("CESMROOT environment variable not set")
+    add_CIME_paths(cesmroot=environ_CESMROOT)
+except ImportError:
     print("ERROR: add_CIME_paths failed, update CESMROOT environment variable")
     raise SystemExit
 
@@ -52,6 +58,11 @@ except ImportError:
         "ERROR: CIME.locked_files not found, or unable to find lock_file() and unlock_file()"
     )
     raise SystemExit
+try:
+    from CIME.status import append_case_status
+except ImportError:
+    print("ERROR: CIME.status.append_case_status not found.")
+    raise SystemExit
 
 # get the logger - assuming this is run from create_ppe.build_ppe so that tinkertool_log is set up
 logger = logging.getLogger("tinkertool_log")
@@ -73,33 +84,35 @@ def iterate_dict_to_set_value(case: CIME.case, settings_dict: dict, dict_name: s
     settings_dict : dict
         Dictionary of settings to be applied to the case
     """
+    all_success = True
     for key, value in settings_dict.items():
-        try:
-            case.set_value(key, value)
-        except Exception as error:
-            logger.warning(f"WARNING: {key} from {dict_name} not set in case: {error}")
-            continue
+        if not set_value_with_status_update(case, key, value, kill_on_error=False):
+            all_success = False
+
+    if all_success:
+        logger.debug(f"All key: value pairs where successfully set for {dict_name}: {settings_dict}")
 
 
 def _per_run_case_updates(
     case: CIME.case,
-    paramdict: dict,
+    paramDataset: xr.Dataset,
     componentdict: dict,
     ens_idx: str,
+    namelist_collection_dict: dict|None = None,
     path_base_input: str = "",
     keepexe: bool = False,
     lifeCycleMedianRadius=None,
     lifeCycleSigma=None,
 ):
     """
-    Update and submit the new cloned case, setting namelist parameters according to paramdict
+    Update and submit the new cloned case, setting namelist parameters according to the paramDataset
 
     Parameters
     ----------
     case : CIME.case
         The case object to be updated
-    paramdict : dict
-        Dictionary of namelist parameters to be updated
+    paramDataset : xr.Dataset 
+        Dataset of namelist parameters to be updated
     componentdict : dict
         Dictionary of component names for the parameters
     ens_idx : str
@@ -109,19 +122,18 @@ def _per_run_case_updates(
     logger.info(">> Building clone case {}...".format(ens_idx))
 
     caseroot = case.get_value("CASEROOT")
-    basecasename = os.path.basename(caseroot)
-    unlock_file("env_case.xml", caseroot=caseroot)
-    casename = f"{basecasename}{ens_idx}"
-    case.set_value("CASE", casename)
+    casename = os.path.basename(caseroot)
+    unlock_file("env_case.xml",caseroot=caseroot)
+    set_value_with_status_update(case, "CASE", casename, kill_on_error=False)
     rundir = case.get_value("RUNDIR")
     rundir = os.path.dirname(rundir)
     rundir = f"{rundir}/run.{ens_idx.split('.')[-1]}"
-    case.set_value("RUNDIR", rundir)
+    set_value_with_status_update(case, "RUNDIR", rundir, kill_on_error=False)
     # smb++ extract the chem_mech_in_file
     chem_mech_file = None
-    if "chem_mech_in" in paramdict.keys():
-        chem_mech_file = Path(path_base_input) / paramdict["chem_mech_in"]
-        del paramdict["chem_mech_in"]
+    if "chem_mech_in" in paramDataset.variables.keys():
+        chem_mech_file = Path(path_base_input) / paramDataset["chem_mech_in"].values.item()
+        del paramDataset["chem_mech_in"]
         del componentdict["chem_mech_in"]
     case.flush()
     lock_file("env_case.xml", caseroot=caseroot)
@@ -135,8 +147,8 @@ def _per_run_case_updates(
     components = list(set(componentdict.values()))
 
     paramLinesDict = {component: [] for component in components}
-
-    for var in paramdict.keys():
+    fStringParameters = {}
+    for var in paramDataset:
         paramLines = paramLinesDict[componentdict[var]]
         if var.startswith("lifeCycleNumberMedianRadius"):
             lifeCycleNumber = int(var.split("_")[-1])
@@ -146,7 +158,7 @@ def _per_run_case_updates(
                 )
             lifeCylceList = lifeCycleMedianRadius.split(",")
             lifeCylceList[lifeCycleNumber] = (
-                "{:.1E}".format(paramdict[var]).replace("E", "D").replace("+", "")
+                "{:.1E}".format(paramDataset[var].values.item()).replace("E", "D").replace("+", "")
             )
 
             paramLines.append(
@@ -162,30 +174,53 @@ def _per_run_case_updates(
                 )
             lifeCylceList = lifeCycleSigma.split(",")
             lifeCylceList[lifeCycleNumber] = (
-                "{:.1E}".format(paramdict[var]).replace("E", "D").replace("+", "")
+                "{:.1E}".format(paramDataset[var].values.item()).replace("E", "D").replace("+", "")
             )
             paramLines.append(
                 "oslo_aero_lifecyclesigma = " + ",".join(lifeCylceList) + "\n"
             )
-        else:
-            paramLines.append("{} = {}\n".format(var, paramdict[var]))
 
+        elif paramDataset[var].attrs.get("format_to_file_method", None) == "f-string":
+            esm_component = paramDataset[var].attrs["esm_component"]
+            if fStringParameters.get(esm_component, None) is None:
+                fStringParameters[esm_component] = {}
+            fStringParameters[esm_component][var] = paramDataset[var].values.item()
+        else:
+            value = paramDataset[var].values.item()
+            if isinstance(value, str):
+                value = format_value(value)
+            paramLines.append("{} = {}\n".format(var, value))
+    # appending parameter changes to the user_nl file from the paramLinesDict
+    logging.info(f"fStringParameters: {fStringParameters}")
+    logging.info(f"namelist_collection_dict: {namelist_collection_dict}") 
     for component in components:
         paramLines = paramLinesDict[component]
-        if len(paramLines) > 0:
-            usernlfile = os.path.join(caseroot, f"user_nl_{component}")
-            with open(usernlfile, "a") as file:
-                file.writelines(paramLines)
+        usernlfile = os.path.join(caseroot, f"user_nl_{component}")
+        if len(paramLines) > 0 or fStringParameters.get(component, None) is not None:
+            if namelist_collection_dict is not None:
+                logging.info(fStringParameters.get(component, None) is not None)
+                if fStringParameters.get(component, None) is not None:
+                    logging.info(f"Formatting user_nl_{component} with f-string parameters")
+                    user_nl_str = setup_usr_nlstring(
+                        namelist_collection_dict[f"control_{component}"],
+                        component_name=component,
+                    )
+                    logging.info(f"the following formatting is applied: {fStringParameters[component]}")
+                    user_nl_str = user_nl_str.format(**fStringParameters[component])
+                    with open(usernlfile, "w") as file:
+                        file.writelines(user_nl_str)
+                else:
+                    if "misc" in namelist_collection_dict[f"control_{component}"].sections():
+                        namelist_collection_dict[f"control_{component}"].remove_section("misc")   
+                with open(usernlfile, "a") as file:
+                    file.writelines(paramLines)
 
     if chem_mech_file is not None:
         comm = "cp {} {}".format(chem_mech_file, caseroot + "/")
         subprocess.run(comm, shell=True)
         unlock_file("env_build.xml", caseroot=caseroot)
         value = case.get_value("CAM_CONFIG_OPTS", resolved=False)
-        case.set_value(
-            "CAM_CONFIG_OPTS",
-            f"{value} --usr_mech_infile {caseroot}/{chem_mech_file.name}",
-        )
+        set_value_with_status_update(case, "CAM_CONFIG_OPTS", f"{value} --usr_mech_infile {caseroot}/{chem_mech_file.name}", kill_on_error=False)
         case.flush()
         lock_file("env_build.xml", caseroot=caseroot)
 
@@ -199,24 +234,23 @@ def _per_run_case_updates(
 
 
 def build_base_case(
-    baseroot: str,
-    basecasename: str,
-    overwrite: bool,
-    case_settings: dict,
-    env_pe_settings: dict,
-    env_run_settings: dict,
-    env_build_settings: dict,
-    namelist_collection_dict: dict,
-) -> str:
+    basecaseroot:               Path,
+    overwrite:                  bool,
+    case_settings:              dict,
+    env_pe_settings:            dict,
+    env_run_settings:           dict,
+    env_build_settings:         dict,
+    namelist_collection_dict:   dict,
+    paramDataset:               xr.Dataset,
+    pdim: str
+) -> Path:
     """
     Create and build the base case that all PPE cases are cloned from
 
     Parameters
     ----------
-    baseroot : str
-        The base directory for the cases
-    basecasename : str
-        The base case name
+    basecaseroot : Path
+        The base case root directory
     overwrite : bool
         Overwrite existing cases
     case_settings : dict
@@ -232,24 +266,24 @@ def build_base_case(
 
     Returns
     -------
-    str
+    Path
         The root directory of the base case
     """
-    logger.info(">>> BUILDING BASE CASE...")
-    caseroot = os.path.join(baseroot, basecasename)
-    if overwrite and os.path.isdir(caseroot):
-        shutil.rmtree(caseroot)
-    with Case(caseroot, read_only=False) as case:
-        if not os.path.isdir(caseroot):
-            logger.info("Creating base case directory: {}".format(caseroot))
+
+    if overwrite and basecaseroot.is_dir():
+        shutil.rmtree(basecaseroot)
+    with Case(str(basecaseroot), read_only=False) as case:
+        logging.debug(dir(case))
+        if not basecaseroot.is_dir():
+            logger.info(">>> BUILDING BASE CASE...")
+            logger.info('Creating base case directory: {}'.format(basecaseroot))
             # create the case using the case_settings
             case.create(
-                casename=os.path.basename(caseroot),
+                casename=basecaseroot.name,
                 srcroot=case_settings.pop("cesmroot"),
                 compset_name=case_settings.pop("compset"),
                 grid_name=case_settings.pop("res"),
                 machine_name=case_settings.pop("mach"),
-                walltime=case_settings.pop("walltime"),
                 project=case_settings.pop("project"),
                 driver="nuopc",
                 run_unsupported=True,
@@ -257,18 +291,15 @@ def build_base_case(
                 **case_settings,
             )
             case.record_cmd(init=True)
+        
         else:
-            if not case.read_only:
-                logger.info("Reusing existing case directory: {}".format(caseroot))
-            else:
-                logger.warning(
-                    "Base case directory exists but is read-only: {}".format(caseroot)
-                )
+            logger.info('Reusing existing case directory: {}'.format(str(basecaseroot)))
+
 
         # set the case environment variables
         # first using the case's own values
-        case.set_value("EXEROOT", case.get_value("EXEROOT", resolved=True))
-        case.set_value("RUNDIR", case.get_value("RUNDIR", resolved=True))
+        set_value_with_status_update(case, "EXEROOT", case.get_value("EXEROOT", resolved=True), kill_on_error=True)
+        set_value_with_status_update(case, "RUNDIR", case.get_value("RUNDIR", resolved=True), kill_on_error=True)
         # set the PE settings
         # check if the env_pe_settings are not empty dict, or all entries are None
         if not env_pe_settings or all(
@@ -288,39 +319,37 @@ def build_base_case(
 
         logger.info(">>> Setting environment run settings...")
         # set the run settings
-        case.set_value("RUN_TYPE", env_run_settings.pop("RUN_TYPE"))
+        set_value_with_status_update(case, "RUN_TYPE", env_run_settings.pop("RUN_TYPE"), kill_on_error=False)
+        set_value_with_status_update(case, 'JOB_WALLCLOCK_TIME', env_run_settings.pop('JOB_WALLCLOCK_TIME_RUN'), subgroup='case.run', kill_on_error=False)
+        set_value_with_status_update(case, 'JOB_WALLCLOCK_TIME', env_run_settings.pop('JOB_WALLCLOCK_TIME_ARCHIVE'), subgroup='case.st_archive', kill_on_error=False)
+        set_value_with_status_update(case, 'JOB_WALLCLOCK_TIME', env_run_settings.pop('JOB_WALLCLOCK_TIME_COMPRESS'), subgroup='case.compress', kill_on_error=False)
         if env_run_settings.get("GET_REFCASE") is not None:
-            case.set_value("GET_REFCASE", env_run_settings.pop("GET_REFCASE"))
+            set_value_with_status_update(case, "GET_REFCASE", env_run_settings.pop("GET_REFCASE"), kill_on_error=False)
         if env_run_settings.get("RUN_REFCASE") is not None:
-            case.set_value("RUN_REFCASE", env_run_settings.pop("RUN_REFCASE"))
-        if any(
-            env_run_settings.get(key) is not None
-            for key in ["RUN_REFDIR", "RUN_REFDATE"]
-        ):
-            case.set_value("RUN_REFDIR", env_run_settings.pop("RUN_REFDIR"))
-            case.set_value("RUN_REFDATE", env_run_settings.pop("RUN_REFDATE"))
+            set_value_with_status_update(case, "RUN_REFCASE", env_run_settings.pop('RUN_REFCASE'), kill_on_error=False)
+        if any(env_run_settings.get(key) is not None for key in ['RUN_REFDIR', 'RUN_REFDATE']):
+            set_value_with_status_update(case, "RUN_REFDIR", env_run_settings.pop("RUN_REFDIR"), kill_on_error=False)
+            set_value_with_status_update(case, "RUN_REFDATE", env_run_settings.pop("RUN_REFDATE"), kill_on_error=False)
 
-        case.set_value("STOP_OPTION", env_run_settings.pop("STOP_OPTION"))
-        case.set_value("STOP_N", env_run_settings.pop("STOP_N"))
-        case.set_value("RUN_STARTDATE", env_run_settings.pop("RUN_STARTDATE"))
+        set_value_with_status_update(case, "STOP_OPTION",env_run_settings.pop("STOP_OPTION"), kill_on_error=False)
+        set_value_with_status_update(case, "STOP_N",env_run_settings.pop("STOP_N"), kill_on_error=False)
+        set_value_with_status_update(case, "RUN_STARTDATE",env_run_settings.pop("RUN_STARTDATE"), kill_on_error=False)
 
-        if any(
-            env_run_settings.get(key) is not None for key in ["REST_N", "REST_OPTION"]
-        ):
-            case.set_value("REST_OPTION", env_run_settings.pop("REST_OPTION"))
-            case.set_value("REST_N", env_run_settings.pop("REST_N"))
+        if any(env_run_settings.get(key) is not None for key in ['REST_N', 'REST_OPTION']):
+            set_value_with_status_update(case, "REST_OPTION", env_run_settings.pop("REST_OPTION"), kill_on_error=False)
+            set_value_with_status_update(case, "REST_N", env_run_settings.pop("REST_N"), kill_on_error=False)
 
-        if env_run_settings.get("CAM_CONFIG_OPTS") is not None:
-            if env_run_settings.get("cam_onopts"):
-                Warning.warning(
+        if env_run_settings.get('CAM_CONFIG_OPTS') is not None:
+            if env_run_settings.get('cam_onopts'):
+                logging.warning(
                     "Both 'CAM_CONFIG_OPTS' and 'cam_onopts' were provided. "
                     "'CAM_CONFIG_OPTS' will overwrite all previous options including 'cam_onopts'."
                 )
-            case.set_value("CAM_CONFIG_OPTS", env_run_settings.pop("CAM_CONFIG_OPTS"))
-        elif env_run_settings.get("cam_onopts") is not None:
-            current_opts = case.get_value("CAM_CONFIG_OPTS", resolved=True)
+            set_value_with_status_update(case, 'CAM_CONFIG_OPTS', env_run_settings.pop('CAM_CONFIG_OPTS'), kill_on_error=False)
+        elif env_run_settings.get('cam_onopts') is not None:
+            current_opts = case.get_value('CAM_CONFIG_OPTS', resolved=True)
             new_opts = f"{current_opts} {env_run_settings.pop('cam_onopts')}".strip()
-            case.set_value("CAM_CONFIG_OPTS", new_opts)
+            set_value_with_status_update(case, 'CAM_CONFIG_OPTS', new_opts, kill_on_error=False)
 
         # check if there are any additional run settings
         if env_run_settings or any(
@@ -330,7 +359,7 @@ def build_base_case(
                 case=case, settings_dict=env_run_settings, dict_name="env_run_settings"
             )
 
-        case.set_value("DEBUG", env_build_settings.pop("DEBUG", "FALSE"))
+        set_value_with_status_update(case, "DEBUG", env_build_settings.pop("DEBUG", "FALSE"), kill_on_error=False)
         # check if the env_build_settings are not empty dict, or all entries are None
         if not env_build_settings or all(
             value is None for value in env_build_settings.values()
@@ -348,81 +377,101 @@ def build_base_case(
 
         logger.info(">>> base case write user_nl files...")
         # write user_nl files
-        for nl_control_filename in namelist_collection_dict.keys():
-            # get the component name from the file name assuming control_<component>.ini
-            component_name = nl_control_filename.split("_")[1].split(".")[0]
-            user_nl_str = setup_usr_nlstring(
-                namelist_collection_dict[nl_control_filename],
-                component_name=component_name,
-            )
-            write_user_nl_file(caseroot, f"user_nl_{component_name}", user_nl_str)
+        fStringParameters = {}
+        for var in paramDataset:
+            if paramDataset[var].attrs.get("format_to_file_method", None) == "f-string":
+                esm_component = paramDataset[var].attrs["esm_component"]
+                if fStringParameters.get(esm_component, None) is None:
+                    fStringParameters[esm_component] = {}
+                fStringParameters[esm_component][var] = paramDataset[var].isel({pdim:0}).values.item()
 
-    logger.info(">> base case_build...")
-    os.chdir(caseroot)
-    subprocess.run(["./case.build"], check=True)
-    logger.info(">>> base case build completed successfully.")
+        for nl_control_name in namelist_collection_dict.keys():
+            # get the component name from the file name assuming control_<component> using the name in the .ini file
+            component_name = nl_control_name.split('_')[-1]
+            user_nl_str = setup_usr_nlstring(namelist_collection_dict[nl_control_name], component_name=component_name)
+            
+            if fStringParameters.get(component_name, None) is not None:
+                user_nl_str = user_nl_str.format(**fStringParameters[component_name])
+            write_user_nl_file(str(basecaseroot), f"user_nl_{component_name}", user_nl_str)
 
-    return caseroot
+        logger.info(">> base case_build...")
+        build.case_build(basecaseroot, case=case)
+
+    return basecaseroot
 
 
 def clone_base_case(
-    baseroot: str,
-    basecaseroot: str,
-    overwrite: bool,
-    paramdict: dict,
-    componentdict: dict,
-    ensemble_idx: str,
-    path_base_input: str = "",
-    keepexe: bool = False,
-    **kwargs,
-):
+    baseroot:           Path,
+    basecaseroot:       Path,
+    overwrite:          bool,
+    paramDataset:       xr.Dataset,
+    componentdict:      dict,
+    ensemble_idx:       str,
+    namelist_collection_dict: dict,
+    path_base_input:    Path=Path(''),
+    keepexe:            bool=False,
+    **kwargs
+) -> Path:
     """
     Clone the base case and update the namelist parameters
 
     Parameters
     ----------
-    baseroot : str
+    baseroot : Path
         The base directory for the cases
-    basecaseroot : str
+    basecaseroot : Path
         The base case root directory
     overwrite : bool
         Overwrite existing cases
-    paramdict : dict
-        Dictionary of namelist parameters to be updated
+    paramDataset : xr.Dataset
+        Dataset of namelist parameters to be updated
     componentdict : dict
         Dictionary of component names for the parameters
     ensemble_idx : str
         The ensemble index for the new case
-    path_base_input : str
+    path_base_input : Path
         The path to the base input files
     keepexe : bool
         Keep the executable files
     **kwargs : dict
         Additional keyword arguments to be passed to the case updates
 
+    Returns
+    -------
+    Path
+        The root directory of the cloned case
     """
 
     logger.info(">>> CLONING BASE CASE for member {}...".format(ensemble_idx))
-    cloneroot = os.path.join(baseroot, f"ensamble_member.{ensemble_idx}")
-
-    if overwrite and os.path.isdir(cloneroot):
+    cloneroot = baseroot.joinpath(f'ensemble_member.{ensemble_idx}')
+    # should be able to overwrite cloned cases independently of base case... 
+    if overwrite and cloneroot.exists():
         shutil.rmtree(cloneroot)
-    if not os.path.isdir(cloneroot):
-        with Case(basecaseroot, read_only=False) as clone:
-            clone.create_clone(cloneroot, keepexe=keepexe)
-    with Case(cloneroot, read_only=False) as case:
+    if not cloneroot.exists():
+        logger.debug(f"Creating clone directory: {cloneroot}")
+        logger.debug(f"cloneroot type: {type(cloneroot)}")
+        with Case(str(basecaseroot), read_only=False) as clone:
+            clone.create_clone(str(cloneroot), keepexe=keepexe)
+    fstings_params = [False if paramDataset[var].attrs.get("format_to_file_method", None) != "f-string" else True for var in paramDataset]
+    logging.info(f"f-string parameters present: {fstings_params}")
+    if any(fstings_params) == True:
+        namelist_dict = namelist_collection_dict
+    else:
+        logging.info("No f-string parameters present, setting namelist_collection_dict to None")
+        namelist_dict = None    
+    with Case(str(cloneroot), read_only=False) as case:
         _per_run_case_updates(
             case=case,
-            paramdict=paramdict,
+            paramDataset=paramDataset,
             componentdict=componentdict,
             ens_idx=ensemble_idx,
-            path_base_input=path_base_input,
+            path_base_input=str(path_base_input),
             keepexe=keepexe,
+            namelist_collection_dict=namelist_dict,
             **kwargs,
         )
 
-    return cloneroot
-
+    return Path(cloneroot)
 
 def take(n, iterable):
     "Return first n items of the iterable as a list"

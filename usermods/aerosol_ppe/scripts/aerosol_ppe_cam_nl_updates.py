@@ -30,11 +30,11 @@ from tinkertool.utils.write_out_station_nl_string import write_out_station_nm_st
 # ------------------------ #
 # --- Global variables --- #
 # ------------------------ #
-with pkg_resources.path("config_examples", "default_control_atm.ini") as p:
+with pkg_resources.path("usermods.aerosol_ppe", "user_nl_cam.ini") as p:
     config_path = p.resolve()
-with pkg_resources.path("input_files", "stations_combined.csv") as p:
+with pkg_resources.path("usermods.aerosol_ppe.input_files", "stations_combined.csv") as p:
     station_csv = p.resolve()
-with pkg_resources.path("input_files", "output_variables.csv") as p:
+with pkg_resources.path("usermods.aerosol_ppe.input_files", "output_variables.csv") as p:
     fincl_csv = p.resolve()
 
 # --------------------- #
@@ -106,7 +106,6 @@ def main():
         help="Increase verbosity level (use -v for more detail)",
     )
     args = parser.parse_args()
-
     # --- check CLI arguments and handle defaults
     # -- verbose
     verbose = False
@@ -129,9 +128,9 @@ def main():
     fincl_data_file = (
         args.fincl_data_file if args.fincl_data_file is not None else fincl_csv
     )
-    namelist_string = get_namlist_string("mon-global", 1, args.fincl_data_file, "A")
+    namelist_string = get_namlist_string("mon-global", 1, fincl_data_file, "A")
     station_data_namlist_vars = get_namlist_string(
-        "3-h-station", 2, args.fincl_data_file, "I"
+        "3-h-station", 2, fincl_data_file, "I"
     )
     if verbose:
         print(f"{'Using fincl data file'.ljust(width)}: {fincl_data_file}")
@@ -153,14 +152,14 @@ def main():
 
     nml_variable = namelist_string.split("=")[0].strip()
     station_nml_varialbe = station_data_namlist_vars.split("=")[0].strip()
-    nml_from_config = config["camexp"].get(nml_variable, None)
+    nml_from_config = config["misc"].get(nml_variable, None)
 
     # Merge namelist_string with name list from control atm file
     for nml_n, nml_v in zip(
         [nml_variable, station_nml_varialbe],
         [namelist_string, station_data_namlist_vars],
     ):
-        nml_from_config = config["camexp"].get(nml_n, None)
+        nml_from_config = config["misc"].get(nml_n, None)
         if nml_from_config is not None and args.overwrite_existing_fincl == False:
             nml_config_vars = nml_from_config.split("\n")
             namelist_string_vars = nml_v.split("=")[1].strip().split("\n")
@@ -174,14 +173,14 @@ def main():
             )
         namelist_string_vars.sort()
         # updated nml to config
-        config["camexp"][nml_n] = ("\n").join(namelist_string_vars)
+        config["misc"][nml_n] = ("\n").join(namelist_string_vars)
         # write the station data string to the control atm file
 
     station_variable_name_str = station_data_string.split("=")[0].strip()
     station_variables_str = station_data_string.split("=")[1].strip()
-    config["camexp"][station_variable_name_str] = station_variables_str
+    config["misc"][station_variable_name_str] = station_variables_str
     # Write update control atm file
-    config["camexp"]["avgflag_pertape"] = ",".join(args.pertape_flags)
+    config["misc"]["avgflag_pertape"] = ",".join(args.pertape_flags)
 
     with open(output_file, "w") as out_file:
         config.write(out_file)

@@ -1,3 +1,5 @@
+# TODO: when writing string for user_nl's check if the keyword already exists
+# in the file, if so remove that line
 import configparser
 import logging
 import os
@@ -18,78 +20,108 @@ def format_value(value: str) -> str:
         The string to format.
     """
     value = value.strip()
+
     # Handle Fortran logicals
-    if value.lower() in [".true.", ".false."]:
-        return value.lower()
-    # Handle single numeric value (int, float, E or D notation)
-    if re.match(r"^-?\d+(\.\d*)?([eEdD][+-]?\d+)?$", value):
-        return value
+    if value.lower() in ['.true.', '.false.']:
+        return_value = value.lower()
     # Handle comma-separated list of numbers or booleans
-    if "," in value:
+    elif "," in value:
         vals = [v.strip() for v in value.split(",")]
-        if all(
-            re.match(r"^-?\d+(\.\d*)?([eEdD][+-]?\d+)?$", v)
-            or v.lower() in [".true.", ".false."]
-            for v in vals
-        ):
-            return ", ".join(vals)
-        # Otherwise, treat as strings
-        return ", ".join(f"'{v}'" for v in vals)
-    # Otherwise, treat as string
-    return f"'{value}'"
+        if all(re.match(r'^-?\d+(\.\d*)?([eEdD][+-]?\d+)?$', v) or v.lower() in ['.true.', '.false.'] for v in vals):
+            # For numeric lists, join without spaces (Fortran convention)
+            return_value = ",".join(vals)
+        else:
+            # For string lists, quote each item and join with commas (no spaces)
+            return_value = ",".join(f"'{v}'" for v in vals)
+    # Handle single numeric value (int, float, E or D notation)
+    elif re.match(r'^-?\d+(\.\d*)?([eEdD][+-]?\d+)?$', value):
+        return_value = value
+    else:
+        # Otherwise, treat as string
+        return_value = f"'{value}'"
 
+    logging.debug(f"'format_value': in - {value}, out {return_value}")
+    return return_value
 
+# TODO: Since the usage syntax of user_nl is different between model components
+# we should make the user_nlstring writing based on a component class instances
+# instead of if tests. Will become more important when we perturb more
+# user nl's
 def setup_usr_nlstring(
-    user_nl_config: configparser.ConfigParser, component_name: str
+  user_nl_config: configparser.ConfigParser,
+  component_name: str
+) -> str:
+  """
+  Takes inn configparser objects of default namelist settings for setting dianoistics and control namelist settings.
+
+  Parameters:
+  -----------
+  user_nl_config : configparser.ConfigParser
+      A configparser object containing default namelist settings.
+  component_name : str
+      Name of the component for which the namelist settings are being set up, e.g. 'cam', 'clm', etc.
+      Per now only 'blom' is the exception where the namelist section is not used.
+  """
+  user_nlstring = ""
+  section_list = user_nl_config.sections()
+  if 'misc' in section_list:
+    for key in user_nl_config['misc']:
+      value = user_nl_config['misc'][key]
+      if any(substring in key for substring in ["fincl", "fexcl"]):
+        # Handle multi-line diagnostic lists
+        if "\n" in value:
+          diag_list = value.split("\n")
+          # For string lists, quote each item
+          user_nlstring += key + f" = '{diag_list[0]}',\n"
+          for diag in diag_list[1:-1]:
+            user_nlstring += f"         '{diag}',\n"
+          user_nlstring +=  f"         '{diag_list[-1]}'\n"
+        else:
+          # Single line - use format_value for proper formatting
+          user_nlstring += key + " = " + format_value(value) + "\n"
+      else:
+        user_nlstring += key + " = " + format_value(user_nl_config['misc'][key]) + "\n"
+    section_list.remove('misc')
+  for section in section_list:
+    if component_name.lower() != 'blom':
+      user_nlstring += f"&{section}\n"
+    for key in user_nl_config[section]:
+      value = user_nl_config[section][key]
+      if any(substring in key for substring in ["fincl", "fexcl"]):
+        # Handle multi-line diagnostic lists
+        if "\n" in value:
+          diag_list = value.split("\n")
+          # For string lists, quote each item
+          user_nlstring += key + f" = '{diag_list[0]}',\n"
+          for diag in diag_list[1:-1]:
+            user_nlstring += f"         '{diag}',\n"
+          user_nlstring +=  f"         '{diag_list[-1]}'\n"
+        else:
+          # Single line - use format_value for proper formatting
+          user_nlstring += key + " = " + format_value(value) + "\n"
+
+      elif key.endswith("_specifier"):
+        emis_specfier = value.split("\n")
+        user_nlstring += key + f" = '{emis_specfier[0]}',\n"
+        for emis in emis_specfier[1:-1]:
+          user_nlstring += f"                  '{emis}',\n"
+        user_nlstring += f"                  '{emis_specfier[-1]}'\n"
+      else:
+        user_nlstring += key + " = " + format_value(value) + "\n"
+    if component_name.lower() != 'blom':
+      user_nlstring += "/\n"
+    user_nlstring += "\n"
+  return user_nlstring
+
+
+def write_user_nl_file(
+    caseroot:       str,
+    usernlfile:     str,
+    user_nl_str:    str
 ) -> None:
-    """
-    Takes inn configparser objects of default namelist settings for setting dianoistics and control namelist settings.
-
-    Parameters:
-    -----------
-    user_nl_config : configparser.ConfigParser
-        A configparser object containing default namelist settings.
-    component_name : str
-        Name of the component for which the namelist settings are being set up, e.g. 'cam', 'clm', etc.
-        Per now only 'blom' is the exception where the namelist section is not used.
-    """
-    user_nlstring = ""
-    if "misc" in user_nl_config.sections():
-        for key in user_nl_config["misc"]:
-            user_nlstring += (
-                key + " = " + format_value(user_nl_config["misc"][key]) + "\n"
-            )
-        user_nl_config.remove_section("misc")
-    for section in user_nl_config.sections():
-        if component_name.lower() != "blom":
-            user_nlstring += f"&{section}\n"
-        for key in user_nl_config[section]:
-            if key.startswith("fincl"):
-                diag_list = user_nl_config[section][key].split("\n")
-                user_nlstring += key + f" = '{diag_list[0]}',\n"
-                for diag in diag_list[1:-1]:
-                    user_nlstring += f"         '{diag}',\n"
-                user_nlstring += f"         '{diag_list[-1]}'\n"
-
-            elif key.endswith("_specifier"):
-                emis_specfier = user_nl_config[section][key].split("\n")
-                user_nlstring += key + f" = '{emis_specfier[0]}',\n"
-                for emis in emis_specfier[1:-1]:
-                    user_nlstring += f"                  '{emis}',\n"
-                user_nlstring += f"                  '{emis_specfier[-1]}'\n"
-
-            else:
-                user_nlstring += (
-                    key + " = " + format_value(user_nl_config[section][key]) + "\n"
-                )
-        if component_name.lower() != "blom":
-            user_nlstring += "/\n"
-        user_nlstring += "\n"
-    return user_nlstring
-
-
-def write_user_nl_file(caseroot: str, usernlfile: str, user_nl_str: str) -> None:
-    """write user_nl string to file
+    """write user_nl string to file. Here we OVERWRITE the
+    full file content, i.e. creating a new file. This implies that
+    that the contral files should hold all key-value pairs.
 
     Parameters
     ----------
@@ -104,5 +136,5 @@ def write_user_nl_file(caseroot: str, usernlfile: str, user_nl_str: str) -> None
     """
     user_nl_file = os.path.join(caseroot, usernlfile)
     logger.info(f"...Writing to user_nl file: {usernlfile}")
-    with open(user_nl_file, "a") as funl:
+    with open(user_nl_file, "w") as funl:
         funl.write(user_nl_str)
