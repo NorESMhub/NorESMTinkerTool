@@ -11,7 +11,9 @@ import xarray as xr
 
 from tinkertool.setup.namelist import setup_usr_nlstring, write_user_nl_file, format_value
 from tinkertool.setup.setup_cime_connection import add_CIME_paths
+from tinkertool.utils.CIME_interaction_utils import set_value_with_status_update
 
+# TODO: get rid of the need to export CESMROOT env variable, use the one in the config file instead?
 try:
     environ_CESMROOT = os.environ.get('CESMROOT')
     if environ_CESMROOT is None:
@@ -56,6 +58,11 @@ except ImportError:
         "ERROR: CIME.locked_files not found, or unable to find lock_file() and unlock_file()"
     )
     raise SystemExit
+try:
+    from CIME.status import append_case_status
+except ImportError:
+    print("ERROR: CIME.status.append_case_status not found.")
+    raise SystemExit
 
 # get the logger - assuming this is run from create_ppe.build_ppe so that tinkertool_log is set up
 logger = logging.getLogger("tinkertool_log")
@@ -77,12 +84,13 @@ def iterate_dict_to_set_value(case: CIME.case, settings_dict: dict, dict_name: s
     settings_dict : dict
         Dictionary of settings to be applied to the case
     """
+    all_success = True
     for key, value in settings_dict.items():
-        try:
-            case.set_value(key, value)
-        except Exception as error:
-            logger.warning(f"WARNING: {key} from {dict_name} not set in case: {error}")
-            continue
+        if not set_value_with_status_update(case, key, value, kill_on_error=False):
+            all_success = False
+
+    if all_success:
+        logger.debug(f"All key: value pairs where successfully set for {dict_name}: {settings_dict}")
 
 
 def _per_run_case_updates(
@@ -116,11 +124,11 @@ def _per_run_case_updates(
     caseroot = case.get_value("CASEROOT")
     casename = os.path.basename(caseroot)
     unlock_file("env_case.xml",caseroot=caseroot)
-    case.set_value("CASE", casename)
+    set_value_with_status_update(case, "CASE", casename, kill_on_error=False)
     rundir = case.get_value("RUNDIR")
     rundir = os.path.dirname(rundir)
     rundir = f"{rundir}/run.{ens_idx.split('.')[-1]}"
-    case.set_value("RUNDIR", rundir)
+    set_value_with_status_update(case, "RUNDIR", rundir, kill_on_error=False)
     # smb++ extract the chem_mech_in_file
     chem_mech_file = None
     if "chem_mech_in" in paramDataset.variables.keys():
@@ -212,10 +220,7 @@ def _per_run_case_updates(
         subprocess.run(comm, shell=True)
         unlock_file("env_build.xml", caseroot=caseroot)
         value = case.get_value("CAM_CONFIG_OPTS", resolved=False)
-        case.set_value(
-            "CAM_CONFIG_OPTS",
-            f"{value} --usr_mech_infile {caseroot}/{chem_mech_file.name}",
-        )
+        set_value_with_status_update(case, "CAM_CONFIG_OPTS", f"{value} --usr_mech_infile {caseroot}/{chem_mech_file.name}", kill_on_error=False)
         case.flush()
         lock_file("env_build.xml", caseroot=caseroot)
 
@@ -293,8 +298,8 @@ def build_base_case(
 
         # set the case environment variables
         # first using the case's own values
-        case.set_value("EXEROOT", case.get_value("EXEROOT", resolved=True))
-        case.set_value("RUNDIR", case.get_value("RUNDIR", resolved=True))
+        set_value_with_status_update(case, "EXEROOT", case.get_value("EXEROOT", resolved=True), kill_on_error=True)
+        set_value_with_status_update(case, "RUNDIR", case.get_value("RUNDIR", resolved=True), kill_on_error=True)
         # set the PE settings
         # check if the env_pe_settings are not empty dict, or all entries are None
         if not env_pe_settings or all(
@@ -314,29 +319,25 @@ def build_base_case(
 
         logger.info(">>> Setting environment run settings...")
         # set the run settings
-        case.set_value("RUN_TYPE", env_run_settings.pop("RUN_TYPE"))
-        case.set_value('JOB_WALLCLOCK_TIME', env_run_settings.pop('JOB_WALLCLOCK_TIME_RUN'), subgroup='case.run')
-        case.set_value('JOB_WALLCLOCK_TIME', env_run_settings.pop('JOB_WALLCLOCK_TIME_ARCHIVE'), subgroup='case.st_archive')
-        case.set_value('JOB_WALLCLOCK_TIME', env_run_settings.pop('JOB_WALLCLOCK_TIME_COMPRESS'), subgroup='case.compress')
+        set_value_with_status_update(case, "RUN_TYPE", env_run_settings.pop("RUN_TYPE"), kill_on_error=False)
+        set_value_with_status_update(case, 'JOB_WALLCLOCK_TIME', env_run_settings.pop('JOB_WALLCLOCK_TIME_RUN'), subgroup='case.run', kill_on_error=False)
+        set_value_with_status_update(case, 'JOB_WALLCLOCK_TIME', env_run_settings.pop('JOB_WALLCLOCK_TIME_ARCHIVE'), subgroup='case.st_archive', kill_on_error=False)
+        set_value_with_status_update(case, 'JOB_WALLCLOCK_TIME', env_run_settings.pop('JOB_WALLCLOCK_TIME_COMPRESS'), subgroup='case.compress', kill_on_error=False)
         if env_run_settings.get("GET_REFCASE") is not None:
-            case.set_value("GET_REFCASE", env_run_settings.pop("GET_REFCASE"))
+            set_value_with_status_update(case, "GET_REFCASE", env_run_settings.pop("GET_REFCASE"), kill_on_error=False)
         if env_run_settings.get("RUN_REFCASE") is not None:
-            case.set_value("RUN_REFCASE", env_run_settings.pop("RUN_REFCASE"))
-        if any(
-            env_run_settings.get(key) is not None
-            for key in ["RUN_REFDIR", "RUN_REFDATE"]
-        ):
-            case.set_value("RUN_REFDIR", env_run_settings.pop("RUN_REFDIR"))
-            case.set_value("RUN_REFDATE", env_run_settings.pop("RUN_REFDATE"))
+            set_value_with_status_update(case, "RUN_REFCASE", env_run_settings.pop('RUN_REFCASE'), kill_on_error=False)
+        if any(env_run_settings.get(key) is not None for key in ['RUN_REFDIR', 'RUN_REFDATE']):
+            set_value_with_status_update(case, "RUN_REFDIR", env_run_settings.pop("RUN_REFDIR"), kill_on_error=False)
+            set_value_with_status_update(case, "RUN_REFDATE", env_run_settings.pop("RUN_REFDATE"), kill_on_error=False)
 
-        case.set_value("STOP_OPTION", env_run_settings.pop("STOP_OPTION"))
-        case.set_value("STOP_N", env_run_settings.pop("STOP_N"))
-        case.set_value("RUN_STARTDATE", env_run_settings.pop("RUN_STARTDATE"))
+        set_value_with_status_update(case, "STOP_OPTION",env_run_settings.pop("STOP_OPTION"), kill_on_error=False)
+        set_value_with_status_update(case, "STOP_N",env_run_settings.pop("STOP_N"), kill_on_error=False)
+        set_value_with_status_update(case, "RUN_STARTDATE",env_run_settings.pop("RUN_STARTDATE"), kill_on_error=False)
 
-        if env_run_settings.get("REST_N") is not None:
-            case.set_value("REST_N", env_run_settings.pop("REST_N"))
-        if env_run_settings.get("REST_OPTION") is not None:
-            case.set_value("REST_OPTION", env_run_settings.pop("REST_OPTION"))    
+        if any(env_run_settings.get(key) is not None for key in ['REST_N', 'REST_OPTION']):
+            set_value_with_status_update(case, "REST_OPTION", env_run_settings.pop("REST_OPTION"), kill_on_error=False)
+            set_value_with_status_update(case, "REST_N", env_run_settings.pop("REST_N"), kill_on_error=False)
 
         if env_run_settings.get('CAM_CONFIG_OPTS') is not None:
             if env_run_settings.get('cam_onopts'):
@@ -344,11 +345,11 @@ def build_base_case(
                     "Both 'CAM_CONFIG_OPTS' and 'cam_onopts' were provided. "
                     "'CAM_CONFIG_OPTS' will overwrite all previous options including 'cam_onopts'."
                 )
-            case.set_value("CAM_CONFIG_OPTS", env_run_settings.pop("CAM_CONFIG_OPTS"))
-        elif env_run_settings.get("cam_onopts") is not None:
-            current_opts = case.get_value("CAM_CONFIG_OPTS", resolved=True)
+            set_value_with_status_update(case, 'CAM_CONFIG_OPTS', env_run_settings.pop('CAM_CONFIG_OPTS'), kill_on_error=False)
+        elif env_run_settings.get('cam_onopts') is not None:
+            current_opts = case.get_value('CAM_CONFIG_OPTS', resolved=True)
             new_opts = f"{current_opts} {env_run_settings.pop('cam_onopts')}".strip()
-            case.set_value("CAM_CONFIG_OPTS", new_opts)
+            set_value_with_status_update(case, 'CAM_CONFIG_OPTS', new_opts, kill_on_error=False)
 
         # check if there are any additional run settings
         if env_run_settings or any(
@@ -358,7 +359,7 @@ def build_base_case(
                 case=case, settings_dict=env_run_settings, dict_name="env_run_settings"
             )
 
-        case.set_value("DEBUG", env_build_settings.pop("DEBUG", "FALSE"))
+        set_value_with_status_update(case, "DEBUG", env_build_settings.pop("DEBUG", "FALSE"), kill_on_error=False)
         # check if the env_build_settings are not empty dict, or all entries are None
         if not env_build_settings or all(
             value is None for value in env_build_settings.values()
