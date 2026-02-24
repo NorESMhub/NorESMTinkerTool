@@ -1944,12 +1944,7 @@ Returns</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>tinkertool/scripts/create_ppe/create_ppe.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">201</span>
-<span class="normal">202</span>
-<span class="normal">203</span>
-<span class="normal">204</span>
-<span class="normal">205</span>
-<span class="normal">206</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">206</span>
 <span class="normal">207</span>
 <span class="normal">208</span>
 <span class="normal">209</span>
@@ -1987,7 +1982,12 @@ Returns</p>
 <span class="normal">241</span>
 <span class="normal">242</span>
 <span class="normal">243</span>
-<span class="normal">244</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">check_build</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">CheckBuildConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">check_build</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">CheckBuildConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the build was successful by checking for case.build success in each case directories CaseStatus</span>
 
 <span class="sd">    Parameters</span>
@@ -2063,12 +2063,7 @@ Returns</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>tinkertool/scripts/create_ppe/create_ppe.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">246</span>
-<span class="normal">247</span>
-<span class="normal">248</span>
-<span class="normal">249</span>
-<span class="normal">250</span>
-<span class="normal">251</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">251</span>
 <span class="normal">252</span>
 <span class="normal">253</span>
 <span class="normal">254</span>
@@ -2182,7 +2177,39 @@ Returns</p>
 <span class="normal">362</span>
 <span class="normal">363</span>
 <span class="normal">364</span>
-<span class="normal">365</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">prestage_ensemble</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">PrestageEnsembleConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">prestage_ensemble</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">PrestageEnsembleConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Prestage the ensemble members by copying the base case input files to each member&#39;s input directory.</span>
 
 <span class="sd">    Parameters</span>
@@ -2220,11 +2247,32 @@ Returns</p>
                     <span class="s2">&quot;Note that this might cause a crash if cases are submitted simultaneously.&quot;</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">run_refdir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reference directory </span><span class="si">{</span><span class="n">run_refdir</span><span class="si">}</span><span class="s2"> does not exist for case </span><span class="si">{</span><span class="n">caseroot</span><span class="si">}</span><span class="s2">. Skipping prestaging.&quot;</span><span class="p">)</span>
+                    <span class="n">all_prestage_success</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">continue</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Prestaging case </span><span class="si">{</span><span class="n">caseroot</span><span class="si">}</span><span class="s2"> from reference directory </span><span class="si">{</span><span class="n">run_refdir</span><span class="si">}</span><span class="s2"> to run directory </span><span class="si">{</span><span class="n">rundir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="c1"># check if &#39;rest&#39; is in RUN_REFDIR path</span>
+                <span class="c1"># if not throw a warning and ask user to confirm prestaging</span>
+                <span class="n">rest_dir</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="s1">&#39;rest&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">run_refdir</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;RUN_REFDIR </span><span class="si">{</span><span class="n">run_refdir</span><span class="si">}</span><span class="s2"> for case </span><span class="si">{</span><span class="n">caseroot</span><span class="si">}</span><span class="s2"> does not contain &#39;rest&#39; in its path. </span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="s2">&quot;This might indicate that the reference directory is not a restart directory. </span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="s2">&quot;You will be prompted to confirm prestaging. </span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">rest_dir</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="c1"># copy the netcdf files from the &#39;RUN_REFDIR&#39; to the &#39;RUNDIR&#39;</span>
                 <span class="c1"># and set &#39;RUN_REFDIR&#39;=&#39;RUNDIR&#39;. This is needed to ensure that the</span>
                 <span class="c1"># cases can run independently and do not interfere with each other.</span>
                 <span class="n">ref_netcdf_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">run_refdir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;*.nc&#39;</span><span class="p">))</span>
                 <span class="k">if</span> <span class="n">ref_netcdf_files</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">rest_dir</span><span class="p">:</span>
+                        <span class="n">input_with_timer</span><span class="p">(</span>
+                            <span class="n">prompt</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Press Enter to confirm prestaging of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ref_netcdf_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> netCDF files from </span><span class="si">{</span><span class="n">run_refdir</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">rundir</span><span class="si">}</span><span class="s2"> for case </span><span class="si">{</span><span class="n">caseroot</span><span class="si">}</span><span class="s2">, or Ctrl+C to abort. (Auto-continue in 30 seconds)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+                            <span class="n">default</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+                        <span class="p">)</span>
                     <span class="c1"># Use rsync with shell expansion for glob pattern and progress display</span>
                     <span class="n">cmd_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;rsync --archive --progress &#39;</span><span class="si">{</span><span class="n">run_refdir</span><span class="si">}</span><span class="s2">&#39;/*.nc &#39;</span><span class="si">{</span><span class="n">rundir</span><span class="si">}</span><span class="s2">&#39;/.&quot;</span>
                     <span class="n">log_info_detailed</span><span class="p">(</span><span class="s1">&#39;tinkertool_log&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Copying </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ref_netcdf_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> netCDF files with rsync from </span><span class="si">{</span><span class="n">run_refdir</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">rundir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -2255,7 +2303,7 @@ Returns</p>
                             <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;rsync stderr: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">stderr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                         <span class="n">all_prestage_success</span> <span class="o">=</span> <span class="kc">False</span>
                         <span class="k">continue</span>
-                    <span class="k">case</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s1">&#39;RUN_REFDIR&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">rundir</span><span class="p">))</span>
+                    <span class="n">set_value_with_status_update</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="s1">&#39;RUN_REFDIR&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">rundir</span><span class="p">),</span> <span class="n">kill_on_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No netcdf files found in </span><span class="si">{</span><span class="n">run_refdir</span><span class="si">}</span><span class="s2">. Skipping prestaging for case </span><span class="si">{</span><span class="n">caseroot</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
                     <span class="n">all_prestage_success</span> <span class="o">=</span> <span class="kc">False</span>
@@ -2266,6 +2314,12 @@ Returns</p>
                     <span class="c1"># and set &#39;DRV_RESTART_POINTER&#39; to the rpointer file name with the correct date and time</span>
                     <span class="n">rpointer_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">run_refdir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;rpointer*&#39;</span><span class="p">))</span>
                     <span class="k">if</span> <span class="n">rpointer_files</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">rest_dir</span><span class="p">:</span>
+                            <span class="n">input_with_timer</span><span class="p">(</span>
+                                <span class="n">prompt</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Press Enter to confirm prestaging of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">rpointer_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> rpointer files from </span><span class="si">{</span><span class="n">run_refdir</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">rundir</span><span class="si">}</span><span class="s2"> for case </span><span class="si">{</span><span class="n">caseroot</span><span class="si">}</span><span class="s2">, or Ctrl+C to abort. (Auto-continue in 30 seconds)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+                                <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+                                <span class="n">default</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+                            <span class="p">)</span>
                         <span class="n">cmd_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;rsync --archive &#39;</span><span class="si">{</span><span class="n">run_refdir</span><span class="si">}</span><span class="s2">&#39;/rpointer* &#39;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">rundir</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;/.&quot;</span>
                         <span class="n">log_info_detailed</span><span class="p">(</span><span class="s1">&#39;tinkertool_log&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Copying </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">rpointer_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> rpointer files with rsync from </span><span class="si">{</span><span class="n">run_refdir</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">rundir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                         <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Command: </span><span class="si">{</span><span class="n">cmd_str</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -2295,7 +2349,7 @@ Returns</p>
                             <span class="n">all_prestage_success</span> <span class="o">=</span> <span class="kc">False</span>
                             <span class="k">continue</span>
 
-                        <span class="k">case</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s1">&#39;DRV_RESTART_POINTER&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;rpointer.cpl.</span><span class="si">{</span><span class="n">case</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="s1">&#39;RUN_REFDATE&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">case</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="s1">&#39;RUN_REFTOD&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="n">set_value_with_status_update</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="s1">&#39;DRV_RESTART_POINTER&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;rpointer.cpl.</span><span class="si">{</span><span class="n">case</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="s1">&#39;RUN_REFDATE&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">case</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="s1">&#39;RUN_REFTOD&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">kill_on_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No rpointer files found in </span><span class="si">{</span><span class="n">run_refdir</span><span class="si">}</span><span class="s2">. Skipping prestaging for case </span><span class="si">{</span><span class="n">caseroot</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
                         <span class="n">all_prestage_success</span> <span class="o">=</span> <span class="kc">False</span>
@@ -2338,38 +2392,7 @@ xml_changes : dict[str, str | dict[str, str]] | list[dict[str, str | dict[str, s
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>tinkertool/scripts/create_ppe/create_ppe.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">398</span>
-<span class="normal">399</span>
-<span class="normal">400</span>
-<span class="normal">401</span>
-<span class="normal">402</span>
-<span class="normal">403</span>
-<span class="normal">404</span>
-<span class="normal">405</span>
-<span class="normal">406</span>
-<span class="normal">407</span>
-<span class="normal">408</span>
-<span class="normal">409</span>
-<span class="normal">410</span>
-<span class="normal">411</span>
-<span class="normal">412</span>
-<span class="normal">413</span>
-<span class="normal">414</span>
-<span class="normal">415</span>
-<span class="normal">416</span>
-<span class="normal">417</span>
-<span class="normal">418</span>
-<span class="normal">419</span>
-<span class="normal">420</span>
-<span class="normal">421</span>
-<span class="normal">422</span>
-<span class="normal">423</span>
-<span class="normal">424</span>
-<span class="normal">425</span>
-<span class="normal">426</span>
-<span class="normal">427</span>
-<span class="normal">428</span>
-<span class="normal">429</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">429</span>
 <span class="normal">430</span>
 <span class="normal">431</span>
 <span class="normal">432</span>
@@ -2378,7 +2401,38 @@ xml_changes : dict[str, str | dict[str, str]] | list[dict[str, str | dict[str, s
 <span class="normal">435</span>
 <span class="normal">436</span>
 <span class="normal">437</span>
-<span class="normal">438</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">bulk_xmlchange</span><span class="p">(</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span>
+<span class="normal">448</span>
+<span class="normal">449</span>
+<span class="normal">450</span>
+<span class="normal">451</span>
+<span class="normal">452</span>
+<span class="normal">453</span>
+<span class="normal">454</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span>
+<span class="normal">458</span>
+<span class="normal">459</span>
+<span class="normal">460</span>
+<span class="normal">461</span>
+<span class="normal">462</span>
+<span class="normal">463</span>
+<span class="normal">464</span>
+<span class="normal">465</span>
+<span class="normal">466</span>
+<span class="normal">467</span>
+<span class="normal">468</span>
+<span class="normal">469</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">bulk_xmlchange</span><span class="p">(</span>
     <span class="n">cases</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">xml_changes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -2406,14 +2460,14 @@ xml_changes : dict[str, str | dict[str, str]] | list[dict[str, str | dict[str, s
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>  <span class="c1"># If value is a dictionary, it means subgroup-specific changes</span>
                         <span class="k">for</span> <span class="n">subgroup</span><span class="p">,</span> <span class="n">sub_value</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                             <span class="n">old_value</span> <span class="o">=</span> <span class="n">case</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">subgroup</span><span class="o">=</span><span class="n">subgroup</span><span class="p">)</span>
-                            <span class="k">case</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">sub_value</span><span class="p">,</span> <span class="n">subgroup</span><span class="o">=</span><span class="n">subgroup</span><span class="p">)</span>
+                            <span class="n">set_value_with_status_update</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">sub_value</span><span class="p">,</span> <span class="n">subgroup</span><span class="o">=</span><span class="n">subgroup</span><span class="p">,</span> <span class="n">kill_on_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                             <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
                                 <span class="sa">f</span><span class="s2">&quot;Case </span><span class="si">{</span><span class="n">caseroot</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Changed XML variable &#39;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">&#39; in subgroup &#39;</span><span class="si">{</span><span class="n">subgroup</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
                                 <span class="sa">f</span><span class="s2">&quot;from &#39;</span><span class="si">{</span><span class="n">old_value</span><span class="si">}</span><span class="s2">&#39; to &#39;</span><span class="si">{</span><span class="n">sub_value</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
                             <span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>  <span class="c1"># If value is a simple string, apply to the default</span>
                         <span class="n">old_value</span> <span class="o">=</span> <span class="n">case</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
-                        <span class="k">case</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                        <span class="n">set_value_with_status_update</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">kill_on_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                         <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
                             <span class="sa">f</span><span class="s2">&quot;Case </span><span class="si">{</span><span class="n">caseroot</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Changed XML variable &#39;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">&#39; from &#39;</span><span class="si">{</span><span class="n">old_value</span><span class="si">}</span><span class="s2">&#39; to &#39;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
                         <span class="p">)</span>
