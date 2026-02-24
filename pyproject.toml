@@ -28,7 +28,6 @@ check-build = "tinkertool.scripts.create_ppe.main:check_build_CLI"
 prestage-ensemble = "tinkertool.scripts.create_ppe.main:prestage_ensemble_CLI"
 submit-ppe = "tinkertool.scripts.create_ppe.main:submit_ppe_CLI"
 generate-paramfile = "tinkertool.scripts.generate_paramfile.main:main"
-aerosol-ppe-cam-nl = "usermods.aerosol_ppe.scripts.aerosol_ppe_cam_nl_updates:main"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.8.0"
