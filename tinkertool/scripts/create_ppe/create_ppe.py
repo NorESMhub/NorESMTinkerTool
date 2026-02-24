@@ -83,18 +83,17 @@ def create_ppe(config: CreatePPEConfig):
             err_msg = f"build_ppe returned 'None' but list of cases was expected since build_base_only={build_config.build_base_only}"
             logging.error(err_msg)
             raise RuntimeError(err_msg)
-        else:
-            # build_base_only=True, so no cases to submit
-            logging.info(">> Base case built successfully. No ensemble cases to submit.")
-            return
+
+        # build_base_only=True, so no cases to submit
+        logging.info(">> Base case built successfully. No ensemble cases to submit.")
+        return
 
     cases_for_check_build = [base_case]
-    if cases is None:
-        if config.build_only:
-            err_msg = "build_ppe returned 'None' but list of cases was" \
-            f"expected since build_only={config.build_only}"
-            logging.error(err_msg)
-            raise RuntimeError(err_msg)
+    if cases is None and config.build_only:
+        err_msg = "build_ppe returned 'None' but list of cases was" \
+        f"expected since build_only={config.build_only}"
+        logging.error(err_msg)
+        raise RuntimeError(err_msg)
 
     cases_for_check_build.extend(cases)
 
@@ -165,39 +164,39 @@ def build_ppe(config: BuildPPEConfig) -> tuple[Path, list[Path] | None]:
     if checked_config.build_base_only:
         logging.info(">> No ensembles created as build_base_only is set to True.")
         return basecaseroot, None
-    else:
-        cases = []
-        for i, idx in zip(checked_config.ensemble_num, range(len(checked_config.ensemble_num))):
-            log_info_detailed('tinkertool_log', f"Building ensemble {i} of {checked_config.num_sims}")
-            ensemble_idx = f"{i:03d}"
-            tempParamDataset = checked_config.paramDataset.isel({checked_config.pdim: idx})
-            # Special treatment for chem_mech.in changes:
-            if 'chem_mech_in' in tempParamDataset:
-                # remove all chem_mech_in keys that are not chem_mech_in (there can anyway only be one chem_mech.in file)
-                keys_in_dic = list(tempParamDataset.keys())
-                for v in keys_in_dic:
-                    if v[-12:]=='chem_mech_in' and len(v)>12:
-                        log_info_detailed('tinkertool_log', f'Deleting {v} from parameter directory')
-                        del tempParamDataset[v]
-            # special treatment for non-mandatory parameters to clone_base_case
-            clone_base_case_kwargs = {}
-            if checked_config.simulation_setup.has_section('lifeCycleValues'):
-                clone_base_case_kwargs['lifeCycleMedianRadius'] = checked_config.simulation_setup['lifeCycleValues'].get('medianradius', None)
-                clone_base_case_kwargs['lifeCycleSigma'] = checked_config.simulation_setup['lifeCycleValues'].get('sigma', None)
-            clonecaseroot = clone_base_case(
-                baseroot=checked_config.baseroot,
-                basecaseroot=basecaseroot,
-                overwrite=checked_config.overwrite_ppe,
-                paramDataset=tempParamDataset,
-                componentdict=checked_config.componentdict,
-                ensemble_idx=ensemble_idx,
-                path_base_input=checked_config.paramfile_path.parent,
-                keepexe=checked_config.keepexe,
-                    namelist_collection_dict=checked_config.namelist_collection_dict,
-                **clone_base_case_kwargs
-            )
-            cases.append(clonecaseroot)
-            logging.info(f">> Ensemble {i} of {checked_config.ensemble_num[-1]} created successfully.")
+
+    cases = []
+    for i, idx in zip(checked_config.ensemble_num, range(len(checked_config.ensemble_num))):
+        log_info_detailed('tinkertool_log', f"Building ensemble {i} of {checked_config.num_sims}")
+        ensemble_idx = f"{i:03d}"
+        tempParamDataset = checked_config.paramDataset.isel({checked_config.pdim: idx})
+        # Special treatment for chem_mech.in changes:
+        if 'chem_mech_in' in tempParamDataset:
+            # remove all chem_mech_in keys that are not chem_mech_in (there can anyway only be one chem_mech.in file)
+            keys_in_dic = list(tempParamDataset.keys())
+            for v in keys_in_dic:
+                if v[-12:]=='chem_mech_in' and len(v)>12:
+                    log_info_detailed('tinkertool_log', f'Deleting {v} from parameter directory')
+                    del tempParamDataset[v]
+        # special treatment for non-mandatory parameters to clone_base_case
+        clone_base_case_kwargs = {}
+        if checked_config.simulation_setup.has_section('lifeCycleValues'):
+            clone_base_case_kwargs['lifeCycleMedianRadius'] = checked_config.simulation_setup['lifeCycleValues'].get('medianradius', None)
+            clone_base_case_kwargs['lifeCycleSigma'] = checked_config.simulation_setup['lifeCycleValues'].get('sigma', None)
+        clonecaseroot = clone_base_case(
+            baseroot=checked_config.baseroot,
+            basecaseroot=basecaseroot,
+            overwrite=checked_config.overwrite_ppe,
+            paramDataset=tempParamDataset,
+            componentdict=checked_config.componentdict,
+            ensemble_idx=ensemble_idx,
+            path_base_input=checked_config.paramfile_path.parent,
+            keepexe=checked_config.keepexe,
+                namelist_collection_dict=checked_config.namelist_collection_dict,
+            **clone_base_case_kwargs
+        )
+        cases.append(clonecaseroot)
+        logging.info(f">> Ensemble {i} of {checked_config.ensemble_num[-1]} created successfully.")
 
     return basecaseroot, cases
 

@@ -20,7 +20,7 @@ Note that the package requires python >=3.10,<3.12 to be active in your envirome
 
 2. clone repository:
 ```
-git clone git@github.com:Johannesfjeldsaa/NorESMTinkerTool.git && cd NorESMTinkerTool
+git clone https://github.com/NorESMhub/NorESMTinkerTool.git && cd NorESMTinkerTool
 ```
 
 3. Install
