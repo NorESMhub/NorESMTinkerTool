@@ -27,6 +27,28 @@ def _check_keyword_in_file(
             if keyword in line:
                 return True
     return False
+def _check_keyword_in_stream(
+    file_stream: str,
+    keyword: str
+) -> bool:
+    """Check if a specific keyword exists in a given string stream.
+
+    Parameters
+    ----------
+    file_stream : str
+        The string stream to be checked.
+    keyword : str
+        The keyword to search for in the stream.
+
+    Returns
+    -------
+    bool
+        True if the keyword is found in the stream, False otherwise.
+    """
+    for line in file_stream.splitlines():
+        if keyword in line:
+            return True
+    return False
 
 def check_if_ctsm_param_is_perturbed(
     param_ranges_inpath: str | Path
@@ -44,7 +66,7 @@ def check_if_ctsm_param_is_perturbed(
         True if any CTSM parameters are perturbed, False otherwise.
     """
     ctsm_param_flag = "CTSM_param_file"
-    return _check_keyword_in_file(param_ranges_inpath, ctsm_param_flag)
+    return _check_keyword_in_stream(param_ranges_inpath, ctsm_param_flag)
 
 def check_if_fates_param_is_perturbed(
     param_ranges_inpath: str | Path

@@ -1,12 +1,13 @@
 # TODO: when writing string for user_nl's check if the keyword already exists
 # in the file, if so remove that line
+import configparser
+import logging
 import os
 import re
-import logging
-import configparser
 
 # get the logger - assuming this is run from create_ppe.build_ppe so that tinkertool_log is set up
-logger = logging.getLogger('tinkertool_log')
+logger = logging.getLogger("tinkertool_log")
+
 
 def format_value(value: str) -> str:
     """
@@ -62,16 +63,30 @@ def setup_usr_nlstring(
       Per now only 'blom' is the exception where the namelist section is not used.
   """
   user_nlstring = ""
-  if 'misc' in user_nl_config.sections():
+  section_list = user_nl_config.sections()
+  if 'misc' in section_list:
     for key in user_nl_config['misc']:
-      user_nlstring += key + " = " + format_value(user_nl_config['misc'][key]) + "\n"
-    user_nl_config.remove_section('misc')
-  for section in user_nl_config.sections():
+      value = user_nl_config['misc'][key]
+      if any(substring in key for substring in ["fincl", "fexcl"]):
+        # Handle multi-line diagnostic lists
+        if "\n" in value:
+          diag_list = value.split("\n")
+          # For string lists, quote each item
+          user_nlstring += key + f" = '{diag_list[0]}',\n"
+          for diag in diag_list[1:-1]:
+            user_nlstring += f"         '{diag}',\n"
+          user_nlstring +=  f"         '{diag_list[-1]}'\n"
+        else:
+          # Single line - use format_value for proper formatting
+          user_nlstring += key + " = " + format_value(value) + "\n"
+      else:
+        user_nlstring += key + " = " + format_value(user_nl_config['misc'][key]) + "\n"
+    section_list.remove('misc')
+  for section in section_list:
     if component_name.lower() != 'blom':
       user_nlstring += f"&{section}\n"
     for key in user_nl_config[section]:
       value = user_nl_config[section][key]
-      print(value)
       if any(substring in key for substring in ["fincl", "fexcl"]):
         # Handle multi-line diagnostic lists
         if "\n" in value:
@@ -91,7 +106,6 @@ def setup_usr_nlstring(
         for emis in emis_specfier[1:-1]:
           user_nlstring += f"                  '{emis}',\n"
         user_nlstring += f"                  '{emis_specfier[-1]}'\n"
-
       else:
         user_nlstring += key + " = " + format_value(value) + "\n"
     if component_name.lower() != 'blom':

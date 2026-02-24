@@ -8,9 +8,10 @@ from tinkertool.utils.custom_logging import (
 )
 from tinkertool.setup.case import build_base_case, clone_base_case
 from tinkertool.scripts.create_ppe.config import (
-    CreatePPEConfig,
     BuildPPEConfig,
     CheckedBuildPPEConfig,
+    CheckedSubmitPPEConfig,
+    CreatePPEConfig,
     SubmitPPEConfig,
     CheckedSubmitPPEConfig,
     CheckBuildConfig,
@@ -68,7 +69,8 @@ def create_ppe(config: CreatePPEConfig):
         simulation_setup_path=config.simulation_setup_path,
         build_base_only=config.build_base_only,
         keepexe=config.keepexe,
-        overwrite=config.overwrite,
+        overwrite_base=config.overwrite_base,
+        overwrite_ppe=config.overwrite_ppe,
         verbose=config.verbose,
         log_dir=config.log_dir,
         log_mode=config.log_mode
@@ -144,15 +146,17 @@ def build_ppe(config: BuildPPEConfig) -> tuple[Path, list[Path] | None]:
     logging.info(">> Starting PPE case building")
     log_info_detailed('tinkertool_log', f"Building with config: {config.describe(return_string=True)}") # type: ignore
 
-    if not checked_config.clone_only_during_build:
+    if not checked_config.frozen_base_case:
         basecaseroot = build_base_case(
             basecaseroot=checked_config.baseroot.joinpath(checked_config.basecasename),
-            overwrite=checked_config.overwrite,
+            overwrite=checked_config.overwrite_base_case,
             case_settings=dict(checked_config.simulation_setup['create_case']),
             env_pe_settings=dict(checked_config.simulation_setup['env_pe']) if 'env_pe' in checked_config.simulation_setup.sections() else {},
             env_run_settings=dict(checked_config.simulation_setup['env_run']),
             env_build_settings=dict(checked_config.simulation_setup['env_build']) if 'env_build' in checked_config.simulation_setup.sections() else {},
             namelist_collection_dict=checked_config.namelist_collection_dict,
+            paramDataset=checked_config.paramDataset,
+            pdim=checked_config.pdim
         )
         logging.info(f">> Base case created successfully at {basecaseroot}")
     else:
@@ -166,15 +170,15 @@ def build_ppe(config: BuildPPEConfig) -> tuple[Path, list[Path] | None]:
         for i, idx in zip(checked_config.ensemble_num, range(len(checked_config.ensemble_num))):
             log_info_detailed('tinkertool_log', f"Building ensemble {i} of {checked_config.num_sims}")
             ensemble_idx = f"{i:03d}"
-            temp_param_dict = {k : v[idx] for k,v in checked_config.paramdict.items()}
+            tempParamDataset = checked_config.paramDataset.isel({checked_config.pdim: idx})
             # Special treatment for chem_mech.in changes:
-            if 'chem_mech_in' in temp_param_dict:
+            if 'chem_mech_in' in tempParamDataset:
                 # remove all chem_mech_in keys that are not chem_mech_in (there can anyway only be one chem_mech.in file)
-                keys_in_dic = list(temp_param_dict.keys())
+                keys_in_dic = list(tempParamDataset.keys())
                 for v in keys_in_dic:
                     if v[-12:]=='chem_mech_in' and len(v)>12:
                         log_info_detailed('tinkertool_log', f'Deleting {v} from parameter directory')
-                        del temp_param_dict[v]
+                        del tempParamDataset[v]
             # special treatment for non-mandatory parameters to clone_base_case
             clone_base_case_kwargs = {}
             if checked_config.simulation_setup.has_section('lifeCycleValues'):
@@ -183,12 +187,13 @@ def build_ppe(config: BuildPPEConfig) -> tuple[Path, list[Path] | None]:
             clonecaseroot = clone_base_case(
                 baseroot=checked_config.baseroot,
                 basecaseroot=basecaseroot,
-                overwrite=checked_config.overwrite,
-                paramdict=temp_param_dict,
+                overwrite=checked_config.overwrite_ppe,
+                paramDataset=tempParamDataset,
                 componentdict=checked_config.componentdict,
                 ensemble_idx=ensemble_idx,
                 path_base_input=checked_config.paramfile_path.parent,
                 keepexe=checked_config.keepexe,
+                    namelist_collection_dict=checked_config.namelist_collection_dict,
                 **clone_base_case_kwargs
             )
             cases.append(clonecaseroot)
@@ -390,6 +395,7 @@ def prestage_ensemble(config: PrestageEnsembleConfig) -> bool:
 
     logging.info(f">> {len(checked_config.cases)} cases prestaged successfully.")
     return all_prestage_success
+
 
 def submit_ppe(config: SubmitPPEConfig):
 

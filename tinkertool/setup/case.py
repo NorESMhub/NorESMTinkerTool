@@ -1,12 +1,13 @@
 # ------------------------ #
 # --- Import libraries --- #
 # ------------------------ #
+import logging
 import os
 import shutil
-import logging
 import subprocess
-from pathlib import Path
 from itertools import islice
+from pathlib import Path
+import xarray as xr
 
 from tinkertool.setup.namelist import setup_usr_nlstring, write_user_nl_file, format_value
 from tinkertool.setup.setup_cime_connection import add_CIME_paths
@@ -29,9 +30,12 @@ except ImportError:
     raise SystemExit
 try:
     from CIME.Tools.standard_script_setup import check_minimum_python_version
+
     check_minimum_python_version(3, 8)
 except ImportError:
-    print('ERROR: CIME.Tools.standard_script_setup not found, or unable to use check_minimum_python_version()')
+    print(
+        "ERROR: CIME.Tools.standard_script_setup not found, or unable to use check_minimum_python_version()"
+    )
 try:
     os.environ["PYTHONUNBUFFERED"] = "1"
 except ImportError:
@@ -50,7 +54,9 @@ except ImportError:
 try:
     from CIME.locked_files import lock_file, unlock_file
 except ImportError:
-    print("ERROR: CIME.locked_files not found, or unable to find lock_file() and unlock_file()")
+    print(
+        "ERROR: CIME.locked_files not found, or unable to find lock_file() and unlock_file()"
+    )
     raise SystemExit
 try:
     from CIME.status import append_case_status
@@ -59,18 +65,15 @@ except ImportError:
     raise SystemExit
 
 # get the logger - assuming this is run from create_ppe.build_ppe so that tinkertool_log is set up
-logger = logging.getLogger('tinkertool_log')
+logger = logging.getLogger("tinkertool_log")
 logger.debug("CIME imported successfully")
 
 # ------------------------ #
 # --- Helper functions --- #
 # ------------------------ #
 
-def iterate_dict_to_set_value(
-    case:           CIME.case,
-    settings_dict:  dict,
-    dict_name:      str
-):
+
+def iterate_dict_to_set_value(case: CIME.case, settings_dict: dict, dict_name: str):
     """
     Iterate through a dictionary and set the values in the case object
 
@@ -89,25 +92,27 @@ def iterate_dict_to_set_value(
     if all_success:
         logger.debug(f"All key: value pairs where successfully set for {dict_name}: {settings_dict}")
 
+
 def _per_run_case_updates(
     case: CIME.case,
-    paramdict: dict,
+    paramDataset: xr.Dataset,
     componentdict: dict,
     ens_idx: str,
-    path_base_input:str ='',
-    keepexe: bool=False,
+    namelist_collection_dict: dict|None = None,
+    path_base_input: str = "",
+    keepexe: bool = False,
     lifeCycleMedianRadius=None,
-    lifeCycleSigma=None
+    lifeCycleSigma=None,
 ):
     """
-    Update and submit the new cloned case, setting namelist parameters according to paramdict
+    Update and submit the new cloned case, setting namelist parameters according to the paramDataset
 
     Parameters
     ----------
     case : CIME.case
         The case object to be updated
-    paramdict : dict
-        Dictionary of namelist parameters to be updated
+    paramDataset : xr.Dataset 
+        Dataset of namelist parameters to be updated
     componentdict : dict
         Dictionary of component names for the parameters
     ens_idx : str
@@ -126,12 +131,12 @@ def _per_run_case_updates(
     set_value_with_status_update(case, "RUNDIR", rundir, kill_on_error=False)
     # smb++ extract the chem_mech_in_file
     chem_mech_file = None
-    if 'chem_mech_in' in paramdict.keys():
-        chem_mech_file = Path(path_base_input)/paramdict['chem_mech_in']
-        del paramdict['chem_mech_in']
-        del componentdict['chem_mech_in']
+    if "chem_mech_in" in paramDataset.variables.keys():
+        chem_mech_file = Path(path_base_input) / paramDataset["chem_mech_in"].values.item()
+        del paramDataset["chem_mech_in"]
+        del componentdict["chem_mech_in"]
     case.flush()
-    lock_file("env_case.xml",caseroot=caseroot)
+    lock_file("env_case.xml", caseroot=caseroot)
 
     logger.info("...Casename is {}".format(casename))
     logger.info("...Caseroot is {}".format(caseroot))
@@ -142,46 +147,82 @@ def _per_run_case_updates(
     components = list(set(componentdict.values()))
 
     paramLinesDict = {component: [] for component in components}
-
-    for var in paramdict.keys():
+    fStringParameters = {}
+    for var in paramDataset:
         paramLines = paramLinesDict[componentdict[var]]
-        if var.startswith('lifeCycleNumberMedianRadius'):
-            lifeCycleNumber = int(var.split('_')[-1])
+        if var.startswith("lifeCycleNumberMedianRadius"):
+            lifeCycleNumber = int(var.split("_")[-1])
             if lifeCycleMedianRadius is None:
-                raise ValueError('A default lifeCylceList has to be specified in default_simulation_setup.ini')
-            lifeCylceList = lifeCycleMedianRadius.split(',')
-            lifeCylceList[lifeCycleNumber] = "{:.1E}".format(paramdict[var]).replace('E', 'D').replace('+', '')
+                raise ValueError(
+                    "A default lifeCylceList has to be specified in default_simulation_setup.ini"
+                )
+            lifeCylceList = lifeCycleMedianRadius.split(",")
+            lifeCylceList[lifeCycleNumber] = (
+                "{:.1E}".format(paramDataset[var].values.item()).replace("E", "D").replace("+", "")
+            )
 
-            paramLines.append("oslo_aero_lifecyclenumbermedianradius = "+','.join(lifeCylceList)+"\n")
+            paramLines.append(
+                "oslo_aero_lifecyclenumbermedianradius = "
+                + ",".join(lifeCylceList)
+                + "\n"
+            )
         elif var.startswith("lifeCycleSigma"):
-            lifeCycleNumber = int(var.split('_')[-1])
+            lifeCycleNumber = int(var.split("_")[-1])
             if lifeCycleSigma is None:
-                raise ValueError('A default lifeCylceList has to be specified in default_simulation_setup.ini')
-            lifeCylceList = lifeCycleSigma.split(',')
-            lifeCylceList[lifeCycleNumber] = "{:.1E}".format(paramdict[var]).replace('E', 'D').replace('+', '')
-            paramLines.append("oslo_aero_lifecyclesigma = "+','.join(lifeCylceList)+"\n")
+                raise ValueError(
+                    "A default lifeCylceList has to be specified in default_simulation_setup.ini"
+                )
+            lifeCylceList = lifeCycleSigma.split(",")
+            lifeCylceList[lifeCycleNumber] = (
+                "{:.1E}".format(paramDataset[var].values.item()).replace("E", "D").replace("+", "")
+            )
+            paramLines.append(
+                "oslo_aero_lifecyclesigma = " + ",".join(lifeCylceList) + "\n"
+            )
+
+        elif paramDataset[var].attrs.get("format_to_file_method", None) == "f-string":
+            esm_component = paramDataset[var].attrs["esm_component"]
+            if fStringParameters.get(esm_component, None) is None:
+                fStringParameters[esm_component] = {}
+            fStringParameters[esm_component][var] = paramDataset[var].values.item()
         else:
-            value = paramdict[var]
+            value = paramDataset[var].values.item()
             if isinstance(value, str):
                 value = format_value(value)
             paramLines.append("{} = {}\n".format(var, value))
-
+    # appending parameter changes to the user_nl file from the paramLinesDict
+    logging.info(f"fStringParameters: {fStringParameters}")
+    logging.info(f"namelist_collection_dict: {namelist_collection_dict}") 
     for component in components:
         paramLines = paramLinesDict[component]
-        if len(paramLines) > 0:
-            usernlfile = os.path.join(caseroot, f"user_nl_{component}")
-            with open(usernlfile, "a") as file:
-                file.writelines(paramLines)
+        usernlfile = os.path.join(caseroot, f"user_nl_{component}")
+        if len(paramLines) > 0 or fStringParameters.get(component, None) is not None:
+            if namelist_collection_dict is not None:
+                logging.info(fStringParameters.get(component, None) is not None)
+                if fStringParameters.get(component, None) is not None:
+                    logging.info(f"Formatting user_nl_{component} with f-string parameters")
+                    user_nl_str = setup_usr_nlstring(
+                        namelist_collection_dict[f"control_{component}"],
+                        component_name=component,
+                    )
+                    logging.info(f"the following formatting is applied: {fStringParameters[component]}")
+                    user_nl_str = user_nl_str.format(**fStringParameters[component])
+                    with open(usernlfile, "w") as file:
+                        file.writelines(user_nl_str)
+                else:
+                    if "misc" in namelist_collection_dict[f"control_{component}"].sections():
+                        namelist_collection_dict[f"control_{component}"].remove_section("misc")   
+                with open(usernlfile, "a") as file:
+                    file.writelines(paramLines)
 
     if chem_mech_file is not None:
-        comm = 'cp {} {}'.format(chem_mech_file, caseroot+'/')
+        comm = "cp {} {}".format(chem_mech_file, caseroot + "/")
         subprocess.run(comm, shell=True)
         unlock_file("env_build.xml", caseroot=caseroot)
         value = case.get_value("CAM_CONFIG_OPTS", resolved=False)
         set_value_with_status_update(case, "CAM_CONFIG_OPTS", f"{value} --usr_mech_infile {caseroot}/{chem_mech_file.name}", kill_on_error=False)
         case.flush()
         lock_file("env_build.xml", caseroot=caseroot)
-
 
     logger.info(">> Clone {} case_setup".format(ens_idx))
     case.case_setup()
@@ -191,6 +232,7 @@ def _per_run_case_updates(
         logger.info(">> Clone {} build".format(ens_idx))
         build.case_build(caseroot, case=case)
 
+
 def build_base_case(
     basecaseroot:               Path,
     overwrite:                  bool,
@@ -198,7 +240,9 @@ def build_base_case(
     env_pe_settings:            dict,
     env_run_settings:           dict,
     env_build_settings:         dict,
-    namelist_collection_dict:   dict
+    namelist_collection_dict:   dict,
+    paramDataset:               xr.Dataset,
+    pdim: str
 ) -> Path:
     """
     Create and build the base case that all PPE cases are cloned from
@@ -225,11 +269,13 @@ def build_base_case(
     Path
         The root directory of the base case
     """
-    logger.info(">>> BUILDING BASE CASE...")
+
     if overwrite and basecaseroot.is_dir():
         shutil.rmtree(basecaseroot)
     with Case(str(basecaseroot), read_only=False) as case:
+        logging.debug(dir(case))
         if not basecaseroot.is_dir():
+            logger.info(">>> BUILDING BASE CASE...")
             logger.info('Creating base case directory: {}'.format(basecaseroot))
             # create the case using the case_settings
             case.create(
@@ -242,14 +288,12 @@ def build_base_case(
                 driver="nuopc",
                 run_unsupported=True,
                 answer="r",
-                **case_settings
+                **case_settings,
             )
             case.record_cmd(init=True)
+        
         else:
-            if not case.read_only:
-                logger.info('Reusing existing case directory: {}'.format(str(basecaseroot)))
-            else:
-                logger.warning('Base case directory exists but is read-only: {}'.format(str(basecaseroot)))
+            logger.info('Reusing existing case directory: {}'.format(str(basecaseroot)))
 
 
         # set the case environment variables
@@ -258,14 +302,16 @@ def build_base_case(
         set_value_with_status_update(case, "RUNDIR", case.get_value("RUNDIR", resolved=True), kill_on_error=True)
         # set the PE settings
         # check if the env_pe_settings are not empty dict, or all entries are None
-        if not env_pe_settings or all(value is None for value in env_pe_settings.values()):
-            logging.warning("No environment parallel execution settings provided, using default values.")
+        if not env_pe_settings or all(
+            value is None for value in env_pe_settings.values()
+        ):
+            logging.warning(
+                "No environment parallel execution settings provided, using default values."
+            )
         else:
             logger.info(">>> Setting environment parallel execution settings...")
             iterate_dict_to_set_value(
-                case=case,
-                settings_dict=env_pe_settings,
-                dict_name='env_pe_settings'
+                case=case, settings_dict=env_pe_settings, dict_name="env_pe_settings"
             )
 
         logger.info(">>> base case_setup...")
@@ -306,31 +352,46 @@ def build_base_case(
             set_value_with_status_update(case, 'CAM_CONFIG_OPTS', new_opts, kill_on_error=False)
 
         # check if there are any additional run settings
-        if env_run_settings or any(value is not None for value in env_run_settings.values()):
+        if env_run_settings or any(
+            value is not None for value in env_run_settings.values()
+        ):
             iterate_dict_to_set_value(
-                case=case,
-                settings_dict=env_run_settings,
-                dict_name='env_run_settings'
+                case=case, settings_dict=env_run_settings, dict_name="env_run_settings"
             )
 
         set_value_with_status_update(case, "DEBUG", env_build_settings.pop("DEBUG", "FALSE"), kill_on_error=False)
         # check if the env_build_settings are not empty dict, or all entries are None
-        if not env_build_settings or all(value is None for value in env_build_settings.values()):
-            logging.warning("No environment build settings provided, using default values.")
+        if not env_build_settings or all(
+            value is None for value in env_build_settings.values()
+        ):
+            logging.warning(
+                "No environment build settings provided, using default values."
+            )
         else:
             logger.info(">>> Setting environment build settings...")
             iterate_dict_to_set_value(
                 case=case,
                 settings_dict=env_build_settings,
-                dict_name='env_build_settings'
+                dict_name="env_build_settings",
             )
 
         logger.info(">>> base case write user_nl files...")
         # write user_nl files
-        for nl_control_filename in namelist_collection_dict.keys():
-            # get the component name from the file name assuming control_<component>.ini
-            component_name = nl_control_filename.split('_')[1].split('.')[0]
-            user_nl_str = setup_usr_nlstring(namelist_collection_dict[nl_control_filename], component_name=component_name)
+        fStringParameters = {}
+        for var in paramDataset:
+            if paramDataset[var].attrs.get("format_to_file_method", None) == "f-string":
+                esm_component = paramDataset[var].attrs["esm_component"]
+                if fStringParameters.get(esm_component, None) is None:
+                    fStringParameters[esm_component] = {}
+                fStringParameters[esm_component][var] = paramDataset[var].isel({pdim:0}).values.item()
+
+        for nl_control_name in namelist_collection_dict.keys():
+            # get the component name from the file name assuming control_<component> using the name in the .ini file
+            component_name = nl_control_name.split('_')[-1]
+            user_nl_str = setup_usr_nlstring(namelist_collection_dict[nl_control_name], component_name=component_name)
+            
+            if fStringParameters.get(component_name, None) is not None:
+                user_nl_str = user_nl_str.format(**fStringParameters[component_name])
             write_user_nl_file(str(basecaseroot), f"user_nl_{component_name}", user_nl_str)
 
         logger.info(">> base case_build...")
@@ -343,9 +404,10 @@ def clone_base_case(
     baseroot:           Path,
     basecaseroot:       Path,
     overwrite:          bool,
-    paramdict:          dict,
+    paramDataset:       xr.Dataset,
     componentdict:      dict,
     ensemble_idx:       str,
+    namelist_collection_dict: dict,
     path_base_input:    Path=Path(''),
     keepexe:            bool=False,
     **kwargs
@@ -361,8 +423,8 @@ def clone_base_case(
         The base case root directory
     overwrite : bool
         Overwrite existing cases
-    paramdict : dict
-        Dictionary of namelist parameters to be updated
+    paramDataset : xr.Dataset
+        Dataset of namelist parameters to be updated
     componentdict : dict
         Dictionary of component names for the parameters
     ensemble_idx : str
@@ -382,7 +444,7 @@ def clone_base_case(
 
     logger.info(">>> CLONING BASE CASE for member {}...".format(ensemble_idx))
     cloneroot = baseroot.joinpath(f'ensemble_member.{ensemble_idx}')
-
+    # should be able to overwrite cloned cases independently of base case... 
     if overwrite and cloneroot.exists():
         shutil.rmtree(cloneroot)
     if not cloneroot.exists():
@@ -390,15 +452,23 @@ def clone_base_case(
         logger.debug(f"cloneroot type: {type(cloneroot)}")
         with Case(str(basecaseroot), read_only=False) as clone:
             clone.create_clone(str(cloneroot), keepexe=keepexe)
+    fstings_params = [False if paramDataset[var].attrs.get("format_to_file_method", None) != "f-string" else True for var in paramDataset]
+    logging.info(f"f-string parameters present: {fstings_params}")
+    if any(fstings_params) == True:
+        namelist_dict = namelist_collection_dict
+    else:
+        logging.info("No f-string parameters present, setting namelist_collection_dict to None")
+        namelist_dict = None    
     with Case(str(cloneroot), read_only=False) as case:
         _per_run_case_updates(
             case=case,
-            paramdict=paramdict,
+            paramDataset=paramDataset,
             componentdict=componentdict,
             ens_idx=ensemble_idx,
             path_base_input=str(path_base_input),
             keepexe=keepexe,
-            **kwargs
+            namelist_collection_dict=namelist_dict,
+            **kwargs,
         )
 
     return Path(cloneroot)

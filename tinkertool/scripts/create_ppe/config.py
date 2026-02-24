@@ -4,7 +4,7 @@ import logging
 import configparser
 import numpy as np
 from pathlib import Path
-from netCDF4 import Dataset
+import xarray as xr
 from typing import Union, Optional
 from dataclasses import dataclass, fields, field
 
@@ -13,11 +13,6 @@ from tinkertool.utils.config_utils import BaseConfig, CheckedBaseConfig
 from tinkertool.setup.setup_cime_connection import add_CIME_paths_and_import
 from tinkertool.utils.check_arguments import validate_file, validate_directory, check_type
 
-def get_ncattr_or_default(var, attr, default=None):
-    try:
-        return var.getncattr(attr)
-    except AttributeError:
-        return default
 
 @dataclass(kw_only=True)
 class CreatePPEConfig(BaseConfig):
@@ -27,76 +22,66 @@ class CreatePPEConfig(BaseConfig):
     # Optional fields with defaults
     build_base_only:        bool = field(default=False, metadata={"help": "Only build the base case - not PPE members"})
     build_only:             bool = field(default=False, metadata={"help": "Only build the PPE and not submit them to the queue"})
-    clone_only_during_build:bool = field(default=False, metadata={"help": "Only clone the base case and not build the PPE members. This is useful if you have already built the base_case."})
+    frozen_base_case:       bool = field(default=False, metadata={"help": "Only clone the base case and not build the PPE members. This is useful if you have already built the base_case."})
     keepexe:                bool = field(default=False, metadata={"help": "Reuse the executable for the base case instead of building a new one for each member"})
-    overwrite:              bool = field(default=False, metadata={"help": "Overwrite existing cases if they exist"})
+    overwrite_base_case:    bool = field(default=False, metadata={"help": "Overwrite the exisiting base case it it exists, e.g. it will rebuild the entire case from scratch, required if code changes are made."})
+    overwrite_ppe:          bool = field(default=True, metadata={"help":  "Overwrite PPE ensemble cases if they exist"})
 
     def __post_init__(self):
-        # run parent checks for the variables that are inherited from BaseConfig
         super().__post_init__()
-        # check the arguments
         if self.simulation_setup_path is None:
             raise ValueError("simulation_setup_path is required. Please provide a valid path to the simulation setup file.")
         validate_file(self.simulation_setup_path, ".ini", "simulation setup file", new_file=False)
-        # build_base_only
         check_type(self.build_base_only, bool)
-        # build_only
-        # avoid checking if it is type BuildPPEConfig.
-        # BuildPPEConfig overrides build_only as a dummy field
         if type(self) is CreatePPEConfig or type(self) is CheckedCreatePPEConfig:
             check_type(self.build_only, bool)
-        # clone_only_during_build
-        check_type(self.clone_only_during_build, bool)
-        # keepexe
+        check_type(self.frozen_base_case, bool)
         check_type(self.keepexe, bool)
-        # overwrite
-        check_type(self.overwrite, bool)
+        check_type(self.overwrite_base_case, bool)
+        check_type(self.overwrite_ppe, bool)
 
     def get_checked_and_derived_config(self) -> 'CheckedCreatePPEConfig':
         """Check and handle arguments for the PPE configuration."""
-        # Create log file path (from parent class logic)
         time_str = time.strftime("%Y%m%d-%H%M%S")
         log_file = Path(self.log_dir).joinpath(f'tinkertool_{time_str}.log')
 
         # derived fields - we unpack the simulation setup file
         simulation_setup: configparser.ConfigParser = read_config(self.simulation_setup_path)
         # - ppe_settings
-        baseroot = Path(simulation_setup['ppe_settings']['baseroot']).resolve()
+        baseroot = Path(simulation_setup['ppe_settings'].get('baseroot',vars=os.environ)).resolve()
         basecasename = simulation_setup['ppe_settings']['basecasename']
         ## - paramfile
         pdim: str = simulation_setup['ppe_settings']['pdim']
-        paramfile_path: Path = Path(simulation_setup['ppe_settings']['paramfile']).resolve()
+        paramfile_path: Path = Path(simulation_setup['ppe_settings'].get('paramfile',vars=os.environ)).resolve()
         validate_file(paramfile_path, ".nc", "paramfile", new_file=False)
-        paramfile: Dataset = Dataset(paramfile_path, 'r')
-        if pdim not in list(paramfile.dimensions.keys()):
-            raise SystemExit(f"ERROR: {pdim} is not a valid dimension in {paramfile_path}. \nParamfile dimensions are: {list(paramfile.dimensions.keys())}")
-        paramdict: dict = {}
+        paramfile: xr.Dataset = xr.open_dataset(paramfile_path)
+        if pdim not in paramfile.dims:
+            raise SystemExit(f"ERROR: {pdim} is not a valid dimension in {paramfile_path}. \nParamfile dimensions are: {list(paramfile.dims.keys())}")
+        paramDataset: xr.Dataset = paramfile
         componentdict: dict = {}
-        logging.debug(f"Processing paramfile {paramfile_path} with parameters: {list(paramdict.keys())}")
-        for param in [ param for param in paramfile.variables.keys() if param != pdim ]:
-            # get the values of the parameter for paramdict
-            paramdict[param] = paramfile[param][:]
-            # get the esm_component attribute for componentdict
-            esm_component = get_ncattr_or_default(paramfile.variables[param], 'esm_component', None)
+        logging.debug(f"Processing paramfile {paramfile_path} with parameters: {list(paramDataset.variables.keys())}")
+        for param in [ param for param in paramDataset.variables.keys() if param != pdim ]:
+            esm_component = paramDataset.variables[param].attrs.get('esm_component', None)
             if esm_component is None:
                 err_msg = f"Parameter {param} in paramfile {paramfile_path} does not have an 'esm_component' attribute."
                 logging.error(err_msg)
-                raise SystemExit(err_msg)
+                raise ValueError(err_msg)
             componentdict[param] = esm_component
-        num_sims = paramfile.dimensions[pdim].size
+        num_sims = paramfile.sizes[pdim]
         num_vars = len(paramfile.variables.keys())-1
-        ensemble_num = paramfile[pdim][:]
-        paramfile.close()
-        # - namelist_control
+        ensemble_num = paramfile[pdim][:].values
+
         namelist_collection_dict = {}
-        for control_nl in simulation_setup['namelist_control'].values():
+        for component_nl_name in simulation_setup.options('namelist_control'):
+            control_nl = simulation_setup['namelist_control'].get(component_nl_name,vars=os.environ)
             if control_nl is not None:
                 control_nl = Path(control_nl).resolve()
                 validate_file(control_nl, ".ini", f"namelist control file {control_nl.name}.ini", new_file=False)
-                namelist_collection_dict[control_nl.name] = read_config(control_nl)
+                namelist_collection_dict[component_nl_name] = read_config(control_nl)
             else:
                 logging.warning(f"Control namelist is None for {control_nl.name}, using model default")
         # - create_case
+        simulation_setup['create_case']['cesmroot'] = simulation_setup['create_case'].get('cesmroot',vars=os.environ)
         cesmroot = Path(simulation_setup['create_case']['cesmroot']).resolve()
         validate_directory(cesmroot, "CESM root directory")
         if os.environ.get('CESMROOT') != str(cesmroot):
@@ -104,7 +89,11 @@ class CreatePPEConfig(BaseConfig):
             logging.warning("This may cause issues with CIME paths. Consider choosing one cesmroot.")
 
         add_CIME_paths_and_import(cesmroot)
-
+        if self.__dict__.get('log_file', log_file) is not None:
+            log_file = self.__dict__.get('log_file', log_file)
+        # remove log_file from __dict__ to avoid duplication
+        if 'log_file' in self.__dict__:
+            del self.__dict__['log_file']
         return CheckedCreatePPEConfig(
             **self.__dict__,
             log_file=log_file,
@@ -113,7 +102,7 @@ class CreatePPEConfig(BaseConfig):
             basecasename=basecasename,
             paramfile_path=paramfile_path,
             pdim=pdim,
-            paramdict=paramdict,
+            paramDataset=paramDataset,
             componentdict=componentdict,
             num_sims=num_sims,
             num_vars=num_vars,
@@ -128,9 +117,10 @@ class CheckedCreatePPEConfig(CheckedBaseConfig):
     simulation_setup_path:  Path = field(metadata={"help": "Path to user defined configuration file for simulation setup."})
     build_base_only:        bool = field(default=False, metadata={"help": "Only build the base case - not PPE members"})
     build_only:             bool = field(default=False, metadata={"help": "Only build the PPE and not submit them to the queue"})
-    clone_only_during_build:bool = field(default=False, metadata={"help": "Only clone the base case and not build the PPE members"})
+    frozen_base_case:       bool = field(default=False, metadata={"help": "If true the BaseCase is frozen, and will not be touched during PPE build, useful if already built and not code changes made."})
     keepexe:                bool = field(default=False, metadata={"help": "Reuse the executable for the base case"})
-    overwrite:              bool = field(default=False, metadata={"help": "Overwrite existing cases if they exist"})
+    overwrite_base_case:    bool = field(default=False, metadata={"help": "Overwrite the existing base case if it exists, e.g. it will rebuild the entire case from scratch, required if code changes are made."})
+    overwrite_ppe:          bool = field(default=False, metadata={"help": "Overwrite PPE ensemble cases if they exist"})
     # Additional derived/checked fields:
     simulation_setup:       configparser.ConfigParser = field(metadata={"help": "Parsed simulation setup file"})
     # - ppe_settings
@@ -139,7 +129,7 @@ class CheckedCreatePPEConfig(CheckedBaseConfig):
     # - paramfile
     paramfile_path:         Path = field(metadata={"help": "Path to the paramfile"})
     pdim:                   str = field(metadata={"help": "Dimension of ensemble member count in paramfile"})
-    paramdict:              dict = field(metadata={"help": "Dictionary of parameters in the paramfile"})
+    paramDataset:           xr.Dataset = field(metadata={"help": "Dataset of parameters in the paramfile"})
     componentdict:          dict = field(metadata={"help": "Dictionary of ESM components in the paramfile"})
     num_sims:               int = field(metadata={"help": "Number of ensemble members"})
     num_vars:               int = field(metadata={"help": "Number of variables in the paramfile"})
@@ -154,12 +144,14 @@ class CheckedCreatePPEConfig(CheckedBaseConfig):
         check_type(self.simulation_setup, configparser.ConfigParser)
         # - ppe_settings
         validate_directory(self.baseroot, "base case root directory")
+        if isinstance(self.baseroot, str):
+            self.baseroot = Path(self.baseroot).resolve() 
         check_type(self.baseroot, Path)
         check_type(self.basecasename, str)
         # - paramfile
         validate_file(self.paramfile_path, ".nc", "paramfile", new_file=False)
         check_type(self.pdim, str)
-        check_type(self.paramdict, dict)
+        check_type(self.paramDataset, xr.Dataset)
         check_type(self.componentdict, dict)
         check_type(self.num_sims, int)
         check_type(self.num_vars, int)
@@ -247,8 +239,9 @@ class SubmitPPEConfig(BaseConfig):
         # Create log file path (from parent class logic)
         time_str = time.strftime("%Y%m%d-%H%M%S")
         log_file = Path(self.log_dir).joinpath(f'tinkertool_{time_str}.log')
-
-        return CheckedSubmitPPEConfig(**self.__dict__, log_file=log_file)
+        if self.__dict__.get('log_file') is None:
+            self.__dict__['log_file'] = log_file
+        return CheckedSubmitPPEConfig(**self.__dict__)
 
 @dataclass(kw_only=True)
 class CheckedSubmitPPEConfig(CheckedBaseConfig):

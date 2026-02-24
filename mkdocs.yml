@@ -1,0 +1,42 @@
+site_name: NorESMTinkerTool
+theme:
+  name: material
+  features:
+    - content.code.copy
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      default_lang: python
+  - pymdownx.superfences
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [.]
+          options:
+            filters: ['!^_']
+            members_order: source
+            separate_signature: true
+            docstring_options:
+              ignore_init_summary: true
+            merge_init_into_class: true
+            show_signature_annotations: true
+            signature_crossrefs: true
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Configuration: configuration.md
+  - CLI: cli.md
+  - API Usage: usage.md
+  - API:
+    - Generate Parameter File: api/generate_paramfile.md
+    - Create PPE: api/create_ppe.md
+    - PPE setup interface: api/setup.md
+    - Config utilities: api/config_utils.md
+    - General utilities: api/utils.md
+    - Sampling utilities: api/sampling.md
+    - Aerosol PPE utility functions: api/aerosol_ppe_utils.md
+  - Examples: examples.md
