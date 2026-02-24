@@ -9,7 +9,7 @@ python -m venv tinkertool && source tinkertool/bin/activate
 
 ## clone repository:
 ```
-git clone https://github.com/Ovewh/NorESMTinkerTool.git && cd NorESMTinkerTool
+git clone https://github.com/NorESMhub/NorESMTinkerTool.git && cd NorESMTinkerTool
 ```
 
 ## Install
