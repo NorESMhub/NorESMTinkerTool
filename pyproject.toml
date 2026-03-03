@@ -20,6 +20,7 @@ dependencies = [
 [project.optional-dependencies]
 sampling = ["scipy >=1.14.1,<2.0", "xarray >=2024.9.0,<2026.0"]
 plotting = ["matplotlib >=3.10.1,<4.0", "seaborn >=0.13.2,<1.0.0"]
+postprocess = ["dask >=2024.1.0,<2026.0", "zarr >=2.18.0,<4.0"]
 
 [project.scripts]
 create-ppe = "tinkertool.scripts.create_ppe.main:create_ppe_CLI"
@@ -28,6 +29,7 @@ check-build = "tinkertool.scripts.create_ppe.main:check_build_CLI"
 prestage-ensemble = "tinkertool.scripts.create_ppe.main:prestage_ensemble_CLI"
 submit-ppe = "tinkertool.scripts.create_ppe.main:submit_ppe_CLI"
 generate-paramfile = "tinkertool.scripts.generate_paramfile.main:main"
+reshape-ppe = "tinkertool.scripts.postprocess.main:reshape_ppe_CLI"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.8.0"
